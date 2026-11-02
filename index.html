@@ -1,0 +1,1014 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#3F687E">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="RD Studio">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icons/favicon.png">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>RD Studio do Sono</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap">
+<style>
+/* Layout: app de celular — faixa azul da marca no topo, cartões empilhados, abas fixas embaixo; a gerência abre mais larga no computador.
+   Cores da Studio do Sono: azul petróleo #3F687E do logo, branco e neutros puxados para o azul. */
+:root{
+  --bg:#F1F4F6; --surface:#FFFFFF; --surface2:#F5F8FA; --line:#DCE4E9;
+  --ink:#14232C; --muted:#4A5A64;
+  --accent:#3F687E; --accent-ink:#FFFFFF; --accent-soft:#E2ECF1; --accent-strong:#2E5063;
+  --good:#2E5F7A; --warn:#B45309; --warn-bg:#FFF7ED; --warn-line:#FDBA74; --warn-ink:#9A3412;
+  --header:#3F687E; --header-ink:#FFFFFF; --header-muted:#D6E4EC; --header-chip:rgba(255,255,255,.16);
+  --track:#E1E8EC; --pace:#14232C; --bar-past:#A9C4D3; --shadow:0 6px 20px rgba(20,35,44,.10); --scrim:rgba(10,20,26,.55);
+  --font:'Manrope', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0D161C; --surface:#15212A; --surface2:#1B2A34; --line:#28394A; --ink:#E6EEF2; --muted:#9FB2BE;
+  --accent:#8FB8CF; --accent-ink:#0D161C; --accent-soft:#1E3442; --accent-strong:#CFE2EC;
+  --good:#8FB8CF; --warn:#F5A35C; --warn-bg:#2A1E12; --warn-line:#6B4423; --warn-ink:#F8C08A;
+  --header:#3F687E; --header-ink:#FFFFFF; --header-muted:#D6E4EC; --header-chip:rgba(255,255,255,.14);
+  --track:#28394A; --pace:#E6EEF2; --bar-past:#4D6F83; --shadow:0 6px 20px rgba(0,0,0,.35); --scrim:rgba(0,0,0,.65); color-scheme:dark; } }
+:root[data-theme="dark"]{
+  --bg:#0D161C; --surface:#15212A; --surface2:#1B2A34; --line:#28394A; --ink:#E6EEF2; --muted:#9FB2BE;
+  --accent:#8FB8CF; --accent-ink:#0D161C; --accent-soft:#1E3442; --accent-strong:#CFE2EC;
+  --good:#8FB8CF; --warn:#F5A35C; --warn-bg:#2A1E12; --warn-line:#6B4423; --warn-ink:#F8C08A;
+  --header:#3F687E; --header-ink:#FFFFFF; --header-muted:#D6E4EC; --header-chip:rgba(255,255,255,.14);
+  --track:#28394A; --pace:#E6EEF2; --bar-past:#4D6F83; --shadow:0 6px 20px rgba(0,0,0,.35); --scrim:rgba(0,0,0,.65); color-scheme:dark; }
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:15px;line-height:1.4;font-variant-numeric:tabular-nums}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--header)}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+#app{--w:520px}
+#app.wide{--w:1120px}
+.band{background:var(--header);color:var(--header-ink);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px 58px}
+.band-in{max-width:var(--w);margin:0 auto;display:flex;flex-direction:column;gap:8px}
+.band .eyebrow{font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--header-muted)}
+.band h1{margin:0;font-size:25px;font-weight:800;letter-spacing:-.01em;text-wrap:balance}
+.band .sub{font-size:14px;color:var(--header-muted)}
+.band .chip{align-self:flex-start;background:var(--header-chip);color:var(--header-ink);border-radius:999px;padding:5px 12px;font-size:13px;font-weight:700}
+.brand{display:flex;align-items:center;gap:10px;min-width:0}
+.mark{width:34px;height:34px;border-radius:50%;flex:none;display:block}
+.logo-full{width:132px;height:132px;align-self:center;display:block}
+.linkbtn{background:var(--header-chip);border:none;color:var(--header-ink);border-radius:10px;min-height:38px;min-width:38px;padding:0 12px;font-size:13px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.linkbtn:disabled{opacity:.4;cursor:not-allowed}
+.mnav{display:flex;align-items:center;gap:10px;align-self:flex-start}
+.mnav strong{min-width:130px;text-align:center}
+main{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 130px}
+.main-in{max-width:var(--w);margin:-42px auto 0;display:flex;flex-direction:column;gap:12px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:12px;align-items:start}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.card.hero{border-color:transparent;box-shadow:var(--shadow)}
+.card.flush{padding:0;gap:0;overflow:hidden}
+.card.flush>.head{padding:16px 16px 8px}
+h2{margin:0;font-size:17px;font-weight:700}
+p{margin:0}
+.label{font-size:13px;font-weight:600;color:var(--muted)}
+.small{font-size:12px;color:var(--muted)}
+.big{font-size:32px;font-weight:800;letter-spacing:-.02em;line-height:1.1}
+.mid{font-size:20px;font-weight:800}
+.row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.row.start{justify-content:flex-start;flex-wrap:wrap}
+.stack{display:flex;flex-direction:column;gap:4px;min-width:0}
+.c-good{color:var(--good)} .c-warn{color:var(--warn)} .c-muted{color:var(--muted)}
+.bar{position:relative;height:10px;background:var(--track);border-radius:999px}
+.bar.thin{height:8px}
+.bar>i{display:block;height:100%;border-radius:999px;background:var(--good)}
+.bar>i.warn{background:var(--warn)}
+.bar>b{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--pace);border-radius:1px}
+.kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:3px;min-width:0}
+.kpi .v{font-size:19px;font-weight:800;overflow-wrap:anywhere}
+.tag-ok{font-size:12px;font-weight:700;color:var(--good)}
+.tag-bad{font-size:12px;font-weight:700;color:var(--warn)}
+.tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;border-top:1px solid var(--line);padding-top:12px}
+.btn{min-height:46px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-weight:700;padding:0 16px;cursor:pointer}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.block{width:100%;min-height:54px;font-size:17px}
+.btn.danger{border-color:var(--warn-line);color:var(--warn-ink);background:var(--warn-bg)}
+.btn.small{min-height:40px;padding:0 12px;font-size:14px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.sq{width:44px;height:44px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--accent-strong);font-size:22px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;flex:none}
+.sq.fill{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.sq:disabled{opacity:.4;cursor:not-allowed}
+.stepline{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 16px;border-top:1px solid var(--line)}
+.stepper{display:flex;align-items:center;gap:6px;flex:none}
+.stepper input.n{width:58px;height:44px;text-align:center;font-size:18px;font-weight:800;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink)}
+.money{display:flex;align-items:center;gap:8px;border:1.5px solid var(--accent);border-radius:12px;padding:0 14px;min-height:54px;background:var(--surface)}
+.money span{font-size:18px;font-weight:700;color:var(--muted)}
+.money input{border:none;outline:none;background:transparent;font-size:24px;font-weight:800;width:100%;min-width:0;color:var(--ink)}
+.money.sm{min-height:48px;border-width:1.5px;border-color:var(--line)} .money.sm input{font-size:17px}
+.field{display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:600;color:var(--muted)}
+.field input,.field select,.field textarea{min-height:48px;border:1.5px solid var(--line);border-radius:12px;padding:10px 14px;font-size:17px;font-weight:700;background:var(--surface);color:var(--ink);width:100%}
+.field textarea{font-weight:500;resize:vertical}
+.field .hint{font-weight:500;font-size:12px;color:var(--muted)}
+details.grp{background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+details.grp>summary{list-style:none;min-height:58px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;cursor:pointer}
+details.grp>summary::-webkit-details-marker{display:none}
+details.grp>summary .chev{transition:transform .15s}
+details.grp[open]>summary .chev{transform:rotate(180deg)}
+details.grp .inner{padding:0 16px 16px;display:flex;flex-direction:column;gap:12px}
+.alert{background:var(--warn-bg);border:1px solid var(--warn-line);border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:4px;color:var(--warn-ink);font-size:13px}
+.alert strong{font-size:14px}
+.note{background:var(--accent-soft);border-radius:14px;padding:12px 14px;color:var(--accent-strong);font-size:13px;font-weight:600;display:flex;gap:8px;align-items:flex-start}
+.note svg{flex:none;margin-top:1px}
+.chip{display:inline-flex;align-items:center;border-radius:999px;padding:3px 10px;font-size:12px;font-weight:700;white-space:nowrap}
+.chip.ok{background:var(--accent-soft);color:var(--accent-strong)}
+.chip.warn{background:var(--warn-bg);color:var(--warn-ink);border:1px solid var(--warn-line)}
+.chip.mute{background:var(--surface2);color:var(--muted);border:1px solid var(--line)}
+.scroll{overflow-x:auto}
+table.t{width:100%;border-collapse:collapse;font-size:14px}
+table.t th{background:var(--surface2);color:var(--muted);font-size:12px;font-weight:700;text-align:left;padding:10px 12px;white-space:nowrap}
+table.t td{padding:12px;border-top:1px solid var(--line);white-space:nowrap}
+table.t td.wrap{white-space:normal;min-width:160px}
+table.t .r{text-align:right}
+table.t tr.click{cursor:pointer}
+table.t tr.click:hover td{background:var(--surface2)}
+.chart{display:flex;align-items:flex-end;gap:3px;height:120px;border-bottom:1px solid var(--line)}
+.chart i{flex:1 1 0;border-radius:3px 3px 0 0;background:var(--good);min-height:2px}
+.chart i.past{background:var(--bar-past)}
+.chart i.zero{background:var(--track)}
+.chart i.future{background:transparent;border:1px dashed var(--line);border-bottom:none}
+.prod{display:grid;grid-template-columns:minmax(0,9.5rem) minmax(0,1fr) 3.4rem;align-items:center;gap:10px;font-size:13px}
+.prod .p{font-weight:800;text-align:right}
+.choice{display:flex;align-items:center;gap:14px;text-align:left;width:100%;min-height:72px;padding:14px 16px;border-radius:16px;border:1px solid var(--line);background:var(--surface);cursor:pointer;color:var(--ink)}
+.choice:hover{border-color:var(--accent)}
+.choice .t{font-size:16px;font-weight:800}
+.choice .go{margin-left:auto;color:var(--muted)}
+.ico{width:40px;height:40px;border-radius:12px;background:var(--accent-soft);color:var(--accent-strong);display:flex;align-items:center;justify-content:center;flex:none}
+.pills{display:flex;flex-wrap:wrap;gap:8px}
+.pill{min-height:42px;padding:0 14px;border-radius:999px;border:1px solid var(--line);background:var(--surface);font-weight:700;font-size:14px;cursor:pointer;color:var(--ink)}
+.pill[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.pill.add{border-style:dashed}
+.who{font-size:26px;font-weight:800;text-align:center;line-height:1.25;text-wrap:balance}
+.steps{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:8px}
+ul.diff{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px}
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);padding-left:max(8px,env(safe-area-inset-left,0px));padding-right:max(8px,env(safe-area-inset-right,0px))}
+.tabs-in{max-width:var(--w);margin:0 auto;display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr)}
+.tab{min-height:62px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:none;border:none;color:var(--muted);font-size:12px;font-weight:700;cursor:pointer}
+.tab[aria-current="page"]{color:var(--accent-strong)}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(78px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:12px;font-weight:700;z-index:70;max-width:calc(100% - 32px);text-align:center}
+.overlay{position:fixed;inset:0;z-index:60;background:var(--scrim);display:flex;align-items:flex-end;justify-content:center;padding:max(12px,env(safe-area-inset-top,0px)) max(0px,env(safe-area-inset-right,0px)) 0 max(0px,env(safe-area-inset-left,0px))}
+.sheet{background:var(--surface);color:var(--ink);width:100%;max-width:540px;max-height:92vh;overflow:auto;border-radius:22px 22px 0 0;padding:22px 18px calc(18px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:14px}
+.sheet h2{font-size:20px}
+.mbody{display:flex;flex-direction:column;gap:12px;font-size:15px}
+.mact{display:flex;flex-wrap:wrap-reverse;gap:10px;justify-content:flex-end}
+.mact .btn{flex:1 1 160px}
+.merr{color:var(--warn-ink);font-weight:700;font-size:14px}
+@media (min-width:640px){.overlay{align-items:center}.sheet{border-radius:22px;padding-bottom:22px}}
+.split{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start}
+.split>.main{flex:999 1 560px;min-width:0;display:flex;flex-direction:column;gap:12px}
+.split>.side{flex:1 1 280px;min-width:0;display:flex;flex-direction:column;gap:10px}
+.center{text-align:center;align-items:center}
+@media (max-width:420px){.big{font-size:28px}.kpi .v{font-size:17px}.tiles .mid{font-size:16px}.who{font-size:23px}}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+
+<div id="app"></div>
+<div id="modal" hidden></div>
+<div id="toast" class="toast" role="status" hidden></div>
+
+<script>
+'use strict';
+/* ======================= CONFIGURAÇÃO =======================
+   Cole entre as aspas o endereço do Apps Script (passo 2 do guia).
+   Vazio = MODO DEMONSTRAÇÃO: dados de setembro/26, nada vai para a planilha. */
+const API_URL = 'https://script.google.com/macros/s/AKfycbzoF9f9I-i4tH9Aqtkz7izN78N8oyGMMAPlR3wUB4NsORQv9rsctYEzeWTxS4hVukN5/exec';
+/* ============================================================ */
+
+document.documentElement.lang = 'pt-BR';
+const DEMO = !API_URL;
+const DEMO_DATA = {"fields":["venda","atend","ret","vendas","pecas","colch","box","baum","steel","cama","prot","trav","decor","bmax","bmini","recosto","ptrav","criado","cab","poltr","desafio"],"stores":[{"id":"icarai","name":"Icaraí","cota":250000,"anoant":0,"poltr":12,"sellers":[{"id":"vanessa","name":"Vanessa","days":30,"anoant":null},{"id":"rosangela","name":"Rosangela","days":30,"anoant":null}],"entries":{"vanessa":{"1":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"2":[17462,3,2,2,11,3,0,1,0,0,2,0,0,0,0,0,4,0,0,1,0],"3":[3975,3,0,2,4,1,0,0,0,0,0,1,0,0,0,0,2,0,0,0,0],"4":[220,1,0,1,2,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0],"5":[390,1,1,0,2,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0],"6":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"7":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"8":[0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"9":[4522,1,0,1,4,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0],"10":[0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"11":[0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"12":[0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"13":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"14":[0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"15":[2399,1,1,0,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0],"16":[3796,1,0,1,3,0,0,1,0,0,0,0,0,0,1,0,1,0,0,0,0],"17":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"18":[0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"19":[11445,1,2,0,5,3,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0]},"rosangela":{"1":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"2":[1399,2,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"3":[18339,2,0,1,11,3,0,2,0,0,2,0,0,0,0,0,4,0,0,0,0],"4":[900,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0],"5":[30876,0,4,0,24,5,0,2,0,0,3,2,0,1,0,0,9,0,1,0,0],"6":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"7":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"8":[2149,1,0,1,3,1,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0],"9":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"10":[1399,2,0,1,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0],"11":[15398,1,0,1,2,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0],"12":[6313,1,0,1,7,1,0,0,0,0,2,2,0,0,0,0,2,0,0,0,0],"13":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"14":[0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"15":[0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"16":[0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"17":[1674,1,0,1,3,1,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0],"18":[0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"19":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"20":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]}}},{"id":"plaza","name":"Plaza","cota":400000,"anoant":308081,"poltr":16,"sellers":[{"id":"aline","name":"Aline","days":30,"anoant":55191},{"id":"beatriz","name":"Beatriz","days":30,"anoant":43144},{"id":"josikeila","name":"Josikeila","days":30,"anoant":91490},{"id":"marcia","name":"Márcia","days":30,"anoant":118256}],"entries":{"aline":{"1":[9462,4,0,3,9,2,0,2,0,0,2,3,0,0,0,0,0,0,0,0,0],"2":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"3":[0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"4":[4947,1,0,1,3,1,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0],"5":[5687,1,1,2,3,1,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"6":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"7":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"8":[0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"9":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"10":[3452,1,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"11":[10870,1,1,2,6,1,0,0,0,1,1,3,0,0,0,0,0,0,0,0,0],"12":[7000,1,1,1,3,1,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0],"13":[9176,1,2,2,5,2,0,1,0,0,1,1,0,0,0,0,0,0,0,0,0],"14":[1399,0,1,1,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0],"15":[0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"16":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"17":[0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"18":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"19":[7312,3,0,2,3,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"20":[7532,1,0,1,3,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0]},"beatriz":{"1":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"2":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"3":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"4":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"5":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"6":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"7":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"8":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"9":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"10":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"11":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"12":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"13":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"14":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"15":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"16":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"17":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"18":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"19":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"20":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]},"josikeila":{"1":[2395,1,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0],"2":[0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"3":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"4":[3825,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"5":[5833,1,0,1,3,1,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0],"6":[7146,2,0,1,5,2,0,2,0,0,0,0,0,0,0,0,0,0,1,0,0],"7":[2499,1,1,2,2,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0],"8":[4548,3,0,2,3,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0],"9":[1199,1,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0],"10":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"11":[2268,1,0,1,2,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0],"12":[13596,1,1,2,17,2,0,3,0,0,2,3,0,0,0,0,6,0,0,0,0],"13":[2544,2,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"14":[0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"15":[0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"16":[4452,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"17":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"18":[3607,1,0,1,2,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"19":[5499,2,0,1,2,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0],"20":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]},"marcia":{"1":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"2":[11089,4,0,2,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0],"3":[0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"4":[0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"6":[7210,3,0,2,6,2,1,1,0,0,0,2,0,0,0,0,0,0,0,0,0],"7":[2359,3,1,2,9,1,0,0,0,0,0,7,0,0,1,0,0,0,0,0,0],"8":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"9":[0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"10":[0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"11":[0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"12":[3173,2,0,1,4,1,0,1,0,0,0,1,0,0,0,0,0,0,1,0,0],"13":[5788,0,1,1,2,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0],"14":[290,1,0,1,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0],"15":[0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"16":[2398,1,1,1,2,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0],"17":[0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"18":[1399,0,1,1,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0],"19":[3599,2,1,1,2,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"20":[0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]}}},{"id":"cs01","name":"Casa Shopping","cota":1100000,"anoant":952592,"poltr":36,"sellers":[{"id":"gecica","name":"Gécica","days":30,"anoant":305718},{"id":"marcella","name":"Marcella","days":30,"anoant":248329},{"id":"savana","name":"Savana","days":30,"anoant":287725},{"id":"cristiane","name":"Cristiane","days":30,"anoant":13985}],"entries":{"gecica":{"1":[14000,1,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0],"2":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"3":[28732,2,1,1,5,1,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0],"4":[0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"5":[0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"6":[34795,4,2,3,6,2,0,1,0,1,0,2,0,0,0,0,0,0,0,0,0],"7":[18000,2,0,1,3,1,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0],"8":[0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"9":[0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"10":[43740,0,1,1,5,0,0,0,0,1,0,0,0,0,0,0,0,2,0,1,0],"11":[6466,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"12":[52406,3,0,2,16,8,0,4,0,0,0,0,0,0,0,0,0,0,1,0,0],"13":[0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"14":[0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]},"marcella":{"14":[14500,0,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"15":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"16":[24378,2,0,2,5,2,0,0,0,0,0,2,0,0,0,0,0,1,0,0,0],"17":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"18":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"19":[25801,4,2,2,5,2,0,1,0,1,1,0,0,0,0,0,0,0,0,0,0],"20":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]},"savana":{"1":[0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"2":[3990,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"3":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"4":[0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"5":[0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"6":[4950,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"7":[9900,2,1,1,11,2,2,0,0,0,2,4,0,0,0,0,1,0,0,0,0],"8":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"9":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"10":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"11":[32355,3,2,2,17,6,0,2,0,0,4,5,0,0,0,0,0,0,0,0,0],"12":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"13":[11840,2,1,1,2,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0],"14":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"15":[14000,1,1,1,10,2,1,2,0,0,0,0,0,0,0,0,0,0,0,0,0],"16":[7000,1,1,1,5,2,1,0,0,0,2,0,0,0,0,0,0,0,0,0,0],"17":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"18":[12490,4,2,2,5,2,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0],"19":[12160,3,1,1,3,0,0,0,0,0,0,0,1,0,0,0,0,2,0,0,0],"20":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]},"cristiane":{"10":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"11":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"13":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"17":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"20":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]}}},{"id":"freeway","name":"Freeway","cota":250000,"anoant":263637,"poltr":20,"sellers":[{"id":"rosangela","name":"Rosangela","days":30,"anoant":194296}],"entries":{"rosangela":{"1":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"2":[740,3,0,1,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0],"3":[8200,3,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0],"4":[2600,3,0,1,5,1,1,0,0,0,1,2,0,0,0,0,0,0,0,0,0],"5":[4198,1,0,2,3,0,1,2,0,0,0,0,0,0,0,0,0,0,0,0,0],"6":[0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"7":[0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"8":[1679,2,0,2,3,0,0,1,0,0,0,1,0,0,0,0,1,0,0,0,0],"9":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"10":[20428,2,0,2,8,2,0,1,0,1,0,4,0,0,0,0,0,0,0,0,0],"11":[200,1,0,1,2,0,0,0,0,0,0,1,0,0,0,0,1,0,0,0,0],"12":[10981,3,0,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0],"13":[0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"14":[0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"15":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"16":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"17":[0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"18":[0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"19":[4017,3,0,1,3,1,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0],"20":[0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]}}}]};
+const MARK = 'data:image/png;base64,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';
+const LOGO = 'data:image/png;base64,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';
+
+const FUNIL = ['venda','atend','ret','vendas','pecas'];
+const FUNIL_LBL = {venda:'Valor vendido', atend:'Atendimentos', ret:'Retornos', vendas:'Vendas', pecas:'Peças vendidas'};
+const HINT = {atend:'Clientes novos atendidos', ret:'Clientes que voltaram', vendas:'Pedidos fechados', pecas:'Total de itens nos pedidos'};
+const RULES = {none:'Só contagem (sem cota)', ref:'Base das cotas (colchões)', porColchao:'Cota por colchão vendido', base:'Entra na cota de bases', cotaMensal:'Cota mensal em unidades'};
+const WD = ['dom','seg','ter','qua','qui','sex','sáb'];
+const WDL = ['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];
+const MESES = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+const IC = {
+  edit:'<path d="M4 20h4L19 9l-4-4L4 16v4z"/>', chart:'<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
+  list:'<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>', store:'<path d="M3 9l1-5h16l1 5M4 9v11h16V9M3 9h18M9 20v-6h6v6"/>',
+  alert:'<path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/>',
+  net:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/>',
+  gear:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/>',
+  user:'<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>', lock:'<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>',
+  chev:'<path d="m6 9 6 6 6-6"/>', left:'<path d="m15 18-6-6 6-6"/>', right:'<path d="m9 18 6-6-6-6"/>', check:'<path d="M20 6 9 17l-5-5"/>',
+  refresh:'<path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/>', phone:'<rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/>'
+};
+function icon(n, s){ s = s || 22; return '<svg width="'+s+'" height="'+s+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+IC[n]+'</svg>'; }
+
+/* ---------- utilidades ---------- */
+const $ = (s, r) => (r || document).querySelector(s);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const clone = o => JSON.parse(JSON.stringify(o));
+const pad = n => (n < 10 ? '0' : '') + n;
+const uid = p => p + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
+function money(n){ return 'R$ ' + (Math.round((n || 0) * 100) / 100).toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2}); }
+function brl(n){ return 'R$ ' + Math.round(n || 0).toLocaleString('pt-BR'); }
+function num(n){ return Math.round(n || 0).toLocaleString('pt-BR'); }
+function dec1(n){ return (Math.round((n || 0) * 10) / 10).toFixed(1).replace('.', ','); }
+function pct(n){ return n == null || !isFinite(n) ? '–' : Math.round(n) + '%'; }
+function short(n){ if (n >= 1e6) return 'R$ ' + (n / 1e6).toFixed(2).replace('.', ',') + ' mi'; if (n >= 1e4) return 'R$ ' + Math.round(n / 1000) + ' mil'; return brl(n); }
+
+/* ---------- máscaras: o número entra da direita (1 → 0,01 → 0,12 → 1,23) ---------- */
+const digits = s => String(s || '').replace(/\D/g, '');
+function fmtMoneyInput(cents){ return ((cents || 0) / 100).toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2}); }
+function readMoney(s){ return (parseInt(digits(s), 10) || 0) / 100; }
+function readDec1(s){ return (parseInt(digits(s), 10) || 0) / 10; }
+function readInt(s){ return parseInt(digits(s), 10) || 0; }
+function applyMask(el){
+  const m = el.dataset.mask; let d = digits(el.value).replace(/^0+(?=\d)/, '');
+  if (m === 'money') el.value = fmtMoneyInput(parseInt(d.slice(0, 13) || '0', 10));
+  else if (m === 'dec1') el.value = ((parseInt(d.slice(0, 4) || '0', 10)) / 10).toFixed(1).replace('.', ',');
+  else if (m === 'int') el.value = d === '' ? '' : String(parseInt(d.slice(0, 6), 10));
+  else if (m === 'pin') el.value = d.slice(0, 8);
+  try { const L = el.value.length; el.setSelectionRange(L, L); } catch (e) {}
+}
+const NUMKEY = 'type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off"';
+function moneyField(k, v, label, hint){
+  return '<label class="field" for="f-' + k + '">' + label + '<span class="money sm"><span>R$</span><input id="f-' + k + '" ' + NUMKEY + ' data-mask="money" data-k="' + k + '" value="' + fmtMoneyInput(Math.round((v || 0) * 100)) + '"></span>' + (hint ? '<span class="hint">' + hint + '</span>' : '') + '</label>';
+}
+function intField(k, v, label, hint){ return '<label class="field" for="f-' + k + '">' + label + '<input id="f-' + k + '" ' + NUMKEY + ' data-mask="int" data-k="' + k + '" value="' + (v == null ? '' : Math.round(v)) + '">' + (hint ? '<span class="hint">' + hint + '</span>' : '') + '</label>'; }
+function dec1Field(k, v, label, hint){ return '<label class="field" for="f-' + k + '">' + label + '<input id="f-' + k + '" ' + NUMKEY + ' data-mask="dec1" data-k="' + k + '" value="' + dec1(v || 0) + '">' + (hint ? '<span class="hint">' + hint + '</span>' : '') + '</label>'; }
+function pinField(k, label, hint, visible, v){ return '<label class="field" for="f-' + k + '">' + label + '<input id="f-' + k + '" type="' + (visible ? 'text' : 'password') + '" inputmode="numeric" pattern="[0-9]*" autocomplete="off" data-mask="pin" data-k="' + k + '" value="' + esc(v || '') + '" placeholder="4 a 8 números">' + (hint ? '<span class="hint">' + hint + '</span>' : '') + '</label>'; }
+function textField(k, v, label, ph){ return '<label class="field" for="f-' + k + '">' + label + '<input id="f-' + k + '" type="text" autocomplete="off" data-k="' + k + '" value="' + esc(v || '') + '" placeholder="' + esc(ph || '') + '"></label>'; }
+
+/* ---------- datas ---------- */
+function P(s){ const a = s.split('-').map(Number); return {y:a[0], m:a[1], d:a[2]}; }
+const mkOf = s => s.slice(0, 7);
+function daysIn(mk){ const a = mk.split('-').map(Number); return new Date(a[0], a[1], 0).getDate(); }
+function addDays(s, n){ const p = P(s); return new Date(Date.UTC(p.y, p.m - 1, p.d + n)).toISOString().slice(0, 10); }
+function addMonths(mk, n){ const a = mk.split('-').map(Number); return new Date(Date.UTC(a[0], a[1] - 1 + n, 1)).toISOString().slice(0, 7); }
+const dateOf = (mk, d) => mk + '-' + pad(d);
+function wd(s){ const p = P(s); return new Date(p.y, p.m - 1, p.d).getDay(); }
+function dlabel(s){ const p = P(s); return WD[wd(s)] + ' ' + pad(p.d) + '/' + pad(p.m); }
+function dlow(s){ return dlong(s).toLowerCase(); }
+function dlong(s){ const p = P(s); return WDL[wd(s)] + ', ' + p.d + ' de ' + MESES[p.m - 1]; }
+function mlabel(mk){ const a = mk.split('-').map(Number); const n = MESES[a[1] - 1]; return n[0].toUpperCase() + n.slice(1) + '/' + a[0]; }
+function ctx(mk){ const D = daysIn(mk), tk = mkOf(TODAY), td = P(TODAY).d; return {mk:mk, D:D, t: mk === tk ? td : mk < tk ? D : 0}; }
+
+/* ---------- configuração inicial ---------- */
+function defaultCategories(){ return [
+  {id:'cat-colch', name:'Colchões e bases', products:[{id:'colch', name:'Colchões', rule:'ref'}, {id:'box', name:'Box', rule:'base', peso:0.5}, {id:'baum', name:'Baú de madeira', rule:'base', peso:1}, {id:'steel', name:'Baú steel', rule:'base', peso:1.5}, {id:'cama', name:'Cama madeira / articulada', rule:'base', peso:2}]},
+  {id:'cat-acess', name:'Acessórios', products:[{id:'prot', name:'Protetor de colchão', rule:'porColchao', fator:1}, {id:'trav', name:'Travesseiros', rule:'porColchao', fator:2}, {id:'ptrav', name:'Protetor de travesseiro', rule:'none'}, {id:'decor', name:'Item decorativo', rule:'none'}, {id:'bmax', name:'Body roll max', rule:'none'}, {id:'bmini', name:'Body roll mini', rule:'none'}, {id:'recosto', name:'Recosto', rule:'none'}]},
+  {id:'cat-moveis', name:'Móveis', products:[{id:'criado', name:'Criado / cômoda', rule:'porColchao', fator:1}, {id:'cab', name:'Cabeceira / painel', rule:'porColchao', fator:1}, {id:'poltr', name:'Poltronas', rule:'cotaMensal'}]},
+  {id:'cat-desafio', name:'Cota desafio', products:[{id:'desafio', name:'Cota desafio', rule:'none'}]}
+]; }
+function baseStores(demo){ return [
+  {id:'icarai', name:'Icaraí', sellers:[{id:'vanessa', name:'Vanessa'}, {id:'rosangela', name:'Rosangela'}]},
+  {id:'plaza', name:'Plaza', sellers:[{id:'aline', name:'Aline'}, {id:'beatriz', name:'Beatriz'}, {id:'josikeila', name:'Josikeila'}, {id:'marcia', name:'Márcia'}]},
+  {id:'cs01', name:'Casa Shopping', sellers:[{id:'gecica', name:'Gécica'}, {id:'marcella', name:'Marcella'}, {id:'savana', name:'Savana'}, {id:'cristiane', name:'Cristiane'}]},
+  {id:'freeway', name:'Freeway', sellers: demo ? [{id:'rosangela', name:'Rosangela'}] : []},
+  {id:'cg', name:'Casa & Gourmet', sellers:[{id:'renata', name:'Renata'}, {id:'andre', name:'André'}, {id:'celso', name:'Celso'}]}
+]; }
+function newConfig(demo){ return {version:1, metas:{pa:4, tm:2800, conv:40}, categories:defaultCategories(), stores:baseStores(demo), months:{}}; }
+
+/* ---------- modo demonstração (simula a planilha dentro do aparelho) ---------- */
+const DKEY = 'rd-demo-v3';
+function demoFresh(){
+  const cfg = newConfig(true), entries = [];
+  cfg.months['2026-09'] = {stores:{}};
+  DEMO_DATA.stores.forEach(st => {
+    const sa = {}; st.sellers.forEach(p => { if (p.anoant) sa[p.id] = p.anoant; });
+    cfg.months['2026-09'].stores[st.id] = {cota:st.cota, anoant:st.anoant || 0, prodCotas:{poltr:st.poltr}, days:{}, sellerAno:sa};
+    Object.keys(st.entries).forEach(pid => Object.keys(st.entries[pid]).forEach(d => {
+      const arr = st.entries[pid][d], v = {}; DEMO_DATA.fields.forEach((f, i) => { v[f] = arr[i] || 0; });
+      entries.push({date:'2026-09-' + pad(+d), store:st.id, seller:pid, folga:false, v:v, by:'planilha RD'});
+    }));
+  });
+  const stores = {}; cfg.stores.forEach(s => { stores[s.id] = '1234'; });
+  return {config:cfg, entries:entries, requests:[], pins:{gerencia:'1234', stores:stores}, today:'2026-09-21'};
+}
+function demoState(){ let s = null; try { s = JSON.parse(localStorage.getItem(DKEY) || 'null'); } catch (e) {} if (!s || !s.config) { s = demoFresh(); demoSave(s); } return s; }
+function demoSave(s){ try { localStorage.setItem(DKEY, JSON.stringify(s)); } catch (e) {} }
+async function demoApi(action, p){
+  const s = demoState(), isG = p.token === 'demo-g', ok = o => Object.assign({ok:true}, o || {});
+  switch (action){
+    case 'load': {
+      const months = (p.months && p.months.length) ? p.months : [mkOf(s.today), mkOf(addDays(s.today, -1))];
+      return ok({today:s.today, config:s.config, hasGerenciaPin:true, requests:s.requests, entries:s.entries.filter(e => months.indexOf(mkOf(e.date)) >= 0)});
+    }
+    case 'login':
+      if (p.role === 'gerencia') return p.pin === s.pins.gerencia ? ok({token:'demo-g'}) : {ok:false, error:'Senha incorreta.'};
+      if (!s.pins.stores[p.store]) return {ok:false, error:'A gerência ainda não criou a senha desta loja.'};
+      return p.pin === s.pins.stores[p.store] ? ok({token:'demo-s-' + p.store}) : {ok:false, error:'Senha incorreta.'};
+    case 'saveEntry': {
+      if (!isG && [s.today, addDays(s.today, -1)].indexOf(p.date) < 0) return {ok:false, error:'Só a gerência pode alterar dias anteriores a ontem.'};
+      if (!p.folga && check(p.v).length) return {ok:false, error:check(p.v)[0]};
+      s.entries = s.entries.filter(e => !(e.date === p.date && e.store === p.store && e.seller === p.seller));
+      s.entries.push({date:p.date, store:p.store, seller:p.seller, folga:!!p.folga, v:p.folga ? {} : p.v, by:p.by}); demoSave(s); return ok();
+    }
+    case 'requestFix': s.requests.push({id:uid('r'), created:new Date().toISOString(), store:p.store, seller:p.seller, date:p.date, msg:p.msg, status:'aberto'}); demoSave(s); return ok();
+    case 'resolveRequest': if (!isG) return {ok:false, error:'auth'}; s.requests.forEach(r => { if (r.id === p.id) r.status = 'resolvido'; }); demoSave(s); return ok();
+    case 'saveConfig': if (!isG) return {ok:false, error:'auth'}; s.config = p.config; demoSave(s); return ok();
+    case 'getPins': if (!isG) return {ok:false, error:'auth'}; return ok({stores:s.pins.stores});
+    case 'setPin': if (!isG) return {ok:false, error:'auth'}; if (p.target === 'gerencia') s.pins.gerencia = p.pin; else s.pins.stores[p.store] = p.pin; demoSave(s); return ok();
+    case 'demoToday': s.today = p.today; demoSave(s); return ok();
+    case 'demoReset': localStorage.removeItem(DKEY); return ok();
+  }
+  return {ok:false, error:'Ação desconhecida'};
+}
+
+/* ---------- comunicação com a planilha ---------- */
+let SESSION = (() => { try { return JSON.parse(localStorage.getItem('rd-sessao') || '{}'); } catch (e) { return {}; } })();
+function saveSession(){ try { localStorage.setItem('rd-sessao', JSON.stringify(SESSION)); } catch (e) {} }
+async function api(action, payload){
+  const body = Object.assign({action:action}, payload || {}); if (SESSION.token) body.token = SESSION.token;
+  if (DEMO) return demoApi(action, clone(body));
+  const r = await fetch(API_URL, {method:'POST', body:JSON.stringify(body)}); // texto simples: funciona com o Apps Script
+  if (!r.ok) throw new Error('A planilha respondeu com erro ' + r.status);
+  return r.json();
+}
+let CONFIG = null, TODAY = null, ENTRIES = {}, REQS = [], HAS_GPIN = true, LOADED = new Set(), PINS = null;
+let LOADING = true, LOAD_ERR = null, BUSY = false;
+async function loadData(months){
+  const r = await api('load', {months: months || neededMonths()});
+  if (!r.ok) throw new Error(r.error || 'Erro ao carregar');
+  TODAY = r.today; CONFIG = r.config; HAS_GPIN = r.hasGerenciaPin !== false; REQS = r.requests || [];
+  const ms = (months && months.length) ? months : [mkOf(TODAY), mkOf(addDays(TODAY, -1))];
+  Object.keys(ENTRIES).forEach(k => { if (ms.indexOf(k.split('|')[2].slice(0, 7)) >= 0) delete ENTRIES[k]; });
+  (r.entries || []).forEach(e => { ENTRIES[e.store + '|' + e.seller + '|' + e.date] = e; });
+  ms.forEach(m => LOADED.add(m));
+}
+function neededMonths(){ if (!TODAY) return []; const s = new Set([mkOf(TODAY), mkOf(addDays(TODAY, -1))]); if (ui.month) s.add(ui.month); return Array.from(s); }
+async function refresh(){ await loadData(); }
+
+/* ---------- cálculos (mesma lógica da planilha RD) ---------- */
+function store(id){ return CONFIG.stores.filter(s => s.id === id)[0]; }
+function activeStores(){ return CONFIG.stores.filter(s => !s.archived); }
+function sellersOf(sid){ const s = store(sid); return s ? s.sellers.filter(p => !p.archived) : []; }
+function sellerName(sid, pid){ const s = store(sid); const p = s && s.sellers.filter(x => x.id === pid)[0]; return p ? p.name : pid; }
+function mcfg(mk, sid){ return CONFIG.months && CONFIG.months[mk] && CONFIG.months[mk].stores ? CONFIG.months[mk].stores[sid] || null : null; }
+function hasCota(mk, sid){ const mc = mcfg(mk, sid); return !!(mc && mc.cota > 0); }
+function products(all){ const out = []; CONFIG.categories.forEach(c => { if (c.archived && !all) return; c.products.forEach(p => { if (all || !p.archived) out.push(Object.assign({cat:c.id}, p)); }); }); return out; }
+function allFields(){ return FUNIL.concat(products(true).map(p => p.id)); }
+function fieldLabel(f){ if (FUNIL_LBL[f]) return FUNIL_LBL[f]; const p = products(true).filter(x => x.id === f)[0]; return p ? p.name : f; }
+function refProduct(){ return products().filter(p => p.rule === 'ref')[0]; }
+function daysOf(mk, sid, pid){ const mc = mcfg(mk, sid), v = mc && mc.days ? mc.days[pid] : null; return v == null ? daysIn(mk) : v; }
+/* Regra combinada: cota da loja ÷ vendedores; quem trabalha parte do mês recebe a parte proporcional e a sobra vai para quem trabalha o mês inteiro */
+function split(total, mk, sid){
+  const D = daysIn(mk), ss = sellersOf(sid), res = {}, dOf = p => daysOf(mk, sid, p.id);
+  const w = ss.filter(p => dOf(p) > 0), n = w.length;
+  ss.forEach(p => { res[p.id] = {v:0, kind:'off', days:dOf(p)}; });
+  if (!n) return res;
+  const base = total / n, part = w.filter(p => dOf(p) < D), full = w.filter(p => dOf(p) >= D); let ps = 0;
+  part.forEach(p => { const v = base * dOf(p) / D; ps += v; res[p.id] = {v:v, kind:'part', base:base, days:dOf(p)}; });
+  full.forEach(p => { res[p.id] = {v:(total - ps) / full.length, kind: part.length ? 'rest' : 'equal', ps:ps, nfull:full.length, n:n, days:D}; });
+  return res;
+}
+function howText(r, total, D){ if (r.kind === 'part') return brl(r.base) + ' × ' + r.days + '/' + D + ' dias'; if (r.kind === 'rest') return '(' + brl(total) + ' − ' + brl(r.ps) + ') ÷ ' + r.nfull; if (r.kind === 'equal') return brl(total) + ' ÷ ' + r.n + ' vendedores'; return 'Não trabalha no mês'; }
+function quota(mk, sid, pid){ const mc = mcfg(mk, sid); if (!mc) return 0; if (!pid) return mc.cota || 0; return (split(mc.cota || 0, mk, sid)[pid] || {v:0}).v; }
+function unitQuota(mk, sid, pid, prodId){ const mc = mcfg(mk, sid), tot = mc && mc.prodCotas ? (mc.prodCotas[prodId] || 0) : 0; if (!pid) return tot; return (split(tot, mk, sid)[pid] || {v:0}).v; }
+function val(sid, pid, date, f){ const e = ENTRIES[sid + '|' + pid + '|' + date]; return e && !e.folga && e.v ? (+e.v[f] || 0) : 0; }
+function sum(sid, pids, f, mk, a, b){ let s = 0; for (const pid of pids) for (let d = a; d <= b; d++) s += val(sid, pid, dateOf(mk, d), f); return s; }
+const dezOf = d => d <= 10 ? 1 : d <= 20 ? 2 : 3;
+const dezRange = (z, D) => z === 1 ? [1, 10] : z === 2 ? [11, 20] : [21, D];
+/* Cota da dezena: 1ª = mês ÷ 3; 2ª = o que falta ÷ 2; 3ª = tudo o que falta. Cota do dia = o que falta da dezena ÷ dias que restam nela */
+function dezCota(C, sid, pids, mk, z){ const s1 = sum(sid, pids, 'venda', mk, 1, 10), s2 = sum(sid, pids, 'venda', mk, 11, 20); return z === 1 ? C / 3 : z === 2 ? (C - s1) / 2 : C - s1 - s2; }
+function cotaDia(C, sid, pids, date){
+  const mk = mkOf(date), D = daysIn(mk), day = P(date).d, z = dezOf(day), r = dezRange(z, D), cd = dezCota(C, sid, pids, mk, z), before = sum(sid, pids, 'venda', mk, r[0], day - 1);
+  return {z:z, a:r[0], b:r[1], cotaDez:cd, before:before, falta:cd - before, dias:r[1] - day + 1, dia:(cd - before) / (r[1] - day + 1)};
+}
+function elapsed(sid, pids, c){ if (!c.t) return 0; if (c.mk !== mkOf(TODAY)) return c.t; return pids.some(pid => ENTRIES[sid + '|' + pid + '|' + dateOf(c.mk, c.t)]) ? c.t : c.t - 1; }
+function metrics(sid, pids, c){
+  const m = {}; allFields().forEach(f => { m[f] = sum(sid, pids, f, c.mk, 1, c.t); });
+  const den = m.atend + m.ret;
+  m.pa = m.vendas ? m.pecas / m.vendas : null; m.tm = m.vendas ? m.venda / m.vendas : null; m.conv = den ? m.vendas / den * 100 : null;
+  return m;
+}
+function prodLines(m, sid, pid, mk){
+  const ref = refProduct(), R = ref ? m[ref.id] : 0, lines = [], bases = products().filter(p => p.rule === 'base');
+  if (bases.length) lines.push({label:'Bases', v: R ? bases.reduce((a, p) => a + (m[p.id] || 0) * (+p.peso || 0), 0) / R * 100 : null});
+  products().forEach(p => {
+    if (p.rule === 'porColchao') lines.push({label:p.name, v: R ? (m[p.id] || 0) / (R * (+p.fator || 1)) * 100 : null});
+    else if (p.rule === 'cotaMensal'){ const q = unitQuota(mk, sid, pid, p.id); lines.push({label:p.name + ' (' + (m[p.id] || 0) + ' de ' + dec1(q) + ')', v: q ? (m[p.id] || 0) / q * 100 : null}); }
+  });
+  return {lines:lines, R:R, refName: ref ? ref.name.toLowerCase() : 'colchões'};
+}
+function check(v){
+  v = v || {}; const out = [], den = (v.atend || 0) + (v.ret || 0);
+  if (v.venda > 0 && !v.vendas) out.push('Há valor em R$, mas 0 vendas.');
+  if (v.vendas > 0 && !v.venda) out.push('Há vendas, mas o valor em R$ está zerado.');
+  if ((v.vendas || 0) > den) out.push('Vendas maior que atendimentos + retornos.');
+  if ((v.pecas || 0) < (v.vendas || 0)) out.push('Peças vendidas menor que o número de vendas.');
+  return out;
+}
+function storeAlerts(sid, mk){
+  const c = ctx(mk), out = [], st = store(sid);
+  if (!hasCota(mk, sid)) out.push({kind:'cfg', text:'Cota de ' + mlabel(mk).toLowerCase() + ' ainda não definida.'});
+  if (mk === mkOf(TODAY) && c.t > 1) sellersOf(sid).filter(p => daysOf(mk, sid, p.id) > 0).forEach(p => {
+    let last = 0; for (let d = 1; d <= c.t; d++) if (ENTRIES[sid + '|' + p.id + '|' + dateOf(mk, d)]) last = d;
+    if (last < c.t - 1) out.push({kind:'late', text: esc(p.name) + (last ? ' não lança desde ' + dlabel(dateOf(mk, last)) + '.' : ' ainda não lançou nenhum dia no mês.')});
+  });
+  st.sellers.forEach(p => { for (let d = 1; d <= c.t; d++){ const e = ENTRIES[sid + '|' + p.id + '|' + dateOf(mk, d)]; if (!e || e.folga) continue; const ch = check(e.v); if (ch.length) out.push({kind:'bad', sid:sid, pid:p.id, date:e.date, text: dlabel(e.date) + ' · ' + esc(p.name) + ': ' + money(e.v.venda) + ', ' + (e.v.vendas || 0) + ' vendas. ' + ch[0]}); } });
+  REQS.filter(r => r.store === sid && r.status === 'aberto').forEach(r => out.push({kind:'req', req:r, text:'Pedido de correção · ' + esc(sellerName(sid, r.seller)) + ', ' + dlabel(r.date) + (r.msg ? ': “' + esc(r.msg) + '”' : '')}));
+  return out;
+}
+
+/* ---------- avisos (janela de confirmação) e mensagens ---------- */
+let MODAL = null;
+function modal(o){
+  return new Promise(res => {
+    MODAL = {res:res, validate:o.validate};
+    const el = $('#modal');
+    el.innerHTML = '<div class="overlay" data-overlay><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="m-title"><h2 id="m-title">' + o.title + '</h2><div class="mbody">' + o.body + '<div class="merr" id="m-err" role="alert"></div></div><div class="mact">' +
+      o.actions.map(a => '<button class="btn ' + (a.primary ? 'primary' : '') + (a.danger ? ' danger' : '') + '" data-mact="' + a.act + '">' + a.label + '</button>').join('') + '</div></div></div>';
+    el.hidden = false;
+    setTimeout(() => { const f = el.querySelector('input,textarea,select') || el.querySelector('.mact .btn:last-child'); if (f) f.focus(); }, 40);
+  });
+}
+function modalValues(){ const v = {}; document.querySelectorAll('#modal [data-k]').forEach(i => { v[i.dataset.k] = i.type === 'checkbox' ? i.checked : i.value; }); return v; }
+function closeModal(act){
+  if (!MODAL) return; const values = modalValues();
+  if (act !== 'no' && MODAL.validate){ const err = MODAL.validate(values, act); if (err){ $('#m-err').textContent = err; return; } }
+  const el = $('#modal'); el.hidden = true; el.innerHTML = ''; const r = MODAL.res; MODAL = null; r({act:act, values:values});
+}
+async function ask(title, body, yes, danger){ const r = await modal({title:title, body:body, actions:[{label:'Voltar', act:'no'}, {label:yes, act:'yes', primary:!danger, danger:!!danger}]}); return r.act === 'yes'; }
+function toast(msg){ const t = $('#toast'); t.textContent = msg; t.hidden = false; clearTimeout(toast._t); toast._t = setTimeout(() => { t.hidden = true; }, 3200); }
+async function run(fn, okMsg){
+  if (BUSY) return; BUSY = true; toast('Salvando…');
+  try { const r = await fn(); if (r && r.ok === false){ handleError(r); return false; } await refresh(); render(); if (okMsg) toast(okMsg); return true; }
+  catch (e){ toast('Sem conexão com a planilha. Confira a internet e tente de novo.'); return false; }
+  finally { BUSY = false; }
+}
+function handleError(r){
+  if (r.error === 'auth'){ SESSION.token = null; saveSession(); toast('Sua sessão expirou. Digite a senha de novo.'); const role = SESSION.role; SESSION = {}; saveSession(); go({step:'pin', pickRole:role, pickStore:role === 'gerente' ? ui.pickStore : null}); return; }
+  toast(r.error || 'Não deu certo. Tente de novo.');
+}
+
+/* ---------- estado da tela ---------- */
+let ui = {step:'home'};
+function go(ch){ Object.assign(ui, ch); render(); window.scrollTo(0, 0); }
+
+/* ---------- pedaços de tela ---------- */
+function bar(p, pace, thin){ const w = Math.max(0, Math.min(100, p || 0)); return '<div class="bar' + (thin ? ' thin' : '') + '"><i class="' + ((p || 0) >= (pace != null ? pace : 100) ? '' : 'warn') + '" style="width:' + w + '%"></i>' + (pace != null ? '<b style="left:' + Math.min(100, pace) + '%"></b>' : '') + '</div>'; }
+function kpi(label, v, meta, ok){ return '<div class="kpi"><span class="label">' + label + '</span><span class="v">' + (v == null ? '–' : v) + '</span><span class="small">meta ' + meta + '</span>' + (v == null ? '<span class="small">sem vendas</span>' : ok ? '<span class="tag-ok">● Na meta</span>' : '<span class="tag-bad">▲ Abaixo</span>') + '</div>'; }
+function kpiRow(m){ const M = CONFIG.metas; return '<div class="kpis">' + kpi('P.A.', m.pa == null ? null : dec1(m.pa), dec1(M.pa), m.pa >= M.pa) + kpi('Ticket médio', m.tm == null ? null : brl(m.tm), brl(M.tm), m.tm >= M.tm) + kpi('Conversão', m.conv == null ? null : pct(m.conv), M.conv + '%', m.conv >= M.conv) + '</div>'; }
+function prodCard(m, sid, pid, mk, title){
+  const pl = prodLines(m, sid, pid, mk); if (!pl.lines.length) return '';
+  return '<section class="card"><div class="stack"><h2>' + title + '</h2><span class="small">Sobre ' + pl.R + ' ' + esc(pl.refName) + ' vendidos no mês · meta de 100% em cada uma</span></div>' +
+    pl.lines.map(r => '<div class="prod"><span>' + esc(r.label) + '</span>' + bar(r.v, null, true) + '<span class="p ' + (r.v == null ? 'c-muted' : r.v >= 100 ? 'c-good' : 'c-warn') + '">' + pct(r.v) + '</span></div>').join('') + '</section>';
+}
+function chart(sid, pids, c){
+  const vals = []; let max = 1; for (let d = 1; d <= c.D; d++){ const v = sum(sid, pids, 'venda', c.mk, d, d); vals.push(v); if (d <= c.t && v > max) max = v; }
+  const zt = c.t ? dezOf(c.t) : 0;
+  const bars = vals.map((v, i) => { const d = i + 1; if (d > c.t) return '<i class="future" style="height:10%"></i>'; if (!v) return '<i class="zero" style="height:2px"></i>'; return '<i class="' + (dezOf(d) === zt && c.mk === mkOf(TODAY) ? '' : 'past') + '" style="height:' + Math.max(3, v / max * 100) + '%" title="' + dlabel(dateOf(c.mk, d)) + ': ' + brl(v) + '"></i>'; }).join('');
+  return '<section class="card"><div class="row"><h2>Vendas por dia</h2><span class="small">maior dia: ' + brl(max) + '</span></div><div class="chart" role="img" aria-label="Vendas diárias de ' + mlabel(c.mk) + '">' + bars + '</div><div class="row small"><span>dia 1</span><span>dia 10</span><span>dia 20</span><span>dia ' + c.D + '</span></div></section>';
+}
+function dezCard(C, sid, pids, c, anoant){
+  const el = elapsed(sid, pids, c), sold = sum(sid, pids, 'venda', c.mk, 1, c.t), pace = el / c.D * 100;
+  const rows = [1, 2, 3].map(z => {
+    const r = dezRange(z, c.D), cd = dezCota(C, sid, pids, c.mk, z), s = sum(sid, pids, 'venda', c.mk, r[0], Math.min(r[1], c.t));
+    const state = c.t > r[1] ? 'fechada' : c.t >= r[0] ? 'em andamento' : 'prévia';
+    if (state === 'prévia') return '<div class="stack"><div class="row"><strong>' + z + 'ª dezena</strong><span class="small">começa ' + dlabel(dateOf(c.mk, r[0])) + '</span></div><span class="small">Cota prevista hoje: ' + brl(cd) + '</span></div>';
+    const p = cd > 0 ? s / cd * 100 : 100;
+    return '<div class="stack"><div class="row"><strong>' + z + 'ª dezena <span class="small">(' + state + ')</span></strong><span class="' + (p >= 100 ? 'c-good' : 'c-warn') + '" style="font-weight:800">' + pct(p) + '</span></div>' + bar(p, null) + '<span class="small">' + brl(s) + ' de ' + brl(cd) + '</span></div>';
+  }).join('');
+  const mp = C ? sold / C * 100 : 0, ano = anoant ? anoant * el / c.D : 0;
+  return '<section class="card"><h2>Cota</h2>' + rows + '<div class="stack"><div class="row"><strong>Mês</strong><span class="' + (mp >= pace ? 'c-good' : 'c-warn') + '" style="font-weight:800">' + pct(mp) + '</span></div>' + bar(mp, pace) +
+    '<span class="small">' + brl(sold) + ' de ' + brl(C) + ' · a linha marca o ritmo esperado (' + pct(pace) + ')</span></div>' +
+    '<div class="row" style="background:var(--surface2);border-radius:12px;padding:10px 12px"><span class="label">Comparado ao ano anterior</span><strong>' + (ano ? pct(sold / ano * 100) : '– não preenchido') + '</strong></div></section>';
+}
+function monthNav(){ const cur = mkOf(TODAY); return '<div class="mnav"><button class="linkbtn" data-act="month" data-d="-1" aria-label="Mês anterior">' + icon('left', 18) + '</button><strong>' + mlabel(ui.month) + '</strong><button class="linkbtn" data-act="month" data-d="1" aria-label="Próximo mês"' + (ui.month >= cur ? ' disabled' : '') + '>' + icon('right', 18) + '</button></div>'; }
+function band(o){
+  return '<header class="band"><div class="band-in"><div class="row"><span class="brand"><img class="mark" src="' + MARK + '" alt="Studio do Sono"><span class="eyebrow">' + o.eyebrow + '</span></span>' +
+    (SESSION.role ? '<span class="row" style="gap:6px"><button class="linkbtn" data-act="refresh" aria-label="Atualizar dados">' + icon('refresh', 18) + '</button><button class="linkbtn" data-act="logout">Sair</button></span>' : '') + '</div>' +
+    (o.title ? '<h1>' + o.title + '</h1>' : '') + (o.sub ? '<span class="sub">' + o.sub + '</span>' : '') + (o.month ? monthNav() : '') + (o.chip ? '<span class="chip">' + o.chip + '</span>' : '') + '</div></header>';
+}
+function tabs(list){ return '<nav class="tabs" aria-label="Seções"><div class="tabs-in">' + list.map(t => '<button class="tab" data-act="tab" data-tab="' + t[0] + '"' + (ui.tab === t[0] ? ' aria-current="page"' : '') + '>' + icon(t[2]) + '<span>' + t[1] + '</span></button>').join('') + '</div></nav>'; }
+function page(b, body, t){ return b + '<main><div class="main-in">' + body + '</div></main>' + (t || ''); }
+function choice(act, ic, t, sub, extra){ return '<button class="choice" data-act="' + act + '" ' + (extra || '') + '><span class="ico">' + icon(ic) + '</span><span class="stack"><span class="t">' + t + '</span>' + (sub ? '<span class="small">' + sub + '</span>' : '') + '</span><span class="go">' + icon('right', 20) + '</span></button>'; }
+function backBtn(step){ return '<button class="btn small" data-act="step" data-step="' + step + '">' + icon('left', 16) + ' Voltar</button>'; }
+
+/* ---------- telas de entrada ---------- */
+function startBand(sub){ return '<header class="band"><div class="band-in center" style="align-items:center"><img class="logo-full" src="' + LOGO + '" alt="Studio do Sono"><h1>Resumo de Desempenho</h1><span class="sub">' + sub + '</span></div></header>'; }
+function viewStart(){
+  const s = ui.step;
+  if (s === 'store'){
+    return page(startBand(ui.pickRole === 'vendedor' ? 'Passo 1 de 3 · escolha a sua loja' : 'Escolha a loja que você gerencia'),
+      '<section class="card hero"><div class="row"><h2>Qual é a sua loja?</h2>' + backBtn('home') + '</div>' + activeStores().map(st => choice('pick-store', 'store', esc(st.name), sellersOf(st.id).length + ' vendedores', 'data-store="' + st.id + '"')).join('') + '</section>');
+  }
+  if (s === 'seller'){
+    const st = store(ui.pickStore);
+    return page(startBand('Passo 2 de 3 · loja ' + esc(st.name)), '<section class="card hero"><div class="row"><h2>Quem é você?</h2>' + backBtn('store') + '</div>' +
+      (sellersOf(st.id).length ? sellersOf(st.id).map(p => choice('pick-seller', 'user', esc(p.name), '', 'data-pid="' + p.id + '"')).join('') : '<div class="alert">Esta loja ainda não tem vendedores cadastrados. Fale com a gerência.</div>') + '</section>');
+  }
+  if (s === 'confirm'){
+    const st = store(ui.pickStore);
+    return page(startBand('Passo 3 de 3 · confirme'), '<section class="card hero center"><span class="ico" style="width:56px;height:56px">' + icon('user', 28) + '</span>' +
+      '<p class="who">Você é ' + esc(sellerName(st.id, ui.pickSeller)) + ',<br>da loja ' + esc(st.name) + '?</p><span class="small">Tudo o que você lançar fica registrado no seu nome. Este aparelho vai lembrar de você.</span>' +
+      '<button class="btn block primary" data-act="confirm-seller">Sim, sou eu · continuar</button><button class="btn" data-act="step" data-step="seller">Não sou eu</button></section>');
+  }
+  if (s === 'pin'){
+    const g = ui.pickRole === 'gerencia', st = g ? null : store(ui.pickStore), setup = g && !HAS_GPIN;
+    return page(startBand(g ? 'Gerência geral' : 'Gerente · ' + esc(st.name)),
+      '<section class="card hero"><div class="row"><h2>' + (setup ? 'Crie a senha da gerência' : 'Digite a senha') + '</h2>' + backBtn(g ? 'home' : 'store') + '</div>' +
+      (setup ? '<span class="small">É o primeiro acesso. Escolha uma senha só de números (4 a 8). Guarde bem: ela protege toda a configuração.</span>' + pinField('pin', 'Nova senha') + pinField('pin2', 'Repita a senha')
+        : '<span class="small">' + (g ? 'Senha da gerência geral.' : 'Senha do gerente desta loja. Quem define é a gerência geral.') + (DEMO ? ' Na demonstração, a senha é 1234.' : '') + '</span>' + pinField('pin', 'Senha')) +
+      '<button class="btn block primary" data-act="' + (setup ? 'setup-pin' : 'login') + '">' + (setup ? 'Criar senha e entrar' : 'Entrar') + '</button></section>');
+  }
+  if (!CONFIG && s !== 'home') ui.step = 'home';
+  return page(startBand(DEMO ? 'Demonstração com os dados de setembro/26' : 'Lançamento diário e cotas das lojas'),
+    (!CONFIG ? '<div class="alert"><strong>O app ainda não foi configurado.</strong><span>A gerência geral precisa entrar primeiro para cadastrar as lojas.</span></div>' : '') +
+    '<section class="card hero"><h2>Quem está usando?</h2>' +
+    (CONFIG ? choice('role', 'user', 'Sou vendedor', 'Lançar o meu dia e ver a minha cota', 'data-role="vendedor"') + choice('role', 'store', 'Sou gerente de loja', 'Acompanhar a loja e os vendedores', 'data-role="gerente"') : '') +
+    choice('role', 'lock', 'Gerência geral', 'Painel das lojas, configuração e senhas', 'data-role="gerencia"') + '</section>' +
+    '<button class="btn" data-act="install-help">' + icon('phone', 18) + ' Como instalar no celular</button>' +
+    (DEMO ? '<section class="card"><h2>Modo demonstração</h2><span class="small">Nada aqui vai para a planilha: fica só neste aparelho. Senha de teste da gerência e de todas as lojas: 1234. Avance a data para testar dias novos.</span>' +
+      '<div class="row"><button class="sq" data-act="demo-day" data-d="-1" aria-label="Dia anterior">' + icon('left') + '</button><strong>' + dlong(TODAY) + '</strong><button class="sq" data-act="demo-day" data-d="1" aria-label="Próximo dia">' + icon('right') + '</button></div>' +
+      '<button class="btn danger" data-act="demo-reset">Apagar testes e voltar aos dados de setembro</button></section>' : ''));
+}
+
+/* ---------- vendedor ---------- */
+function viewSeller(){
+  const sid = SESSION.store, pid = SESSION.seller, st = store(sid);
+  if (!st || !sellersOf(sid).some(p => p.id === pid)){ SESSION = {}; saveSession(); return viewStart(); }
+  const tab = ui.tab || 'lancar', name = esc(sellerName(sid, pid));
+  let title = 'Lançar o dia', body;
+  if (tab === 'lancar') body = editor(sid, pid, TODAY, 'seller');
+  else if (tab === 'painel'){ title = 'Meu painel'; body = sellerDash(sid, pid); }
+  else if (ui.editDate){ title = 'Corrigir ' + dlabel(ui.editDate); body = '<button class="btn small" data-act="hist-back" style="align-self:flex-start">' + icon('left', 16) + ' Voltar aos lançamentos</button>' + editor(sid, pid, ui.editDate, 'seller'); }
+  else { title = 'Meus lançamentos'; body = sellerHist(sid, pid); }
+  return page(band({eyebrow:esc(st.name) + ' · ' + name, title:title, sub:dlong(TODAY)}), body, tabs([['lancar', 'Lançar', 'edit'], ['painel', 'Meu painel', 'chart'], ['hist', 'Lançamentos', 'list']]));
+}
+let EDITOR = null, draft = null;
+function zeros(){ const o = {}; allFields().forEach(f => { o[f] = 0; }); return o; }
+function openDraft(sid, pid, date, mode){ const key = sid + '|' + pid + '|' + date; if (!EDITOR || EDITOR.key !== key){ const e = ENTRIES[key]; draft = zeros(); if (e && !e.folga && e.v) Object.keys(e.v).forEach(f => { draft[f] = +e.v[f] || 0; }); EDITOR = {key:key, sid:sid, pid:pid, date:date}; } EDITOR.mode = mode; }
+function editor(sid, pid, date, mode){
+  openDraft(sid, pid, date, mode);
+  const mk = mkOf(date), e = ENTRIES[sid + '|' + pid + '|' + date], q = quota(mk, sid, pid), has = hasCota(mk, sid);
+  let banner = '';
+  if (mode === 'seller' && date !== TODAY) banner = '<div class="alert"><strong>Você está corrigindo ontem, ' + dlabel(date) + '.</strong><span>Hoje é o último dia em que você pode mexer neste lançamento. Depois, só a gerência.</span></div>';
+  if (mode === 'gerencia') banner = '<div class="alert"><strong>Correção pela gerência · uso excepcional</strong><span>' + esc(sellerName(sid, pid)) + ', ' + dlabel(date) + '. A alteração muda resultados já calculados e fica registrada no histórico da planilha.</span></div>';
+  const status = e ? (e.folga ? '<span class="chip mute">Marcado como folga</span>' : '<span class="chip ok">Já lançado · mudar = correção</span>') : '<span class="chip mute">Ainda não lançado</span>';
+  let html = banner;
+  if (has){
+    const ci = cotaDia(q, sid, [pid], date);
+    html += '<section class="card hero"><div class="row"><div class="stack"><span class="label">Cota ' + (date === TODAY ? 'de hoje' : 'deste dia') + '</span><span class="big">' + (ci.dia > 0 ? brl(ci.dia) : 'Batida') + '</span></div><div class="stack" style="align-items:flex-end"><span class="label">Lançado</span><span class="mid c-good" id="live-pct"></span></div></div><div id="live-bar"></div>' +
+      '<div class="row" style="flex-wrap:wrap"><span class="small">' + ci.z + 'ª dezena · dia ' + (P(date).d - ci.a + 1) + ' de ' + (ci.b - ci.a + 1) + ' · faltavam ' + brl(Math.max(0, ci.falta)) + ' na dezena</span>' + status + '</div></section>';
+  } else html += '<section class="card hero"><div class="row"><h2>' + dlong(date) + '</h2>' + status + '</div><span class="small">A gerência ainda não definiu a cota de ' + mlabel(mk).toLowerCase() + '. Você já pode lançar normalmente.</span></section>';
+  html += '<section class="card flush"><div class="head stack" style="gap:10px"><h2>Funil do dia</h2><label class="label" for="f-venda">Valor vendido</label><div class="money"><span>R$</span><input id="f-venda" ' + NUMKEY + ' data-mask="money" data-f="venda" value="' + fmtMoneyInput(Math.round(draft.venda * 100)) + '"></div><span class="small">Digite só os números: 1 vira 0,01; 12345 vira 123,45.</span></div>' +
+    ['atend', 'ret', 'vendas', 'pecas'].map(f => stepLine(f, FUNIL_LBL[f], HINT[f])).join('') + '<div style="height:6px"></div></section><div id="live-kpis"></div><div id="live-check"></div>';
+  html += CONFIG.categories.filter(c => !c.archived && c.products.some(p => !p.archived)).map((c, i) => '<details class="grp"' + (i === 0 ? ' open' : '') + '><summary><span class="stack"><strong>' + esc(c.name) + '</strong><span class="small" data-gsum="' + c.id + '"></span></span><span class="chev">' + icon('chev', 20) + '</span></summary>' +
+    c.products.filter(p => !p.archived).map(p => stepLine(p.id, p.name)).join('') + '</details>').join('');
+  html += '<section class="card"><button class="btn block primary" data-act="save" id="save-btn">Salvar</button><button class="btn" data-act="folga">Dia sem venda / folga</button>' + (mode === 'gerencia' ? '<button class="btn" data-act="fix-close">Cancelar correção</button>' : '') +
+    '<span class="small">Você só digita quantidades. P.A., ticket, conversão e cotas são calculados pelo app. Antes de gravar, o app mostra um resumo para você conferir.</span></section>';
+  return html;
+}
+function stepLine(f, label, hint){
+  return '<div class="stepline"><span class="stack"><strong>' + esc(label) + '</strong>' + (hint ? '<span class="small">' + hint + '</span>' : '') + '</span><span class="stepper"><button class="sq" data-act="dec" data-f="' + f + '" aria-label="Diminuir ' + esc(label) + '">−</button>' +
+    '<input class="n" data-f="' + f + '" data-mask="int" ' + NUMKEY + ' aria-label="' + esc(label) + '" value="' + (draft[f] || 0) + '"><button class="sq fill" data-act="inc" data-f="' + f + '" aria-label="Aumentar ' + esc(label) + '">+</button></span></div>';
+}
+function refreshLive(){
+  if (!EDITOR || !draft) return; const {sid, pid, date} = EDITOR, mk = mkOf(date);
+  if (hasCota(mk, sid)){ const ci = cotaDia(quota(mk, sid, pid), sid, [pid], date), pp = ci.dia > 0 ? draft.venda / ci.dia * 100 : 100; const a = $('#live-pct'); if (a) a.textContent = pct(pp) + ' da cota'; const b = $('#live-bar'); if (b) b.innerHTML = bar(pp, null); }
+  const den = draft.atend + draft.ret, m = {pa: draft.vendas ? draft.pecas / draft.vendas : null, tm: draft.vendas ? draft.venda / draft.vendas : null, conv: den ? draft.vendas / den * 100 : null};
+  const k = $('#live-kpis'); if (k) k.innerHTML = kpiRow(m);
+  const c = check(draft), el = $('#live-check');
+  if (el) el.innerHTML = c.length ? '<div class="alert" role="alert"><strong>Confira antes de salvar</strong>' + c.map(x => '<span>• ' + x + '</span>').join('') + '</div>' : '<div class="note">' + icon('check', 18) + '<span>Números conferidos. Tudo certo para salvar.</span></div>';
+  const btn = $('#save-btn'); if (btn){ btn.disabled = c.length > 0; btn.textContent = c.length ? 'Corrija os avisos para salvar' : (ENTRIES[EDITOR.key] ? 'Salvar correção' : 'Salvar o dia'); }
+  CONFIG.categories.forEach(cat => { const n = cat.products.filter(p => !p.archived).reduce((a, p) => a + (draft[p.id] || 0), 0); const s = document.querySelector('[data-gsum="' + cat.id + '"]'); if (s) s.textContent = n ? n + (n === 1 ? ' item lançado' : ' itens lançados') : 'Nada lançado'; });
+}
+function fmtField(f, v){ return f === 'venda' ? money(v) : String(v || 0); }
+function summaryHtml(v){
+  const rows = FUNIL.map(f => '<li>' + FUNIL_LBL[f] + ': <strong>' + fmtField(f, v[f]) + '</strong></li>').join('') + products().filter(p => v[p.id] > 0).map(p => '<li>' + esc(p.name) + ': <strong>' + v[p.id] + '</strong></li>').join('');
+  return '<ul class="diff">' + rows + '</ul>';
+}
+function diffList(prev, v){
+  const out = []; if (prev.folga) out.push('Estava marcado como folga → passa a ter lançamento');
+  allFields().forEach(f => { const a = prev.folga ? 0 : (+(prev.v || {})[f] || 0), b = +v[f] || 0; if (a !== b) out.push(esc(fieldLabel(f)) + ': ' + fmtField(f, a) + ' → <strong>' + fmtField(f, b) + '</strong>'); });
+  return out;
+}
+async function saveDraft(folga){
+  const E = EDITOR, prev = ENTRIES[E.key], fix = !!prev; let body;
+  if (folga){ body = '<p>Marcar <strong>' + dlow(E.date) + '</strong> como <strong>dia sem venda / folga</strong> de ' + esc(sellerName(E.sid, E.pid)) + '?</p>' + (prev && !prev.folga ? '<div class="alert">Os números já lançados neste dia serão apagados.</div>' : ''); }
+  else {
+    if (check(draft).length) return toast('Corrija os avisos antes de salvar');
+    if (fix){ const d = diffList(prev, draft); if (!d.length) return toast('Nada mudou neste dia.'); body = '<p>Você está <strong>corrigindo</strong> ' + dlow(E.date) + '. Confira o que muda:</p><ul class="diff">' + d.map(x => '<li>' + x + '</li>').join('') + '</ul>'; }
+    else body = '<p>Confira o lançamento de <strong>' + dlow(E.date) + '</strong> antes de gravar:</p>' + summaryHtml(draft);
+  }
+  if (E.mode === 'seller') body += '<p class="small">' + (E.date === TODAY ? 'Você ainda pode corrigir este dia hoje e amanhã. Depois, só a gerência.' : 'Hoje é o último dia para corrigir este lançamento. Depois, só a gerência.') + '</p>';
+  if (E.mode === 'gerencia') body += '<div class="alert"><strong>Correção pela gerência.</strong><span>Muda resultados já calculados e fica registrada no histórico da planilha.</span></div>';
+  if (!(await ask(folga ? 'Confirmar folga?' : fix ? 'Confirmar correção?' : 'Confirmar lançamento?', body, folga ? 'Sim, marcar folga' : fix ? 'Sim, salvar correção' : 'Sim, salvar'))) return;
+  const d0 = E.date, by = SESSION.role === 'gerencia' ? 'Gerência geral' : sellerName(E.sid, E.pid);
+  const ok = await run(() => api('saveEntry', {store:E.sid, seller:E.pid, date:E.date, folga:!!folga, v: folga ? {} : clone(draft), by:by}), (folga ? 'Folga registrada · ' : fix ? 'Correção salva · ' : 'Lançamento salvo · ') + dlabel(d0));
+  if (ok){ EDITOR = null; if (ui.editDate){ ui.editDate = null; } if (ui.fix){ ui.fix = null; } render(); }
+}
+function sellerDash(sid, pid){
+  const c = ctx(mkOf(TODAY)), pids = [pid], mc = mcfg(c.mk, sid);
+  if (!mc || !mc.cota) return '<section class="card hero"><h2>Cota de ' + mlabel(c.mk).toLowerCase() + ' ainda não definida</h2><span class="small">Assim que a gerência definir, o seu painel aparece aqui. Seus lançamentos já estão sendo guardados.</span></section>';
+  if (!daysOf(c.mk, sid, pid)) return '<section class="card hero"><h2>Sem cota neste mês</h2><span class="small">A gerência marcou você sem dias trabalhados em ' + mlabel(c.mk).toLowerCase() + '.</span></section>';
+  const sp = split(mc.cota || 0, c.mk, sid)[pid], q = sp.v, ci = cotaDia(q, sid, pids, TODAY), m = metrics(sid, pids, c);
+  return '<section class="card hero"><span class="label">Cota de hoje · ' + ci.z + 'ª dezena</span><span class="big">' + (ci.dia > 0 ? brl(ci.dia) : 'Dezena batida') + '</span><span class="small">Faltam ' + brl(Math.max(0, ci.falta)) + ' na dezena, em ' + ci.dias + ' dias. Sua cota do mês: ' + brl(q) + ' (' + howText(sp, mc.cota, c.D) + ').</span></section>' +
+    dezCard(q, sid, pids, c, mc.sellerAno ? mc.sellerAno[pid] : 0) + chart(sid, pids, c) + kpiRow(m) + prodCard(m, sid, pid, c.mk, 'Cotas de produtos');
+}
+function sellerHist(sid, pid){
+  const y = addDays(TODAY, -1), dates = []; for (let d = P(TODAY).d; d >= 1; d--) dates.push(dateOf(mkOf(TODAY), d)); if (mkOf(y) !== mkOf(TODAY)) dates.splice(1, 0, y);
+  const rows = dates.map(date => {
+    const e = ENTRIES[sid + '|' + pid + '|' + date], c = e && !e.folga ? check(e.v) : [], req = REQS.filter(r => r.store === sid && r.seller === pid && r.date === date && r.status === 'aberto')[0];
+    const chip = !e ? (date < y ? '<span class="chip warn">Não lançado</span>' : '<span class="chip mute">Pendente</span>') : e.folga ? '<span class="chip mute">Folga</span>' : c.length ? '<span class="chip warn">Revisar</span>' : '<span class="chip ok">Lançado</span>';
+    const can = date === TODAY || date === y;
+    const btn = can ? '<button class="btn small" data-act="edit-day" data-date="' + date + '">' + (e ? 'Corrigir' : 'Lançar') + '</button>' : req ? '<span class="chip ok">Correção pedida</span>' : '<button class="btn small" data-act="ask-fix" data-date="' + date + '">' + icon('lock', 14) + ' Pedir correção</button>';
+    return '<tr><td><strong>' + dlabel(date) + '</strong>' + (date === TODAY ? ' <span class="small">hoje</span>' : date === y ? ' <span class="small">ontem</span>' : '') + '</td><td class="r">' + (e && !e.folga ? brl(e.v.venda) : '–') + '</td><td>' + chip + '</td><td class="r">' + btn + '</td></tr>';
+  }).join('');
+  return '<div class="note">' + icon('lock', 18) + '<span>Você pode lançar ou corrigir hoje e ontem. Dias mais antigos só a gerência altera: use “Pedir correção”.</span></div>' +
+    '<section class="card flush"><div class="head"><h2>' + mlabel(mkOf(TODAY)) + '</h2></div><div class="scroll"><table class="t"><thead><tr><th>Dia</th><th class="r">Valor</th><th>Situação</th><th></th></tr></thead><tbody>' + rows + '</tbody></table></div></section>';
+}
+async function askFix(sid, pid, date){
+  const r = await modal({title:'Pedir correção à gerência', body:'<p>Você não pode mais alterar <strong>' + dlow(date) + '</strong>. Explique o que precisa mudar e a gerência faz a correção.</p><label class="field" for="f-msg">O que está errado?<textarea id="f-msg" data-k="msg" rows="3" placeholder="Ex.: esqueci de lançar 1 travesseiro"></textarea></label>',
+    actions:[{label:'Cancelar', act:'no'}, {label:'Enviar pedido', act:'yes', primary:true}], validate:v => v.msg.trim() ? '' : 'Escreva o que precisa corrigir.'});
+  if (r.act !== 'yes') return;
+  run(() => api('requestFix', {store:sid, seller:pid, date:date, msg:r.values.msg.trim()}), 'Pedido enviado à gerência');
+}
+
+/* ---------- loja (gerente e gerência) ---------- */
+function storeDash(sid, mk, who){
+  const c = ctx(mk), pids = sellersOf(sid).map(p => p.id), mc = mcfg(mk, sid), m = metrics(sid, pids, c), el = elapsed(sid, pids, c), pace = el / c.D * 100;
+  const C = mc ? mc.cota || 0 : 0, mp = C ? m.venda / C * 100 : 0, proj = el ? m.venda / el * c.D : 0, ano = mc && mc.anoant ? mc.anoant * el / c.D : 0;
+  let html = '<section class="card hero"><div class="row"><div class="stack"><span class="label">Vendido em ' + mlabel(mk).toLowerCase() + '</span><span class="big">' + brl(m.venda) + '</span></div>' + (C ? '<span class="mid ' + (mp >= pace ? 'c-good' : 'c-warn') + '">' + pct(mp) + '</span>' : '') + '</div>';
+  if (C){
+    const ci = c.t && mk === mkOf(TODAY) ? cotaDia(C, sid, pids, TODAY) : null;
+    html += bar(mp, pace) + '<span class="small">Cota ' + brl(C) + ' · a linha marca o ritmo esperado (' + pct(pace) + ')</span><div class="tiles">' +
+      '<div class="stack"><span class="small">Projeção do mês</span><span class="mid">' + short(proj) + '</span><span class="small ' + (proj >= C ? 'c-good' : 'c-warn') + '" style="font-weight:700">' + pct(proj / C * 100) + ' da cota</span></div>' +
+      '<div class="stack"><span class="small">Cota de hoje</span><span class="mid">' + (ci ? (ci.dia > 0 ? brl(ci.dia) : 'Batida') : '–') + '</span><span class="small">loja inteira</span></div>' +
+      '<div class="stack"><span class="small">Ano anterior</span><span class="mid">' + (ano ? pct(m.venda / ano * 100) : '–') + '</span><span class="small">' + (ano ? 'até agora' : 'não preenchido') + '</span></div></div>';
+  } else html += '<div class="alert"><strong>Cota do mês não definida.</strong><span>' + (who === 'gerencia' ? 'Defina em Configurar › Mês.' : 'A gerência geral ainda vai definir.') + '</span></div>';
+  html += '</section>';
+  const sp = mc ? split(C, mk, sid) : {};
+  const ranked = sellersOf(sid).filter(p => daysOf(mk, sid, p.id) > 0).map(p => { const mm = metrics(sid, [p.id], c), q = sp[p.id] ? sp[p.id].v : 0; return {p:p, m:mm, q:q, pct: q ? mm.venda / q * 100 : 0}; }).sort((a, b) => b.pct - a.pct || b.m.venda - a.m.venda);
+  html += '<section class="card flush"><div class="head row"><h2>Vendedores</h2><span class="small">% da cota individual</span></div>' + (ranked.length ? ranked.map((r, i) =>
+    '<div class="stepline" style="flex-direction:column;align-items:stretch;gap:8px"><div class="row"><span class="row start" style="gap:10px;min-width:0"><span class="chip ok">' + (i + 1) + '</span><strong>' + esc(r.p.name) + '</strong></span><span><strong>' + brl(r.m.venda) + '</strong> <strong class="' + (r.pct >= pace ? 'c-good' : 'c-warn') + '">' + (r.q ? pct(r.pct) : '') + '</strong></span></div>' +
+    (r.q ? bar(r.pct, pace, true) : '') + '<span class="small">' + (r.q ? 'Cota ' + brl(r.q) + ' · ' : '') + 'P.A. ' + (r.m.pa == null ? '–' : dec1(r.m.pa)) + ' · Ticket ' + (r.m.tm == null ? '–' : brl(r.m.tm)) + ' · Conversão ' + pct(r.m.conv) + '</span></div>').join('') : '<div class="stepline small">Nenhum vendedor ativo.</div>') + '</section>';
+  return html + kpiRow(m) + prodCard(m, sid, null, mk, 'Cotas de produtos da loja') + chart(sid, pids, c);
+}
+function storeGrid(sid, mk){
+  const c = ctx(mk), ps = sellersOf(sid); let rows = '';
+  for (let d = c.t; d >= 1; d--){ const date = dateOf(mk, d);
+    rows += '<tr><td><strong>' + dlabel(date) + '</strong></td>' + ps.map(p => { const e = ENTRIES[sid + '|' + p.id + '|' + date];
+      if (!e) return '<td class="r">' + (daysOf(mk, sid, p.id) ? '<span class="chip ' + (date < TODAY ? 'warn' : 'mute') + '">' + (date < TODAY ? 'Falta' : 'Pendente') + '</span>' : '–') + '</td>';
+      if (e.folga) return '<td class="r"><span class="chip mute">Folga</span></td>';
+      const ch = check(e.v); return '<td class="r ' + (ch.length ? 'c-warn' : '') + '" title="' + esc(ch.join(' ')) + '">' + brl(e.v.venda) + (ch.length ? ' ▲' : '') + '</td>'; }).join('') + '<td class="r"><strong>' + brl(sum(sid, ps.map(p => p.id), 'venda', mk, d, d)) + '</strong></td></tr>'; }
+  return '<section class="card flush"><div class="head stack"><h2>Lançamentos por dia</h2><span class="small">▲ = lançamento com números que não batem.</span></div><div class="scroll"><table class="t"><thead><tr><th>Dia</th>' + ps.map(p => '<th class="r">' + esc(p.name) + '</th>').join('') + '<th class="r">Loja</th></tr></thead><tbody>' + (rows || '<tr><td colspan="9" class="small">Nenhum dia neste mês ainda.</td></tr>') + '</tbody></table></div></section>';
+}
+function storeConf(sid, mk, who){
+  const a = storeAlerts(sid, mk); if (!a.length) return '<div class="note">' + icon('check', 18) + '<span>Nada para conferir. Todos lançaram e os números batem.</span></div>';
+  const g = who === 'gerencia', grp = (k, t, sub) => { const l = a.filter(x => x.kind === k); if (!l.length) return ''; return '<section class="card"><div class="stack"><h2>' + t + '</h2>' + (sub ? '<span class="small">' + sub + '</span>' : '') + '</div>' + l.map(x => '<div class="alert"><span>' + x.text + '</span>' +
+    (g && x.kind === 'req' ? '<div class="row start" style="margin-top:6px"><button class="btn small" data-act="fix-open" data-store="' + sid + '" data-pid="' + x.req.seller + '" data-date="' + x.req.date + '">Corrigir</button><button class="btn small" data-act="req-done" data-id="' + x.req.id + '">Marcar como resolvido</button></div>' : '') +
+    (g && x.kind === 'bad' ? '<div class="row start" style="margin-top:6px"><button class="btn small" data-act="fix-open" data-store="' + sid + '" data-pid="' + x.pid + '" data-date="' + x.date + '">Corrigir</button></div>' : '') + '</div>').join('') + '</section>'; };
+  return grp('req', 'Pedidos de correção', g ? '' : 'Quem corrige é a gerência geral.') + grp('cfg', 'Configuração') + grp('late', 'Lançamentos atrasados') + grp('bad', 'Números que não batem', 'O app não deixa salvar assim. Estes vieram de antes ou da planilha.');
+}
+function viewGerente(){
+  const sid = SESSION.store, st = store(sid); if (!st){ SESSION = {}; saveSession(); return viewStart(); }
+  const tab = ui.tab || 'loja', mk = mkOf(TODAY), n = storeAlerts(sid, mk).length;
+  const body = tab === 'loja' ? storeDash(sid, mk, 'gerente') : tab === 'grid' ? storeGrid(sid, mk) : storeConf(sid, mk, 'gerente');
+  return page(band({eyebrow:'Gerente da loja', title:esc(st.name), sub:dlong(TODAY) + ' · ' + sellersOf(sid).length + ' vendedores'}), body, tabs([['loja', 'Loja', 'store'], ['grid', 'Lançamentos', 'list'], ['conf', 'Conferência' + (n ? ' (' + n + ')' : ''), 'alert']]));
+}
+
+/* ---------- gerência geral ---------- */
+function viewGerencia(){
+  if (!ui.month) ui.month = mkOf(TODAY);
+  const tab = ui.tab || 'rede'; let body, title = 'Painel das lojas', month = true;
+  if (tab === 'rede') body = network(ui.month);
+  else if (tab === 'lojas'){ const sid = ui.store && store(ui.store) ? ui.store : activeStores()[0].id; ui.store = sid; title = esc(store(sid).name); body = storePicker(false) + gerStore(sid, ui.month); }
+  else { title = 'Configurar'; month = ui.sub === 'mes' || !ui.sub; body = configView(); }
+  return page(band({eyebrow:'Gerência geral', title:title, sub:dlong(TODAY), month:month}), body, tabs([['rede', 'Lojas', 'net'], ['lojas', 'Detalhe', 'store'], ['config', 'Configurar', 'gear']]));
+}
+function storePicker(withNew){ if (!ui.store || !store(ui.store)) ui.store = activeStores()[0] ? activeStores()[0].id : null; return '<section class="card"><div class="pills" role="group" aria-label="Loja">' + activeStores().map(st => '<button class="pill" data-act="pick-ger-store" data-store="' + st.id + '" aria-pressed="' + (ui.store === st.id) + '">' + esc(st.name) + '</button>').join('') + (withNew ? '<button class="pill add" data-act="store-new">+ Nova loja</button>' : '') + '</div></section>'; }
+function gerStore(sid, mk){
+  let fix = '';
+  const c = ctx(mk), ps = sellersOf(sid), open = !!(ui.fix && ui.fix.sid === sid);
+  fix = '<details class="grp" id="fix-box"' + (open ? ' open' : '') + '><summary><span class="stack"><strong>' + icon('lock', 16) + ' Correção de lançamentos · uso excepcional</strong><span class="small">Para quando o vendedor não pode mais corrigir. Fica registrado no histórico.</span></span><span class="chev">' + icon('chev', 20) + '</span></summary><div class="inner">';
+  if (open) fix += editor(ui.fix.sid, ui.fix.pid, ui.fix.date, 'gerencia');
+  else if (!ps.length || !c.t) fix += '<span class="small">Nada para corrigir neste mês.</span>';
+  else fix += '<div class="grid2"><label class="field" for="fx-p">Vendedor<select id="fx-p">' + ps.map(p => '<option value="' + p.id + '">' + esc(p.name) + '</option>').join('') + '</select></label><label class="field" for="fx-d">Dia<select id="fx-d">' +
+    Array.from({length:c.t}, (_, i) => c.t - i).map(d => '<option value="' + dateOf(mk, d) + '">' + dlabel(dateOf(mk, d)) + '</option>').join('') + '</select></label></div><button class="btn" data-act="fix-pick" style="align-self:flex-start">Abrir lançamento</button>';
+  fix += '</div></details>';
+  return '<div class="split"><div class="main">' + storeDash(sid, mk, 'gerencia') + '</div><div class="side">' + storeConf(sid, mk, 'gerencia') + '</div></div>' + storeGrid(sid, mk) + fix;
+}
+function network(mk){
+  const tot = {v:0, c:0, p:0}; let pace = 0;
+  const rows = activeStores().map(st => { const c = ctx(mk), pids = sellersOf(st.id).map(p => p.id), m = metrics(st.id, pids, c), el = elapsed(st.id, pids, c), mc = mcfg(mk, st.id), C = mc ? mc.cota || 0 : 0, proj = el ? m.venda / el * c.D : 0, ano = mc && mc.anoant ? mc.anoant * el / c.D : 0;
+    pace = Math.max(pace, el / c.D * 100); if (C){ tot.v += m.venda; tot.c += C; tot.p += proj; }
+    return {st:st, m:m, C:C, pace:el / c.D * 100, pct: C ? m.venda / C * 100 : null, proj: C ? proj / C * 100 : null, yoy: ano ? m.venda / ano * 100 : null, alerts:storeAlerts(st.id, mk), need: C ? Math.max(0, C - m.venda) / Math.max(1, c.D - c.t + (mk === mkOf(TODAY) ? 1 : 0)) : 0}; })
+    .sort((a, b) => (b.proj == null ? -1 : b.proj) - (a.proj == null ? -1 : a.proj));
+  const M = CONFIG.metas, onPace = rows.filter(r => r.C && r.pct >= r.pace).length, reqs = REQS.filter(r => r.status === 'aberto').length, tp = tot.c ? tot.v / tot.c * 100 : null;
+  let html = '<div class="kpis" style="grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr))"><div class="kpi"><span class="label">Vendido nas lojas</span><span class="v">' + brl(tot.v) + '</span><span class="small">de ' + brl(tot.c) + ' de cota</span></div>' +
+    '<div class="kpi"><span class="label">% da cota</span><span class="v ' + (tp >= pace ? 'c-good' : 'c-warn') + '">' + pct(tp) + '</span><span class="small">ritmo esperado: ' + pct(pace) + '</span></div>' +
+    '<div class="kpi"><span class="label">Projeção do mês</span><span class="v">' + short(tot.p) + '</span><span class="small ' + (tot.p >= tot.c ? 'c-good' : 'c-warn') + '" style="font-weight:700">' + pct(tot.c ? tot.p / tot.c * 100 : null) + ' da cota</span></div>' +
+    '<div class="kpi"><span class="label">Lojas no ritmo</span><span class="v">' + onPace + ' de ' + rows.length + '</span><span class="small">' + (reqs ? reqs + (reqs === 1 ? ' pedido de correção aberto' : ' pedidos de correção abertos') : 'sem pedidos de correção') + '</span></div></div>';
+  html += '<div class="split"><section class="card flush main"><div class="head row" style="flex-wrap:wrap"><h2>Lojas</h2><span class="small">ordenadas pela projeção · toque para abrir</span></div><div class="scroll"><table class="t"><thead><tr><th>Loja</th><th class="r">Vendido</th><th style="min-width:170px">% da cota</th><th class="r">Projeção</th><th class="r">Ano ant.</th><th class="r">P.A.</th><th class="r">Ticket</th><th class="r">Conv.</th><th class="r">Avisos</th></tr></thead><tbody>' +
+    rows.map(r => '<tr class="click" data-act="open-store" data-store="' + r.st.id + '" tabindex="0"><td><strong>' + esc(r.st.name) + '</strong></td><td class="r">' + brl(r.m.venda) + '</td><td>' + (r.C ? '<div class="row" style="gap:8px"><div style="flex:1">' + bar(r.pct, r.pace, true) + '</div><strong class="' + (r.pct >= r.pace ? 'c-good' : 'c-warn') + '">' + pct(r.pct) + '</strong></div>' : '<span class="chip warn">Cota não definida</span>') + '</td>' +
+      '<td class="r ' + (r.proj >= 100 ? 'c-good' : 'c-warn') + '"><strong>' + pct(r.proj) + '</strong></td><td class="r">' + pct(r.yoy) + '</td><td class="r ' + (r.m.pa >= M.pa ? 'c-good' : 'c-warn') + '">' + (r.m.pa == null ? '–' : dec1(r.m.pa)) + '</td><td class="r">' + (r.m.tm == null ? '–' : brl(r.m.tm)) + '</td><td class="r ' + (r.m.conv >= M.conv ? 'c-good' : 'c-warn') + '">' + pct(r.m.conv) + '</td>' +
+      '<td class="r">' + (r.alerts.length ? '<span class="chip warn">' + r.alerts.length + '</span>' : '<span class="chip ok">0</span>') + '</td></tr>').join('') + '</tbody></table></div></section><div class="side"><h2>Atenção</h2>';
+  const side = rows.map(r => { const parts = [], cnt = k => r.alerts.filter(a => a.kind === k).length;
+    if (cnt('req')) parts.push(cnt('req') + (cnt('req') === 1 ? ' pedido de correção.' : ' pedidos de correção.'));
+    r.alerts.filter(a => a.kind === 'late').forEach(a => parts.push(a.text));
+    if (cnt('bad')) parts.push(cnt('bad') + (cnt('bad') === 1 ? ' lançamento com números que não batem.' : ' lançamentos com números que não batem.'));
+    if (!r.C) parts.push('Cota do mês não definida.'); else if (!(mcfg(mk, r.st.id) || {}).anoant) parts.push('Venda do ano anterior não preenchida.');
+    if (r.C && r.proj < 100 && mk === mkOf(TODAY)) parts.push('Precisa de ' + brl(r.need) + ' por dia até o fim do mês.');
+    return parts.length ? '<div class="alert"><strong>' + esc(r.st.name) + '</strong>' + parts.map(x => '<span>' + x + '</span>').join('') + '</div>' : ''; }).join('');
+  return html + (side || '<div class="note">' + icon('check', 18) + '<span>Nada pedindo atenção.</span></div>') + '</div></div>';
+}
+
+/* ---------- configurar ---------- */
+function configView(){
+  const sub = ui.sub || 'mes', subs = [['mes', 'Mês e vendedores'], ['lojas', 'Lojas e senhas'], ['produtos', 'Produtos'], ['metas', 'Metas']];
+  let html = '<section class="card"><div class="pills" role="group" aria-label="O que configurar">' + subs.map(s => '<button class="pill" data-act="sub" data-sub="' + s[0] + '" aria-pressed="' + (sub === s[0]) + '">' + s[1] + '</button>').join('') + '</div></section>';
+  if (sub === 'mes') html += storePicker(false) + cfgMonth(ui.store, ui.month);
+  else if (sub === 'lojas') html += cfgStores();
+  else if (sub === 'produtos') html += cfgProducts();
+  else html += cfgMetas();
+  return html;
+}
+function cfgMonth(sid, mk){
+  const st = store(sid), mc = mcfg(mk, sid), D = daysIn(mk), units = products().filter(p => p.rule === 'cotaMensal');
+  if (!st) return '';
+  if (!mc || !mc.cota){ const prev = mcfg(addMonths(mk, -1), sid);
+    return '<section class="card hero"><h2>' + esc(st.name) + ': ' + mlabel(mk).toLowerCase() + ' ainda não configurado</h2><span class="small">Defina a cota do mês para o app calcular as cotas dos vendedores, do dia e das dezenas.</span><div class="row start"><button class="btn primary" data-act="month-edit">Definir números do mês</button>' +
+      (prev && prev.cota ? '<button class="btn" data-act="month-copy">Copiar de ' + mlabel(addMonths(mk, -1)).toLowerCase() + '</button>' : '') + '</div></section>' + sellersCard(sid, mk, null); }
+  return '<section class="card hero"><div class="row"><h2>' + esc(st.name) + ' · ' + mlabel(mk) + '</h2><button class="btn small" data-act="month-edit">' + icon('edit', 16) + ' Editar</button></div><div class="tiles" style="border:none;padding:0">' +
+    '<div class="stack"><span class="small">Cota do mês</span><span class="mid">' + brl(mc.cota) + '</span></div><div class="stack"><span class="small">Venda no ano anterior</span><span class="mid">' + (mc.anoant ? brl(mc.anoant) : '–') + '</span>' + (mc.anoant ? '' : '<span class="small c-warn" style="font-weight:700">preencher</span>') + '</div>' +
+    units.map(p => '<div class="stack"><span class="small">Cota de ' + esc(p.name.toLowerCase()) + '</span><span class="mid">' + num((mc.prodCotas || {})[p.id] || 0) + ' un.</span></div>').join('') + '</div><span class="small">' + D + ' dias · dezenas: 1 a 10, 11 a 20 e 21 a ' + D + '</span></section>' + sellersCard(sid, mk, mc);
+}
+function sellersCard(sid, mk, mc){
+  const D = daysIn(mk), ss = sellersOf(sid), units = products().filter(p => p.rule === 'cotaMensal'), sp = split(mc ? mc.cota || 0 : 0, mk, sid);
+  if (mc && !mc.cota) mc = null;
+  let total = 0; ss.forEach(p => { total += sp[p.id].v; });
+  const ok = !mc || Math.abs(total - (mc.cota || 0)) < 1;
+  return '<section class="card flush"><div class="head row" style="flex-wrap:wrap"><div class="stack"><h2>Vendedores</h2><span class="small">Cota individual = cota da loja ÷ vendedores. Quem trabalha só parte do mês recebe a parte proporcional aos dias; a sobra vai para quem trabalha o mês inteiro.</span></div><button class="btn small primary" data-act="seller-new">+ Adicionar vendedor</button></div>' +
+    '<div class="scroll"><table class="t"><thead><tr><th>Vendedor</th><th class="r">Dias</th><th>Como foi calculado</th><th class="r">Cota</th>' + units.map(p => '<th class="r">' + esc(p.name) + '</th>').join('') + '<th class="r">Ano anterior</th><th></th></tr></thead><tbody>' +
+    (ss.length ? ss.map(p => { const r = sp[p.id];
+      return '<tr><td><strong>' + esc(p.name) + '</strong></td><td class="r">' + r.days + '/' + D + '</td><td class="small">' + (mc ? howText(r, mc.cota, D) : '–') + '</td><td class="r"><strong>' + (mc && r.v ? brl(r.v) : '–') + '</strong></td>' +
+        units.map(u => '<td class="r">' + (mc && r.days ? dec1(unitQuota(mk, sid, p.id, u.id)) : '–') + '</td>').join('') + '<td class="r">' + (mc && mc.sellerAno && mc.sellerAno[p.id] ? brl(mc.sellerAno[p.id]) : '–') + '</td><td class="r"><button class="btn small" data-act="seller-edit" data-pid="' + p.id + '">Editar</button></td></tr>'; }).join('')
+      : '<tr><td colspan="8" class="small">Nenhum vendedor. Toque em “Adicionar vendedor”.</td></tr>') + '</tbody>' +
+    (mc && ss.length ? '<tfoot><tr><td><strong>Soma</strong></td><td></td><td></td><td class="r"><strong>' + brl(total) + '</strong></td>' + units.map(u => '<td></td>').join('') + '<td></td><td></td></tr></tfoot>' : '') + '</table></div>' +
+    '<div style="padding:12px 16px">' + (!mc ? '' : !ss.length ? '<div class="alert"><strong>Loja sem vendedores.</strong><span>Adicione os vendedores para dividir a cota.</span></div>' : ok ? '<div class="note">' + icon('check', 18) + '<span>Soma das cotas = cota da loja (' + brl(mc.cota) + ').</span></div>' : '<div class="alert"><strong>A soma não fecha.</strong><span>Ninguém trabalha o mês inteiro, então sobram ' + brl((mc.cota || 0) - total) + ' sem dono. Ajuste os dias.</span></div>') + '</div></section>';
+}
+function cfgStores(){
+  const pins = PINS || {};
+  return '<section class="card"><div class="row"><div class="stack"><h2>Senha da gerência geral</h2><span class="small">Só números, de 4 a 8. Use uma que só você saiba.</span></div><button class="btn small" data-act="gpin-edit">Alterar</button></div></section>' +
+    '<section class="card flush"><div class="head row" style="flex-wrap:wrap"><div class="stack"><h2>Lojas e senhas dos gerentes</h2><span class="small">Cada loja tem a sua senha. Passe a senha só para o gerente daquela loja.</span></div><button class="btn small primary" data-act="store-new">+ Nova loja</button></div>' +
+    '<div class="scroll"><table class="t"><thead><tr><th>Loja</th><th class="r">Vendedores</th><th>Senha do gerente</th><th></th></tr></thead><tbody>' +
+    activeStores().map(st => '<tr><td><strong>' + esc(st.name) + '</strong></td><td class="r">' + sellersOf(st.id).length + '</td><td>' + (PINS == null ? '<span class="small">carregando…</span>' : pins[st.id] ? '<strong style="letter-spacing:.1em">' + esc(pins[st.id]) + '</strong>' : '<span class="chip warn">Não definida</span>') + '</td><td class="r"><button class="btn small" data-act="store-edit" data-store="' + st.id + '">Editar</button></td></tr>').join('') + '</tbody></table></div></section>' +
+    (CONFIG.stores.some(s => s.archived) ? '<section class="card"><h2>Lojas desativadas</h2>' + CONFIG.stores.filter(s => s.archived).map(s => '<div class="row"><span>' + esc(s.name) + '</span><button class="btn small" data-act="store-restore" data-store="' + s.id + '">Reativar</button></div>').join('') + '</section>' : '');
+}
+function cfgProducts(){
+  return '<div class="note">' + icon('alert', 18) + '<span>Valor vendido, atendimentos, retornos, vendas e peças são fixos, porque entram no P.A., no ticket e na conversão. O resto você pode mudar à vontade.</span></div>' +
+    CONFIG.categories.filter(c => !c.archived).map(c => '<section class="card flush"><div class="head row" style="flex-wrap:wrap"><h2>' + esc(c.name) + '</h2><span class="row" style="gap:6px"><button class="btn small" data-act="cat-edit" data-cat="' + c.id + '">Editar categoria</button><button class="btn small primary" data-act="prod-new" data-cat="' + c.id + '">+ Produto</button></span></div>' +
+      '<div class="scroll"><table class="t"><tbody>' + (c.products.filter(p => !p.archived).map(p => '<tr><td><strong>' + esc(p.name) + '</strong></td><td class="small wrap">' + ruleText(p) + '</td><td class="r"><button class="btn small" data-act="prod-edit" data-pid="' + p.id + '">Editar</button></td></tr>').join('') || '<tr><td class="small">Sem produtos.</td></tr>') + '</tbody></table></div></section>').join('') +
+    '<button class="btn primary" data-act="cat-new" style="align-self:flex-start">+ Nova categoria</button>' +
+    (products(true).some(p => p.archived) ? '<section class="card"><h2>Produtos desativados</h2>' + products(true).filter(p => p.archived).map(p => '<div class="row"><span>' + esc(p.name) + '</span><button class="btn small" data-act="prod-restore" data-pid="' + p.id + '">Reativar</button></div>').join('') + '</section>' : '');
+}
+function ruleText(p){ if (p.rule === 'porColchao') return 'Cota: ' + dec1(p.fator || 1) + ' por colchão vendido'; if (p.rule === 'base') return 'Cota de bases · peso ' + dec1(p.peso || 0); if (p.rule === 'ref') return 'Base das cotas por colchão'; if (p.rule === 'cotaMensal') return 'Cota mensal em unidades (definida por loja no mês)'; return 'Só contagem'; }
+function cfgMetas(){ const M = CONFIG.metas; return '<section class="card"><h2>Metas dos indicadores · todas as lojas</h2>' + dec1Field('pa', M.pa, 'P.A. (peças por venda)', 'Digite 40 para 4,0') + moneyField('tm', M.tm, 'Ticket médio') + intField('conv', M.conv, 'Conversão (%)', 'Vendas ÷ (atendimentos + retornos)') + '<button class="btn primary" data-act="metas-save" style="align-self:flex-start">Salvar metas</button></section>'; }
+
+/* ações de configuração (todas com aviso antes de gravar) */
+async function saveCfg(mut, msg){ const cfg = clone(CONFIG); mut(cfg); await run(() => api('saveConfig', {config:cfg}), msg); }
+function cfgMonthObj(cfg, mk, sid){ cfg.months = cfg.months || {}; cfg.months[mk] = cfg.months[mk] || {stores:{}}; cfg.months[mk].stores[sid] = cfg.months[mk].stores[sid] || {cota:0, anoant:0, prodCotas:{}, days:{}, sellerAno:{}}; return cfg.months[mk].stores[sid]; }
+async function monthEdit(){
+  const sid = ui.store, mk = ui.month, mc = mcfg(mk, sid) || {}, units = products().filter(p => p.rule === 'cotaMensal');
+  const r = await modal({title:'Números de ' + mlabel(mk).toLowerCase() + ' · ' + esc(store(sid).name), body: moneyField('cota', mc.cota, 'Cota do mês') + moneyField('anoant', mc.anoant, 'Venda no mesmo mês do ano anterior', 'Deixe 0,00 se não houver.') +
+    units.map(p => intField('u_' + p.id, (mc.prodCotas || {})[p.id] || 0, 'Cota de ' + esc(p.name.toLowerCase()) + ' (unidades)')).join('') + '<div class="alert"><span>Ao salvar, as cotas de todos os vendedores desta loja são recalculadas.</span></div>',
+    actions:[{label:'Cancelar', act:'no'}, {label:'Salvar números', act:'yes', primary:true}], validate:v => readMoney(v.cota) > 0 ? '' : 'Informe a cota do mês.'});
+  if (r.act !== 'yes') return;
+  const nv = {cota:readMoney(r.values.cota), anoant:readMoney(r.values.anoant)};
+  if (mc.cota && mc.cota !== nv.cota && !(await ask('Alterar a cota?', '<p>A cota de ' + esc(store(sid).name) + ' em ' + mlabel(mk).toLowerCase() + ' muda de <strong>' + money(mc.cota) + '</strong> para <strong>' + money(nv.cota) + '</strong>.</p><p class="small">As cotas do dia, das dezenas e dos vendedores serão recalculadas.</p>', 'Sim, alterar'))) return;
+  saveCfg(cfg => { const o = cfgMonthObj(cfg, mk, sid); o.cota = nv.cota; o.anoant = nv.anoant; o.prodCotas = o.prodCotas || {}; units.forEach(p => { o.prodCotas[p.id] = readInt(r.values['u_' + p.id]); }); }, 'Números do mês salvos');
+}
+async function monthCopy(){
+  const sid = ui.store, mk = ui.month, pm = addMonths(mk, -1), prev = mcfg(pm, sid);
+  if (!(await ask('Copiar de ' + mlabel(pm).toLowerCase() + '?', '<p>A cota (' + brl(prev.cota) + ') e as cotas em unidades de ' + mlabel(pm).toLowerCase() + ' vão para ' + mlabel(mk).toLowerCase() + ' em ' + esc(store(sid).name) + '.</p><p class="small">A venda do ano anterior não é copiada (é de outro mês) e todos os vendedores voltam para o mês inteiro. Confira depois.</p>', 'Sim, copiar'))) return;
+  saveCfg(cfg => { const o = cfgMonthObj(cfg, mk, sid); o.cota = prev.cota; o.prodCotas = clone(prev.prodCotas || {}); }, 'Mês copiado. Confira os números.');
+}
+async function sellerEdit(pid){
+  const sid = ui.store, mk = ui.month, D = daysIn(mk), mc = mcfg(mk, sid), p = store(sid).sellers.filter(x => x.id === pid)[0];
+  const r = await modal({title:'Editar ' + esc(p.name), body: textField('name', p.name, 'Nome') + intField('days', daysOf(mk, sid, pid), 'Dias trabalhados em ' + mlabel(mk).toLowerCase(), 'De 0 a ' + D + '. Férias ou entrada no meio do mês: a cota fica proporcional e a sobra vai para os outros.') +
+    moneyField('ano', mc && mc.sellerAno ? mc.sellerAno[pid] : 0, 'Venda dele(a) no mesmo mês do ano anterior', 'Opcional.'),
+    actions:[{label:'Desligar vendedor', act:'off', danger:true}, {label:'Cancelar', act:'no'}, {label:'Salvar', act:'yes', primary:true}],
+    validate:(v, a) => a === 'off' ? '' : !v.name.trim() ? 'Escreva o nome.' : readInt(v.days) > D ? 'No máximo ' + D + ' dias.' : ''});
+  if (r.act === 'off'){
+    if (!(await ask('Desligar ' + esc(p.name) + '?', '<p>' + esc(p.name) + ' sai da lista da loja e não consegue mais lançar. A cota é redividida entre os outros. Os lançamentos já feitos continuam guardados na planilha.</p>', 'Sim, desligar', true))) return;
+    return saveCfg(cfg => { cfg.stores.filter(s => s.id === sid)[0].sellers.forEach(x => { if (x.id === pid) x.archived = true; }); }, esc(p.name) + ' desligado(a)');
+  }
+  if (r.act !== 'yes') return;
+  const days = Math.min(D, readInt(r.values.days)), name = r.values.name.trim(), ano = readMoney(r.values.ano);
+  if (days !== daysOf(mk, sid, pid) && !(await ask('Mudar os dias de ' + esc(p.name) + '?', '<p>De <strong>' + daysOf(mk, sid, pid) + '</strong> para <strong>' + days + '</strong> dias em ' + mlabel(mk).toLowerCase() + '.</p><p class="small">As cotas de todos os vendedores da loja serão recalculadas.</p>', 'Sim, mudar'))) return;
+  saveCfg(cfg => { cfg.stores.filter(s => s.id === sid)[0].sellers.forEach(x => { if (x.id === pid) x.name = name; }); const o = cfgMonthObj(cfg, mk, sid); o.days = o.days || {}; o.days[pid] = days; o.sellerAno = o.sellerAno || {}; o.sellerAno[pid] = ano; if (!mc) o.cota = 0; }, 'Vendedor atualizado');
+}
+async function sellerNew(){
+  const sid = ui.store, mk = ui.month, D = daysIn(mk);
+  const r = await modal({title:'Adicionar vendedor · ' + esc(store(sid).name), body: textField('name', '', 'Nome', 'Nome do vendedor') + '<label class="field" for="f-start">Começa em ' + mlabel(mk).toLowerCase() + '<select id="f-start" data-k="start"><option value="0">Mês inteiro</option>' + Array.from({length:D - 1}, (_, i) => i + 2).map(d => '<option value="' + d + '">Dia ' + d + ' (' + (D - d) + ' dias)</option>').join('') + '</select><span class="hint">Contagem como no seu exemplo: entra no dia 10 → 20 dias.</span></label>',
+    actions:[{label:'Cancelar', act:'no'}, {label:'Adicionar', act:'yes', primary:true}], validate:v => !v.name.trim() ? 'Escreva o nome.' : sellersOf(sid).some(p => p.name.toLowerCase() === v.name.trim().toLowerCase()) ? 'Já existe alguém com esse nome nesta loja.' : ''});
+  if (r.act !== 'yes') return;
+  const name = r.values.name.trim(), start = +r.values.start, days = start ? D - start : D, id = uid('v');
+  if (!(await ask('Adicionar ' + esc(name) + '?', '<p><strong>' + esc(name) + '</strong> entra na loja ' + esc(store(sid).name) + (start ? ' no dia ' + start + ', com ' + days + ' dias em ' + mlabel(mk).toLowerCase() : ' no mês inteiro') + '.</p><p class="small">As cotas dos outros vendedores serão recalculadas.</p>', 'Sim, adicionar'))) return;
+  saveCfg(cfg => { cfg.stores.filter(s => s.id === sid)[0].sellers.push({id:id, name:name}); const o = cfgMonthObj(cfg, mk, sid); o.days = o.days || {}; o.days[id] = days; }, name + ' adicionado(a)');
+}
+async function storeEditOrNew(sid){
+  const st = sid ? store(sid) : null, pins = PINS || {}, mk = mkOf(TODAY);
+  const body = textField('name', st ? st.name : '', 'Nome da loja', 'Ex.: Barra') + pinField('pin', 'Senha do gerente da loja', 'Só números, de 4 a 8. Você pode ver e trocar quando quiser.', true, st ? pins[sid] : '') +
+    (st ? '' : moneyField('cota', 0, 'Cota de ' + mlabel(mk).toLowerCase()) + moneyField('anoant', 0, 'Venda no mesmo mês do ano anterior', 'Deixe 0,00 se não houver.'));
+  const acts = st ? [{label:'Desativar loja', act:'off', danger:true}, {label:'Cancelar', act:'no'}, {label:'Salvar', act:'yes', primary:true}] : [{label:'Cancelar', act:'no'}, {label:'Criar loja', act:'yes', primary:true}];
+  const r = await modal({title: st ? 'Editar ' + esc(st.name) : 'Nova loja', body:body, actions:acts, validate:(v, a) => {
+    if (a === 'off') return ''; const n = v.name.trim(); if (!n) return 'Escreva o nome da loja.';
+    if (CONFIG.stores.some(s => s.id !== sid && s.name.toLowerCase() === n.toLowerCase())) return 'Já existe uma loja com esse nome.';
+    if (v.pin && v.pin.length < 4) return 'A senha precisa ter de 4 a 8 números.'; if (!st && readMoney(v.cota) <= 0) return 'Informe a cota do mês.'; return ''; }});
+  if (r.act === 'off'){
+    if (!(await ask('Desativar ' + esc(st.name) + '?', '<p>A loja some dos painéis e da lista de lojas. Nada é apagado: você pode reativar depois em Lojas e senhas.</p>', 'Sim, desativar', true))) return;
+    return saveCfg(cfg => { cfg.stores.forEach(s => { if (s.id === sid) s.archived = true; }); }, esc(st.name) + ' desativada');
+  }
+  if (r.act !== 'yes') return;
+  const name = r.values.name.trim(), pin = r.values.pin;
+  const changes = []; if (st && name !== st.name) changes.push('Nome: ' + esc(st.name) + ' → <strong>' + esc(name) + '</strong>'); if (st && pin && pin !== pins[sid]) changes.push('Senha do gerente: nova senha <strong>' + esc(pin) + '</strong>');
+  if (st && !changes.length) return toast('Nada mudou.');
+  const msg = st ? '<ul class="diff">' + changes.map(c => '<li>' + c + '</li>').join('') + '</ul>' : '<p>Criar a loja <strong>' + esc(name) + '</strong> com cota de ' + money(readMoney(r.values.cota)) + ' em ' + mlabel(mk).toLowerCase() + (pin ? ' e senha do gerente <strong>' + esc(pin) + '</strong>' : ' (sem senha de gerente por enquanto)') + '?</p><p class="small">Depois, adicione os vendedores em Configurar › Mês e vendedores.</p>';
+  if (!(await ask(st ? 'Salvar alterações?' : 'Criar loja?', msg, st ? 'Sim, salvar' : 'Sim, criar'))) return;
+  const id = sid || uid('l');
+  const ok = await run(async () => {
+    if (!st || name !== st.name){ const cfg = clone(CONFIG); if (st) cfg.stores.forEach(s => { if (s.id === sid) s.name = name; }); else { cfg.stores.push({id:id, name:name, sellers:[]}); const o = cfgMonthObj(cfg, mk, id); o.cota = readMoney(r.values.cota); o.anoant = readMoney(r.values.anoant); } const a = await api('saveConfig', {config:cfg}); if (!a.ok) return a; }
+    if (pin && pin !== pins[sid]){ const b = await api('setPin', {target:'store', store:id, pin:pin}); if (!b.ok) return b; }
+    return {ok:true};
+  }, st ? 'Loja atualizada' : name + ' criada. Agora adicione os vendedores.');
+  if (ok){ await loadPins(); if (!st){ ui.store = id; ui.sub = 'mes'; ui.month = mk; } render(); }
+}
+async function gpinEdit(){
+  const r = await modal({title:'Alterar senha da gerência', body: pinField('pin', 'Nova senha') + pinField('pin2', 'Repita a nova senha') + '<div class="alert"><span>Anote a nova senha. Sem ela, ninguém entra na gerência geral.</span></div>', actions:[{label:'Cancelar', act:'no'}, {label:'Trocar senha', act:'yes', primary:true}],
+    validate:v => v.pin.length < 4 ? 'A senha precisa ter de 4 a 8 números.' : v.pin !== v.pin2 ? 'As duas senhas não são iguais.' : ''});
+  if (r.act !== 'yes') return; run(() => api('setPin', {target:'gerencia', pin:r.values.pin}), 'Senha da gerência alterada');
+}
+async function prodEditOrNew(pid, catId){
+  const p = pid ? products(true).filter(x => x.id === pid)[0] : {name:'', rule:'none', fator:1, peso:1, cat:catId};
+  const body = textField('name', p.name, 'Nome do produto') + '<label class="field" for="f-cat">Categoria<select id="f-cat" data-k="cat">' + CONFIG.categories.filter(c => !c.archived).map(c => '<option value="' + c.id + '"' + (c.id === p.cat ? ' selected' : '') + '>' + esc(c.name) + '</option>').join('') + '</select></label>' +
+    '<label class="field" for="f-rule">Tipo de cota<select id="f-rule" data-k="rule">' + Object.keys(RULES).map(k => '<option value="' + k + '"' + (k === p.rule ? ' selected' : '') + '>' + RULES[k] + '</option>').join('') + '</select><span class="hint">Por colchão: ex. travesseiro = 2 por colchão. Bases: cada item tem um peso. Mensal: você define as unidades de cada loja no mês.</span></label>' +
+    dec1Field('fator', p.fator || 1, 'Quantos por colchão (para “cota por colchão”)', 'Digite 20 para 2,0') + dec1Field('peso', p.peso || 1, 'Peso na cota de bases (para “entra na cota de bases”)', 'Digite 5 para 0,5');
+  const r = await modal({title: pid ? 'Editar ' + esc(p.name) : 'Novo produto', body:body, actions: pid ? [{label:'Desativar produto', act:'off', danger:true}, {label:'Cancelar', act:'no'}, {label:'Salvar', act:'yes', primary:true}] : [{label:'Cancelar', act:'no'}, {label:'Criar produto', act:'yes', primary:true}],
+    validate:(v, a) => a === 'off' ? '' : !v.name.trim() ? 'Escreva o nome do produto.' : products(true).some(x => x.id !== pid && x.name.toLowerCase() === v.name.trim().toLowerCase()) ? 'Já existe um produto com esse nome.' : ''});
+  if (r.act === 'off'){
+    if (p.rule === 'ref') return toast('Este é a base das cotas. Escolha outro produto como base antes de desativar.');
+    if (!(await ask('Desativar ' + esc(p.name) + '?', '<p>O produto some da tela de lançamento e das cotas. Os números já lançados continuam guardados na planilha. Dá para reativar depois.</p>', 'Sim, desativar', true))) return;
+    return saveCfg(cfg => cfg.categories.forEach(c => c.products.forEach(x => { if (x.id === pid) x.archived = true; })), esc(p.name) + ' desativado');
+  }
+  if (r.act !== 'yes') return;
+  const v = r.values, np = {id: pid || uid('p'), name:v.name.trim(), rule:v.rule, fator:readDec1(v.fator) || 1, peso:readDec1(v.peso)};
+  const oldRef = refProduct(), extra = v.rule === 'ref' && oldRef && oldRef.id !== np.id ? '<div class="alert"><span>' + esc(oldRef.name) + ' deixa de ser a base das cotas e vira “só contagem”.</span></div>' : '';
+  if (!(await ask(pid ? 'Salvar ' + esc(np.name) + '?' : 'Criar ' + esc(np.name) + '?', '<p><strong>' + esc(np.name) + '</strong> · ' + RULES[np.rule] + (np.rule === 'porColchao' ? ' (' + dec1(np.fator) + ' por colchão)' : np.rule === 'base' ? ' (peso ' + dec1(np.peso) + ')' : '') + '.</p>' + extra + '<p class="small">A mudança aparece para todos os vendedores na próxima vez que abrirem o app.</p>', pid ? 'Sim, salvar' : 'Sim, criar'))) return;
+  saveCfg(cfg => {
+    if (np.rule === 'ref') cfg.categories.forEach(c => c.products.forEach(x => { if (x.rule === 'ref' && x.id !== np.id) x.rule = 'none'; }));
+    let found = null; cfg.categories.forEach(c => { c.products = c.products.filter(x => { if (x.id === np.id){ found = x; return false; } return true; }); });
+    const target = cfg.categories.filter(c => c.id === v.cat)[0]; target.products.push(Object.assign(found || {}, np));
+  }, pid ? 'Produto atualizado' : 'Produto criado');
+}
+async function catEditOrNew(cid){
+  const c = cid ? CONFIG.categories.filter(x => x.id === cid)[0] : null;
+  const r = await modal({title: c ? 'Editar categoria' : 'Nova categoria', body:textField('name', c ? c.name : '', 'Nome da categoria', 'Ex.: Infantil'), actions: c ? [{label:'Desativar categoria', act:'off', danger:true}, {label:'Cancelar', act:'no'}, {label:'Salvar', act:'yes', primary:true}] : [{label:'Cancelar', act:'no'}, {label:'Criar', act:'yes', primary:true}], validate:(v, a) => a === 'off' || v.name.trim() ? '' : 'Escreva o nome.'});
+  if (r.act === 'off'){
+    if (c.products.some(p => p.rule === 'ref' && !p.archived)) return toast('Esta categoria tem a base das cotas. Mude a base antes.');
+    if (!(await ask('Desativar ' + esc(c.name) + '?', '<p>A categoria e todos os produtos dela somem do lançamento. Os números já lançados continuam na planilha.</p>', 'Sim, desativar', true))) return;
+    return saveCfg(cfg => cfg.categories.forEach(x => { if (x.id === cid) x.archived = true; }), 'Categoria desativada');
+  }
+  if (r.act !== 'yes') return; const name = r.values.name.trim();
+  if (!(await ask(c ? 'Renomear categoria?' : 'Criar categoria?', c ? '<p>' + esc(c.name) + ' → <strong>' + esc(name) + '</strong></p>' : '<p>Criar a categoria <strong>' + esc(name) + '</strong>. Depois, adicione os produtos nela.</p>', c ? 'Sim, renomear' : 'Sim, criar'))) return;
+  saveCfg(cfg => { if (c) cfg.categories.forEach(x => { if (x.id === cid) x.name = name; }); else cfg.categories.push({id:uid('c'), name:name, products:[]}); }, c ? 'Categoria renomeada' : 'Categoria criada');
+}
+async function metasSave(){
+  const v = modalLess(), M = CONFIG.metas, n = {pa:readDec1(v.pa), tm:readMoney(v.tm), conv:readInt(v.conv)}, ch = [];
+  if (n.pa !== M.pa) ch.push('P.A.: ' + dec1(M.pa) + ' → <strong>' + dec1(n.pa) + '</strong>'); if (n.tm !== M.tm) ch.push('Ticket médio: ' + money(M.tm) + ' → <strong>' + money(n.tm) + '</strong>'); if (n.conv !== M.conv) ch.push('Conversão: ' + M.conv + '% → <strong>' + n.conv + '%</strong>');
+  if (!ch.length) return toast('Nada mudou.');
+  if (!(await ask('Salvar novas metas?', '<ul class="diff">' + ch.map(x => '<li>' + x + '</li>').join('') + '</ul><p class="small">Vale para todas as lojas e todos os meses nos painéis.</p>', 'Sim, salvar'))) return;
+  saveCfg(cfg => { cfg.metas = n; }, 'Metas salvas');
+}
+function modalLess(){ const v = {}; document.querySelectorAll('main [data-k]').forEach(i => { v[i.dataset.k] = i.value; }); return v; }
+async function loadPins(){ try { const r = await api('getPins', {}); PINS = r.ok ? r.stores || {} : {}; if (!r.ok && r.error === 'auth') handleError(r); } catch (e) { PINS = {}; } }
+
+/* ---------- instalar no celular ---------- */
+let INSTALL_EVT = null;
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); INSTALL_EVT = e; });
+function isStandalone(){ return (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true; }
+function platform(){ const ua = navigator.userAgent || ''; if (/iPhone|iPad|iPod/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) return 'ios'; if (/Android/i.test(ua)) return 'android'; return 'outro'; }
+async function installHelp(){
+  const pf = platform();
+  const ios = '<div class="stack"><strong>iPhone (Safari)</strong><ol class="steps"><li>Abra o link do app no <strong>Safari</strong>.</li><li>Toque no botão <strong>Compartilhar</strong> (quadrado com seta para cima), na barra de baixo.</li><li>Role e toque em <strong>Adicionar à Tela de Início</strong>.</li><li>Toque em <strong>Adicionar</strong>. O ícone branco com “RD” aparece na tela.</li></ol></div>';
+  const and = '<div class="stack"><strong>Android (Chrome)</strong><ol class="steps"><li>Abra o link do app no <strong>Chrome</strong>.</li><li>Toque nos <strong>três pontinhos ⋮</strong>, no canto de cima.</li><li>Toque em <strong>Instalar app</strong> (ou <strong>Adicionar à tela inicial</strong>).</li><li>Confirme. O ícone branco com “RD” aparece na tela.</li></ol></div>';
+  const body = '<p>Instale o <strong>RD Studio do Sono</strong> no celular para abrir com um toque, como um aplicativo. O ícone é branco com o dente-de-leão azul e “RD”, diferente do outro app da empresa.</p>' + (pf === 'ios' ? ios : pf === 'android' ? and : ios + and) + (DEMO ? '<p class="small">Esta é a demonstração. A instalação funciona na versão publicada no endereço da empresa.</p>' : '');
+  const acts = [{label:'Agora não', act:'no'}]; if (INSTALL_EVT) acts.push({label:'Instalar agora', act:'install', primary:true}); else acts.push({label:'Entendi', act:'ok', primary:true});
+  const r = await modal({title:'Instale o app no seu celular', body:body, actions:acts});
+  try { localStorage.setItem('rd-instalar-visto', '1'); } catch (e) {}
+  if (r.act === 'install' && INSTALL_EVT){ INSTALL_EVT.prompt(); INSTALL_EVT = null; }
+}
+
+/* ---------- desenhar ---------- */
+function render(){
+  const app = $('#app');
+  if (LOADING){ app.className = ''; app.innerHTML = startBand('Carregando…') + '<main><div class="main-in"><section class="card hero center"><span class="small">Buscando os dados da planilha…</span></section></div></main>'; return; }
+  if (LOAD_ERR){ app.className = ''; app.innerHTML = startBand('Sem conexão') + '<main><div class="main-in"><section class="card hero"><h2>Não foi possível falar com a planilha</h2><span class="small">' + esc(LOAD_ERR) + '</span><span class="small">Confira a internet e tente de novo.</span><button class="btn primary" data-act="retry">Tentar de novo</button></section></div></main>'; return; }
+  app.className = SESSION.role === 'gerencia' ? 'wide' : '';
+  app.innerHTML = !SESSION.role || !CONFIG ? viewStart() : SESSION.role === 'vendedor' ? viewSeller() : SESSION.role === 'gerente' ? viewGerente() : viewGerencia();
+  if (EDITOR && $('#f-venda')) refreshLive();
+}
+
+/* ---------- toques e digitação ---------- */
+document.addEventListener('click', async ev => {
+  if (ev.target.matches('[data-overlay]')) return closeModal('no');
+  const mb = ev.target.closest('[data-mact]'); if (mb) return closeModal(mb.dataset.mact);
+  const b = ev.target.closest('[data-act]'); if (!b || b.disabled) return;
+  const a = b.dataset.act, d = b.dataset;
+  switch (a){
+    case 'retry': boot(); break;
+    case 'role': if (d.role === 'gerencia') go({step:'pin', pickRole:'gerencia'}); else go({step:'store', pickRole:d.role}); break;
+    case 'step': go({step:d.step}); break;
+    case 'pick-store': if (ui.pickRole === 'vendedor') go({step:'seller', pickStore:d.store}); else go({step:'pin', pickStore:d.store}); break;
+    case 'pick-seller': go({step:'confirm', pickSeller:d.pid}); break;
+    case 'confirm-seller': SESSION = {role:'vendedor', store:ui.pickStore, seller:ui.pickSeller}; saveSession(); EDITOR = null; go({step:'home', tab:'lancar'}); toast('Olá, ' + sellerName(SESSION.store, SESSION.seller) + '!'); break;
+    case 'login': case 'setup-pin': {
+      const pin = ($('#f-pin') || {}).value || '', g = ui.pickRole === 'gerencia';
+      if (pin.length < 4) return toast('A senha tem de 4 a 8 números.');
+      if (a === 'setup-pin' && pin !== ($('#f-pin2') || {}).value) return toast('As duas senhas não são iguais.');
+      try {
+        const r = a === 'setup-pin' ? await api('setupGerencia', {pin:pin}) : await api('login', {role:g ? 'gerencia' : 'gerente', store:ui.pickStore, pin:pin});
+        if (!r.ok){ if (r.needSetup){ HAS_GPIN = false; render(); return; } return toast(r.error || 'Senha incorreta.'); }
+        SESSION = {role:g ? 'gerencia' : 'gerente', store:g ? null : ui.pickStore, token:r.token}; saveSession();
+        if (g && !CONFIG){ await api('saveConfig', {config:newConfig(false)}); await refresh(); toast('Lojas iniciais cadastradas. Confira tudo em Configurar.'); }
+        if (g) loadPins();
+        go({step:'home', tab:g ? 'rede' : 'loja', month:mkOf(TODAY)});
+      } catch (e) { toast('Sem conexão com a planilha.'); }
+      break; }
+    case 'logout':
+      if (!(await ask('Sair?', SESSION.role === 'vendedor' ? '<p>Na próxima vez, você escolhe a loja e o seu nome de novo.</p>' : '<p>Para entrar de novo, vai precisar da senha.</p>', 'Sim, sair'))) return;
+      SESSION = {}; saveSession(); EDITOR = null; PINS = null; go({step:'home', tab:null, editDate:null, fix:null}); break;
+    case 'refresh': try { await refresh(); render(); toast('Dados atualizados'); } catch (e) { toast('Sem conexão com a planilha.'); } break;
+    case 'tab': EDITOR = null; go({tab:d.tab, editDate:null, fix:null}); if (d.tab === 'config' && SESSION.role === 'gerencia' && !PINS){ await loadPins(); render(); } break;
+    case 'inc': case 'dec': { const f = d.f; draft[f] = Math.max(0, (draft[f] || 0) + (a === 'inc' ? 1 : -1)); const i = document.querySelector('input.n[data-f="' + f + '"]'); if (i) i.value = draft[f]; refreshLive(); break; }
+    case 'save': saveDraft(false); break;
+    case 'folga': saveDraft(true); break;
+    case 'edit-day': EDITOR = null; go({editDate:d.date}); break;
+    case 'hist-back': EDITOR = null; go({editDate:null}); break;
+    case 'ask-fix': askFix(SESSION.store, SESSION.seller, d.date); break;
+    case 'month': { const nm = addMonths(ui.month, +d.d); if (nm > mkOf(TODAY)) return; ui.month = nm; if (!LOADED.has(nm)){ try { await loadData([nm]); } catch (e) { toast('Sem conexão com a planilha.'); } } render(); break; }
+    case 'open-store': go({tab:'lojas', store:d.store, fix:null}); break;
+    case 'pick-ger-store': EDITOR = null; go({store:d.store, fix:null}); break;
+    case 'fix-pick': EDITOR = null; ui.fix = {sid:ui.store, pid:$('#fx-p').value, date:$('#fx-d').value}; render(); setTimeout(() => { const f = $('#fix-box'); if (f) f.scrollIntoView({behavior:'smooth'}); }, 50); break;
+    case 'fix-open': {
+      if (!(await ask('Abrir correção?', '<p>Você vai alterar o lançamento de <strong>' + esc(sellerName(d.store, d.pid)) + '</strong> em <strong>' + dlow(d.date) + '</strong>.</p><p class="small">Use só quando o vendedor não puder corrigir. Tudo fica registrado no histórico.</p>', 'Sim, abrir'))) return;
+      EDITOR = null; const mk = mkOf(d.date); if (!LOADED.has(mk)) await loadData([mk]); ui.month = mk; ui.fix = {sid:d.store, pid:d.pid, date:d.date}; ui.tab = 'lojas'; ui.store = d.store; render(); setTimeout(() => { const f = $('#fix-box'); if (f) f.scrollIntoView({behavior:'smooth'}); }, 50); break; }
+    case 'fix-close': EDITOR = null; go({fix:null}); break;
+    case 'req-done': if (await ask('Marcar como resolvido?', '<p>O pedido sai da lista de atenção. Faça isso depois de corrigir o lançamento.</p>', 'Sim, resolvido')) run(() => api('resolveRequest', {id:d.id}), 'Pedido resolvido'); break;
+    case 'sub': go({sub:d.sub}); if (d.sub === 'lojas' && !PINS){ await loadPins(); render(); } break;
+    case 'month-edit': monthEdit(); break;
+    case 'month-copy': monthCopy(); break;
+    case 'seller-edit': sellerEdit(d.pid); break;
+    case 'seller-new': sellerNew(); break;
+    case 'store-new': if (!PINS) await loadPins(); storeEditOrNew(null); break;
+    case 'store-edit': if (!PINS) await loadPins(); storeEditOrNew(d.store); break;
+    case 'store-restore': if (await ask('Reativar loja?', '<p>' + esc(store(d.store).name) + ' volta para os painéis.</p>', 'Sim, reativar')) saveCfg(cfg => cfg.stores.forEach(s => { if (s.id === d.store) s.archived = false; }), 'Loja reativada'); break;
+    case 'gpin-edit': gpinEdit(); break;
+    case 'prod-new': prodEditOrNew(null, d.cat); break;
+    case 'prod-edit': prodEditOrNew(d.pid); break;
+    case 'prod-restore': if (await ask('Reativar produto?', '<p>Ele volta para a tela de lançamento.</p>', 'Sim, reativar')) saveCfg(cfg => cfg.categories.forEach(c => c.products.forEach(x => { if (x.id === d.pid) x.archived = false; })), 'Produto reativado'); break;
+    case 'cat-new': catEditOrNew(null); break;
+    case 'cat-edit': catEditOrNew(d.cat); break;
+    case 'metas-save': metasSave(); break;
+    case 'install-help': installHelp(); break;
+    case 'demo-day': await api('demoToday', {today:addDays(TODAY, +d.d)}); EDITOR = null; await refresh(); render(); break;
+    case 'demo-reset': if (await ask('Apagar os testes?', '<p>Tudo o que foi lançado e configurado nesta demonstração some, e os dados de setembro voltam.</p>', 'Sim, apagar', true)){ await api('demoReset', {}); SESSION = {}; saveSession(); EDITOR = null; ENTRIES = {}; LOADED = new Set(); await refresh(); go({step:'home'}); toast('Demonstração reiniciada'); } break;
+  }
+});
+document.addEventListener('keydown', ev => {
+  if (ev.key === 'Escape' && MODAL) return closeModal('no');
+  if ((ev.key === 'Enter' || ev.key === ' ') && ev.target.matches('tr[data-act]')){ ev.preventDefault(); ev.target.click(); }
+  if (ev.key === 'Enter' && ev.target.id === 'f-pin' && !MODAL){ const btn = document.querySelector('[data-act="login"],[data-act="setup-pin"]'); if (btn) btn.click(); }
+});
+document.addEventListener('input', ev => {
+  const el = ev.target; if (el.dataset.mask) applyMask(el);
+  if (el.dataset.f && draft){ draft[el.dataset.f] = el.dataset.mask === 'money' ? readMoney(el.value) : readInt(el.value); refreshLive(); }
+});
+document.addEventListener('focusin', ev => { const el = ev.target; if (el.dataset && el.dataset.mask){ setTimeout(() => { try { const L = el.value.length; el.setSelectionRange(L, L); } catch (e) {} }, 0); } });
+document.addEventListener('visibilitychange', async () => { if (!document.hidden && SESSION.role && !MODAL && !BUSY){ try { await refresh(); render(); } catch (e) {} } });
+
+/* ---------- início ---------- */
+async function boot(){
+  LOADING = true; LOAD_ERR = null; render();
+  try { await loadData([]); LOADING = false; }
+  catch (e) { LOADING = false; LOAD_ERR = e.message || 'Erro desconhecido'; }
+  if (SESSION.role === 'gerencia') { ui.month = mkOf(TODAY || '2026-01-01'); loadPins().then(render); }
+  render();
+  let seen = null; try { seen = localStorage.getItem('rd-instalar-visto'); } catch (e) {}
+  if (!seen && !isStandalone() && !LOAD_ERR) setTimeout(installHelp, 600);
+}
+if ('serviceWorker' in navigator && !DEMO) navigator.serviceWorker.register('sw.js').catch(() => {});
+boot();
+</script>
+
+</body>
+</html>
