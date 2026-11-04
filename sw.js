@@ -1,7 +1,7 @@
 /* Service worker do RD Studio do Sono.
    Guarda o app no celular para abrir rápido. Os dados (lançamentos) sempre vêm da planilha, pela internet.
    Sempre que publicar uma versão nova do app, troque o número abaixo (v1 → v2 → v3...). */
-const VERSAO = 'rd-studio-v1';
+const VERSAO = 'rd-studio-v8';
 const ARQUIVOS = ['./', './index.html', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png', './icons/apple-touch-icon.png', './icons/favicon.png'];
 
 self.addEventListener('install', (e) => {

@@ -2,7 +2,8 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<meta name="color-scheme" content="light dark">
 <meta name="theme-color" content="#3F687E">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -22,22 +23,23 @@
   --bg:#F1F4F6; --surface:#FFFFFF; --surface2:#F5F8FA; --line:#DCE4E9;
   --ink:#14232C; --muted:#4A5A64;
   --accent:#3F687E; --accent-ink:#FFFFFF; --accent-soft:#E2ECF1; --accent-strong:#2E5063;
-  --good:#2E5F7A; --warn:#B45309; --warn-bg:#FFF7ED; --warn-line:#FDBA74; --warn-ink:#9A3412;
-  --header:#3F687E; --header-ink:#FFFFFF; --header-muted:#D6E4EC; --header-chip:rgba(255,255,255,.16);
+  --good:#23735A; --warn:#B45309; --warn-bg:#FFF7ED; --warn-line:#FDBA74; --warn-ink:#9A3412;
+  --header:#3F687E; --header-ink:#FFFFFF; --header-muted:#D6E4EC; --header-chip:rgba(8,24,32,.28);
   --track:#E1E8EC; --pace:#14232C; --bar-past:#A9C4D3; --shadow:0 6px 20px rgba(20,35,44,.10); --scrim:rgba(10,20,26,.55);
+  --line-strong:#7D8F9A; --mid:#3F687E; --ease-out:cubic-bezier(0.23,1,0.32,1); --ease-drawer:cubic-bezier(0.32,0.72,0,1);
   --font:'Manrope', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 }
 @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
   --bg:#0D161C; --surface:#15212A; --surface2:#1B2A34; --line:#28394A; --ink:#E6EEF2; --muted:#9FB2BE;
   --accent:#8FB8CF; --accent-ink:#0D161C; --accent-soft:#1E3442; --accent-strong:#CFE2EC;
-  --good:#8FB8CF; --warn:#F5A35C; --warn-bg:#2A1E12; --warn-line:#6B4423; --warn-ink:#F8C08A;
-  --header:#3F687E; --header-ink:#FFFFFF; --header-muted:#D6E4EC; --header-chip:rgba(255,255,255,.14);
+  --good:#7FCBA8; --line-strong:#5E7686; --mid:#8FB8CF; --warn:#F5A35C; --warn-bg:#2A1E12; --warn-line:#6B4423; --warn-ink:#F8C08A;
+  --header:#3F687E; --header-ink:#FFFFFF; --header-muted:#D6E4EC; --header-chip:rgba(8,24,32,.28);
   --track:#28394A; --pace:#E6EEF2; --bar-past:#4D6F83; --shadow:0 6px 20px rgba(0,0,0,.35); --scrim:rgba(0,0,0,.65); color-scheme:dark; } }
 :root[data-theme="dark"]{
   --bg:#0D161C; --surface:#15212A; --surface2:#1B2A34; --line:#28394A; --ink:#E6EEF2; --muted:#9FB2BE;
   --accent:#8FB8CF; --accent-ink:#0D161C; --accent-soft:#1E3442; --accent-strong:#CFE2EC;
-  --good:#8FB8CF; --warn:#F5A35C; --warn-bg:#2A1E12; --warn-line:#6B4423; --warn-ink:#F8C08A;
-  --header:#3F687E; --header-ink:#FFFFFF; --header-muted:#D6E4EC; --header-chip:rgba(255,255,255,.14);
+  --good:#7FCBA8; --line-strong:#5E7686; --mid:#8FB8CF; --warn:#F5A35C; --warn-bg:#2A1E12; --warn-line:#6B4423; --warn-ink:#F8C08A;
+  --header:#3F687E; --header-ink:#FFFFFF; --header-muted:#D6E4EC; --header-chip:rgba(8,24,32,.28);
   --track:#28394A; --pace:#E6EEF2; --bar-past:#4D6F83; --shadow:0 6px 20px rgba(0,0,0,.35); --scrim:rgba(0,0,0,.65); color-scheme:dark; }
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:15px;line-height:1.4;font-variant-numeric:tabular-nums}
@@ -63,7 +65,7 @@ main{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px
 .main-in{max-width:var(--w);margin:-42px auto 0;display:flex;flex-direction:column;gap:12px}
 .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:12px;align-items:start}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
-.card.hero{border-color:transparent;box-shadow:var(--shadow)}
+.card.hero{border-color:transparent}
 .card.flush{padding:0;gap:0;overflow:hidden}
 .card.flush>.head{padding:16px 16px 8px}
 h2{margin:0;font-size:17px;font-weight:700}
@@ -128,7 +130,6 @@ table.t td{padding:12px;border-top:1px solid var(--line);white-space:nowrap}
 table.t td.wrap{white-space:normal;min-width:160px}
 table.t .r{text-align:right}
 table.t tr.click{cursor:pointer}
-table.t tr.click:hover td{background:var(--surface2)}
 .chart{display:flex;align-items:flex-end;gap:3px;height:120px;border-bottom:1px solid var(--line)}
 .chart i{flex:1 1 0;border-radius:3px 3px 0 0;background:var(--good);min-height:2px}
 .chart i.past{background:var(--bar-past)}
@@ -137,7 +138,6 @@ table.t tr.click:hover td{background:var(--surface2)}
 .prod{display:grid;grid-template-columns:minmax(0,9.5rem) minmax(0,1fr) 3.4rem;align-items:center;gap:10px;font-size:13px}
 .prod .p{font-weight:800;text-align:right}
 .choice{display:flex;align-items:center;gap:14px;text-align:left;width:100%;min-height:72px;padding:14px 16px;border-radius:16px;border:1px solid var(--line);background:var(--surface);cursor:pointer;color:var(--ink)}
-.choice:hover{border-color:var(--accent)}
 .choice .t{font-size:16px;font-weight:800}
 .choice .go{margin-left:auto;color:var(--muted)}
 .ico{width:40px;height:40px;border-radius:12px;background:var(--accent-soft);color:var(--accent-strong);display:flex;align-items:center;justify-content:center;flex:none}
@@ -152,7 +152,7 @@ nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--surf
 .tabs-in{max-width:var(--w);margin:0 auto;display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr)}
 .tab{min-height:62px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:none;border:none;color:var(--muted);font-size:12px;font-weight:700;cursor:pointer}
 .tab[aria-current="page"]{color:var(--accent-strong)}
-.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(78px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:12px;font-weight:700;z-index:70;max-width:calc(100% - 32px);text-align:center}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(78px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:12px;font-weight:700;z-index:70;width:max-content;max-width:min(440px,calc(100% - 32px));text-align:center;font-size:14px;line-height:1.4}
 .overlay{position:fixed;inset:0;z-index:60;background:var(--scrim);display:flex;align-items:flex-end;justify-content:center;padding:max(12px,env(safe-area-inset-top,0px)) max(0px,env(safe-area-inset-right,0px)) 0 max(0px,env(safe-area-inset-left,0px))}
 .sheet{background:var(--surface);color:var(--ink);width:100%;max-width:540px;max-height:92vh;overflow:auto;border-radius:22px 22px 0 0;padding:22px 18px calc(18px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:14px}
 .sheet h2{font-size:20px}
@@ -166,7 +166,242 @@ nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--surf
 .split>.side{flex:1 1 280px;min-width:0;display:flex;flex-direction:column;gap:10px}
 .center{text-align:center;align-items:center}
 @media (max-width:420px){.big{font-size:28px}.kpi .v{font-size:17px}.tiles .mid{font-size:16px}.who{font-size:23px}}
-@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+
+
+/* ---------- celular: tirar a cara de site ---------- */
+html{-webkit-tap-highlight-color:transparent;-webkit-text-size-adjust:100%;overscroll-behavior:none}
+body{overscroll-behavior:none}
+button,a,summary,.tab,.pill,.choice,.chip,[data-act]{touch-action:manipulation;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+::selection{background:var(--accent-soft);color:var(--ink)}
+@media (hover:hover) and (pointer:fine){
+  .choice:hover{border-color:var(--accent)}
+  table.t tr.click:hover td{background:var(--surface2)}
+  .btn:hover{border-color:var(--line-strong)}
+  .btn.primary:hover{filter:brightness(1.06)}
+  .pill:hover{border-color:var(--line-strong)}
+}
+/* toque: o botão afunda na hora em que o dedo encosta */
+.btn,.sq,.pill,.choice,.linkbtn,.tab{transition:transform 120ms var(--ease-out),background-color 160ms ease,border-color 160ms ease,color 160ms ease}
+.btn:active,.sq:active,.pill:active,.linkbtn:active{transform:scale(.97)}
+.choice:active{transform:scale(.985)}
+.tab:active{transform:scale(.94)}
+.btn:disabled:active,.sq:disabled:active{transform:none}
+/* alvos de toque com 44px no mínimo */
+.linkbtn{min-height:44px;min-width:44px}
+.btn.small{min-height:44px}
+.pill{min-height:44px}
+/* campos: borda visível, foco claro, texto de exemplo mais leve */
+.field input,.field select,.field textarea,.stepper input.n{border-color:var(--line-strong)}
+.field input:focus,.field select:focus,.field textarea:focus,.stepper input.n:focus{outline:3px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
+::placeholder{color:var(--muted);font-weight:500;opacity:1}
+label.money{cursor:text}
+.money input{height:100%;min-height:50px}
+.money:focus-within{outline:3px solid var(--accent);outline-offset:2px}
+.money.sm{border-color:var(--line-strong)}
+.field .money input{border:0;padding:0;min-height:44px;background:transparent;font-size:17px}
+/* status em três níveis: no ritmo (verde), perto (azul da marca), longe (laranja) */
+.c-mid{color:var(--mid)}
+.bar>i.mid{background:var(--mid)}
+/* indicadores como texto, não como caixinhas */
+.kpis{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 4px;gap:0}
+.kpis .kpi{background:none;border:0;border-radius:0;padding:0 12px}
+.kpis .kpi+.kpi{box-shadow:inset 1px 0 0 var(--line)}
+.kpis.loose{background:none;border:0;padding:0;gap:8px}
+.kpis.loose .kpi{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px;box-shadow:none}
+/* informação neutra (não é alerta) */
+.info{background:var(--surface2);border:1px solid var(--line);border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--ink)}
+.info strong{font-size:14px}
+.soft{background:var(--accent-soft);color:var(--accent-strong);border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:600}
+/* listas no lugar de tabelas no celular */
+.lrow{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;border-top:1px solid var(--line);min-height:64px}
+.lrow .stack{gap:2px}
+button.lrow{width:100%;background:none;border-left:0;border-right:0;border-bottom:0;text-align:left;color:var(--ink);cursor:pointer;font:inherit}
+.only-narrow{display:none}
+@media (max-width:719px){.only-wide{display:none!important}.only-narrow{display:flex}}
+/* tabelas largas: primeira coluna fica parada ao arrastar */
+.scroll table.t th:first-child,.scroll table.t td:first-child{position:sticky;left:0;z-index:1;background:var(--surface)}
+.scroll table.t th:first-child{background:var(--surface2)}
+.scroll table.t td:first-child{box-shadow:inset -1px 0 0 var(--line)}
+.drag-hint{font-size:12px;color:var(--muted);padding:0 16px 10px}
+@media (min-width:720px){.drag-hint{display:none}}
+/* janelas de aviso: sobem de baixo, rápido */
+.sheet{max-height:92vh;max-height:92dvh;overscroll-behavior:contain;animation:sheetIn 280ms var(--ease-drawer)}
+.overlay{animation:fadeIn 200ms ease-out}
+@keyframes sheetIn{from{transform:translateY(24px);opacity:0}to{transform:none;opacity:1}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.toast{animation:toastIn 220ms var(--ease-out)}
+@keyframes toastIn{from{transform:translate(-50%,10px);opacity:0}to{transform:translate(-50%,0);opacity:1}}
+.toast.top{bottom:auto;top:calc(12px + env(safe-area-inset-top,0px))}
+/* gerência no computador: abas no topo, sem barra de celular esticada */
+.toptabs{display:none}
+@media (min-width:960px){
+  #app.wide nav.tabs{display:none}
+  #app.wide main{padding-bottom:48px}
+  #app.wide .toptabs{display:flex;gap:4px;margin-top:6px}
+  .toptabs .tt{min-height:44px;padding:0 16px;border-radius:10px;border:0;background:transparent;color:var(--header-muted);font-weight:700;font-size:14px;display:inline-flex;align-items:center;gap:8px;cursor:pointer}
+  .toptabs .tt[aria-current="page"]{background:var(--header-chip);color:var(--header-ink)}
+}
+.band h1.inline{font-size:21px}
+.brand h1{margin:0}
+@media (prefers-reduced-motion: reduce){
+  .sheet{animation:fadeIn 160ms ease-out}
+  .toast{animation:none}
+  .btn:active,.sq:active,.pill:active,.linkbtn:active,.choice:active,.tab:active{transform:none}
+  details.grp>summary .chev{transition:none}
+}
+.lrow .btn,.lrow>.chip{flex:none;white-space:nowrap}
+.lrow .stack{min-width:0}
+.lrow .stack>.chip{align-self:flex-start}
+.netbar{display:flex;align-items:center;gap:10px;background:var(--ink);color:var(--bg);border-radius:14px;padding:10px 12px 10px 14px;font-size:13px}
+.netbar span{flex:1;min-width:0}
+.netbar .btn{background:transparent;color:var(--bg);border-color:rgba(255,255,255,.35);flex:none}
+:root[data-theme="dark"] .netbar .btn{border-color:rgba(0,0,0,.3)}
+.chip.wait{background:var(--surface2);color:var(--ink);border:1px dashed var(--line-strong)}
+
+/* ================= VISUAL MODERNO (v5) ================= */
+:root{--bg:#EDF1F4;--line:#E2E8EC;--radius:22px;
+  --shadow-sm:0 1px 2px rgba(20,35,44,.05),0 4px 14px rgba(20,35,44,.06);
+  --shadow-md:0 2px 4px rgba(20,35,44,.06),0 14px 32px rgba(20,35,44,.12);
+  --feature:#24495B;--card-border:transparent}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#0B1419;--card-border:#22323D;--shadow-sm:none;--shadow-md:0 14px 32px rgba(0,0,0,.4);--feature:#1C3A49}}
+:root[data-theme="dark"]{--bg:#0B1419;--card-border:#22323D;--shadow-sm:none;--shadow-md:0 14px 32px rgba(0,0,0,.4);--feature:#1C3A49}
+body{font-size:15px;letter-spacing:-.005em}
+/* topo */
+.band{padding-block:14px 70px}
+.band-in{gap:10px}
+.band h1.inline{font-size:22px;letter-spacing:-.02em}
+.band .sub{font-size:13px;line-height:1.45}
+.mark{width:38px;height:38px;box-shadow:0 0 0 3px rgba(255,255,255,.18)}
+.linkbtn{background:rgba(255,255,255,.14);border-radius:14px;min-height:42px;min-width:42px}
+.main-in{margin-top:-52px;gap:14px}
+/* cartões */
+.card,details.grp,.kpi,.choice{border-color:var(--card-border);box-shadow:var(--shadow-sm)}
+.card{border-radius:var(--radius);padding:18px;gap:14px}
+details.grp{border-radius:var(--radius)}
+details.grp>summary{min-height:64px;padding:14px 18px}
+details.grp .inner{padding:0 18px 18px}
+.card.hero{box-shadow:var(--shadow-md)}
+h2{font-size:18px;letter-spacing:-.01em}
+.label{font-size:13px;font-weight:600}
+.big{font-size:38px;letter-spacing:-.035em;line-height:1.05}
+.mid{font-size:22px;letter-spacing:-.02em}
+/* cartão de destaque (estilo saldo de banco) */
+.feature{--ink:#fff;--muted:rgba(255,255,255,.72);--good:#86E0B8;--warn:#FFB677;--mid:#CFE2EC;--track:rgba(255,255,255,.18);--pace:#fff;--line:rgba(255,255,255,.16);--surface2:rgba(255,255,255,.1);--accent-soft:rgba(255,255,255,.14);--accent-strong:#fff;--warn-bg:rgba(255,182,119,.16);--warn-line:rgba(255,182,119,.5);--warn-ink:#FFD2AA;
+  background:var(--feature)!important;color:#fff;border-color:transparent!important;position:relative;overflow:hidden}
+.feature::after{content:"";position:absolute;right:-60px;top:-70px;width:220px;height:220px;border-radius:50%;background:radial-gradient(closest-side,rgba(143,184,207,.28),transparent);pointer-events:none}
+.feature>*{position:relative;z-index:1}
+.feature .label{color:rgba(255,255,255,.78)}
+.feature .bar{height:12px}
+.feature .chip.mute,.feature .chip.ok{background:rgba(255,255,255,.14);color:#fff;border-color:transparent}
+.kpi.feature{grid-column:1/-1;padding:18px;border-radius:var(--radius);gap:6px}
+.kpi.feature .v{font-size:34px;letter-spacing:-.03em}
+.kpis.loose .kpi{border-radius:18px;padding:14px;border-color:var(--card-border);box-shadow:var(--shadow-sm)}
+.kpis.loose .kpi .v{font-size:21px}
+.kpis{border-color:var(--card-border);box-shadow:var(--shadow-sm);border-radius:20px}
+/* botões */
+.btn{border-radius:14px;min-height:48px}
+.btn.block{min-height:58px;border-radius:18px;font-size:17px;letter-spacing:-.01em}
+.btn.primary{box-shadow:0 6px 16px rgba(63,104,126,.28)}
+.btn.primary:disabled{box-shadow:none}
+/* contadores − 0 + em pílula */
+.stepline{padding:10px 18px}
+.stepper{background:var(--surface2);border-radius:999px;padding:4px;gap:2px}
+.stepper .sq{width:44px;height:44px;border-radius:50%;border:0;background:var(--surface);box-shadow:0 1px 2px rgba(20,35,44,.1)}
+.stepper .sq.fill{background:var(--accent);box-shadow:0 3px 8px rgba(63,104,126,.3)}
+.stepper input.n,.stepper input.n:focus{width:50px;border:0;background:transparent;font-size:19px}
+.stepper input.n:focus{outline:2px solid var(--accent);outline-offset:-2px;border-radius:10px}
+/* valor em R$ */
+.money{background:var(--surface2);border:0;border-radius:18px;min-height:64px;padding:0 18px}
+.money span{font-size:20px}
+.money input{font-size:30px;letter-spacing:-.02em}
+.money:focus-within{outline:2.5px solid var(--accent);outline-offset:0;background:var(--surface)}
+.money.sm{min-height:52px;border:1.5px solid var(--line-strong);background:var(--surface)} .money.sm input{font-size:18px}
+.field input,.field select,.field textarea{border-radius:14px;min-height:52px}
+#f-pin{font-size:28px;letter-spacing:.5em;text-align:center;min-height:64px;padding-left:calc(14px + .5em)}
+#f-pin::placeholder{font-size:16px;letter-spacing:0}
+/* escolhas da tela inicial */
+.choice{border-radius:20px;min-height:80px;padding:16px 18px;gap:16px}
+.choice .t{font-size:17px;letter-spacing:-.01em}
+.ico{width:48px;height:48px;border-radius:16px}
+.choice .go{width:32px;height:32px;border-radius:50%;background:var(--surface2);display:inline-flex;align-items:center;justify-content:center;flex:none}
+.logo-full{width:118px;height:118px}
+.center .ico{border-radius:50%}
+.who{font-size:28px;letter-spacing:-.02em}
+/* barra de abas flutuante */
+nav.tabs{left:12px;right:12px;bottom:calc(10px + env(safe-area-inset-bottom,0px));padding:6px;border:1px solid var(--card-border);border-radius:24px;box-shadow:0 10px 30px rgba(20,35,44,.16);background:color-mix(in srgb,var(--surface) 94%,transparent);-webkit-backdrop-filter:saturate(1.4) blur(14px);backdrop-filter:saturate(1.4) blur(14px)}
+.tabs-in{gap:4px}
+.tab{min-height:58px;border-radius:18px;gap:4px;font-size:12px}
+.tab svg{width:22px;height:22px}
+.tab[aria-current="page"]{background:var(--accent-soft);color:var(--accent-strong)}
+main{padding-bottom:140px}
+.toast{bottom:calc(96px + env(safe-area-inset-bottom,0px));border-radius:16px}
+/* listas, tabelas, avisos */
+.lrow{padding:14px 18px}
+.card.flush>.head{padding:18px 18px 10px}
+table.t th{background:transparent;border-bottom:1px solid var(--line)}
+.scroll table.t th:first-child{background:var(--surface)}
+.alert,.info,.soft,.note{border-radius:16px}
+.chip{padding:4px 11px}
+.netbar{border-radius:18px}
+.sheet{border-radius:28px 28px 0 0;padding:26px 20px calc(20px + env(safe-area-inset-bottom,0px))}
+@media (min-width:640px){.sheet{border-radius:28px}}
+.toptabs .tt{border-radius:14px}
+
+.kpis.loose{box-shadow:none;border-radius:0}
+.card .choice{box-shadow:none;background:var(--surface2);border-color:transparent}
+.card .choice .ico{background:var(--surface);}
+.card .choice .go{background:var(--surface)}
+@media (hover:hover) and (pointer:fine){.card .choice:hover{border-color:var(--accent)}}
+
+/* ---------- telas de entrada (v5) ---------- */
+.band.welcome{padding-block:18px 30px;border-radius:0 0 32px 32px}
+.band.welcome + main .main-in{margin-top:20px}
+.band.welcome .band-in{align-items:flex-start;text-align:left}
+.band.welcome h1{font-size:30px;letter-spacing:-.03em;line-height:1.1}
+.band.welcome .logo-full{width:76px;height:76px;align-self:flex-start}
+.band.home{padding-block:16px 36px}
+.band.home .row{width:100%;align-items:flex-start}
+.band.home .hello{margin-top:18px;font-size:15px;font-weight:700;color:var(--header-muted)}
+.band.flow h1{margin-top:14px;font-size:28px}
+.band.flow .row{width:100%}
+.band.flow .mark{margin-left:auto}
+.linkbtn.round{border-radius:50%;padding:0;width:44px;height:44px}
+.steps-dots{display:flex;align-items:center;gap:5px;margin-left:6px}
+.steps-dots i{width:22px;height:5px;border-radius:999px;background:rgba(255,255,255,.25)}
+.steps-dots i.on{background:#fff}
+.steps-dots em{font-style:normal;font-size:12px;font-weight:700;color:var(--header-muted);margin-left:6px}
+h2.sect{font-size:15px;color:var(--muted);font-weight:700;margin:4px 4px -2px}
+.role-main{display:flex;align-items:center;gap:16px;width:100%;text-align:left;min-height:104px;padding:20px;border-radius:24px;border:0;cursor:pointer;box-shadow:var(--shadow-md);transition:transform 120ms var(--ease-out)}
+.role-main .ico{width:56px;height:56px;border-radius:18px;background:rgba(255,255,255,.14);color:#fff}
+.role-main .t{font-size:20px;font-weight:800;letter-spacing:-.02em;color:#fff}
+.role-main .small{color:rgba(255,255,255,.78);font-size:14px}
+.role-main .go{margin-left:auto;width:40px;height:40px;border-radius:50%;background:#fff;color:var(--feature);display:inline-flex;align-items:center;justify-content:center;flex:none}
+.roles2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.roles2>:only-child{grid-column:1/-1}
+.role-tile{display:flex;flex-direction:column;align-items:flex-start;gap:6px;text-align:left;padding:18px;min-height:150px;border-radius:24px;border:1px solid var(--card-border);background:var(--surface);color:var(--ink);box-shadow:var(--shadow-sm);cursor:pointer;transition:transform 120ms var(--ease-out)}
+.role-tile .ico{margin-bottom:auto}
+.role-tile .t{font-size:16px;font-weight:800;letter-spacing:-.01em}
+.role-main:active,.role-tile:active,.lchoice:active{transform:scale(.98)}
+details.demo{box-shadow:none;background:transparent;border:1.5px dashed var(--line-strong)}
+.lgroup{box-shadow:var(--shadow-md)}
+.lchoice{display:flex;align-items:center;gap:14px;width:100%;min-height:76px;padding:12px 18px;background:none;border:0;border-top:1px solid var(--line);text-align:left;color:var(--ink);cursor:pointer;font:inherit}
+.lchoice:first-child{border-top:0}
+.lchoice>svg{color:var(--muted);margin-left:auto;flex:none}
+.lchoice .t{font-size:17px;font-weight:800}
+.lchoice .ico{width:44px;height:44px;border-radius:14px}
+@media (hover:hover) and (pointer:fine){.lchoice:hover{background:var(--surface2)}.role-tile:hover{border-color:var(--accent)}}
+.pinbox{align-items:stretch}
+.lockico{width:56px;height:56px;border-radius:50%;background:var(--accent-soft);color:var(--accent-strong);display:flex;align-items:center;justify-content:center;align-self:center}
+.pinbox>.small{text-align:center}
+.confirm .avatar{width:84px;height:84px;border-radius:50%;background:var(--feature);color:#fff;font-size:36px;font-weight:800;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 20px rgba(36,73,91,.3)}
+.btn.ghost{background:transparent;border-color:transparent;color:var(--accent-strong);box-shadow:none}
+
+/* caixa de seleção da loja (gerência) */
+.storesel{padding:14px 16px}
+.selwrap{position:relative;display:flex;align-items:center}
+.selwrap .ico{position:absolute;left:8px;width:36px;height:36px;border-radius:12px;pointer-events:none}
+.selwrap .caret{position:absolute;right:14px;color:var(--muted);pointer-events:none;display:flex}
+.field .selwrap select{appearance:none;-webkit-appearance:none;min-height:56px;padding:0 44px 0 56px;font-size:18px;font-weight:800;border-radius:16px;background:var(--surface2);border:1.5px solid var(--line-strong);cursor:pointer}
 </style>
 </head>
 <body>
@@ -181,7 +416,7 @@ nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--surf
 /* ======================= CONFIGURAÇÃO =======================
    Cole entre as aspas o endereço do Apps Script (passo 2 do guia).
    Vazio = MODO DEMONSTRAÇÃO: dados de setembro/26, nada vai para a planilha. */
-const API_URL = 'https://script.google.com/macros/s/AKfycbzoF9f9I-i4tH9Aqtkz7izN78N8oyGMMAPlR3wUB4NsORQv9rsctYEzeWTxS4hVukN5/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbxFWmJSaUHmr_zxxG3BK3yrfOQpyzveDrpmUzJeBueGzkNg81go0JGHZavrSG6Kp2M/exec';
 /* ============================================================ */
 
 document.documentElement.lang = 'pt-BR';
@@ -243,7 +478,7 @@ function moneyField(k, v, label, hint){
 function intField(k, v, label, hint){ return '<label class="field" for="f-' + k + '">' + label + '<input id="f-' + k + '" ' + NUMKEY + ' data-mask="int" data-k="' + k + '" value="' + (v == null ? '' : Math.round(v)) + '">' + (hint ? '<span class="hint">' + hint + '</span>' : '') + '</label>'; }
 function dec1Field(k, v, label, hint){ return '<label class="field" for="f-' + k + '">' + label + '<input id="f-' + k + '" ' + NUMKEY + ' data-mask="dec1" data-k="' + k + '" value="' + dec1(v || 0) + '">' + (hint ? '<span class="hint">' + hint + '</span>' : '') + '</label>'; }
 function pinField(k, label, hint, visible, v){ return '<label class="field" for="f-' + k + '">' + label + '<input id="f-' + k + '" type="' + (visible ? 'text' : 'password') + '" inputmode="numeric" pattern="[0-9]*" autocomplete="off" data-mask="pin" data-k="' + k + '" value="' + esc(v || '') + '" placeholder="4 a 8 números">' + (hint ? '<span class="hint">' + hint + '</span>' : '') + '</label>'; }
-function textField(k, v, label, ph){ return '<label class="field" for="f-' + k + '">' + label + '<input id="f-' + k + '" type="text" autocomplete="off" data-k="' + k + '" value="' + esc(v || '') + '" placeholder="' + esc(ph || '') + '"></label>'; }
+function textField(k, v, label, ph){ return '<label class="field" for="f-' + k + '">' + label + '<input id="f-' + k + '" type="text" autocomplete="off" maxlength="40" data-k="' + k + '" value="' + esc(v || '') + '" placeholder="' + esc(ph || '') + '"></label>'; }
 
 /* ---------- datas ---------- */
 function P(s){ const a = s.split('-').map(Number); return {y:a[0], m:a[1], d:a[2]}; }
@@ -276,7 +511,7 @@ function baseStores(demo){ return [
 function newConfig(demo){ return {version:1, metas:{pa:4, tm:2800, conv:40}, categories:defaultCategories(), stores:baseStores(demo), months:{}}; }
 
 /* ---------- modo demonstração (simula a planilha dentro do aparelho) ---------- */
-const DKEY = 'rd-demo-v3';
+const DKEY = 'rd-demo-v4';
 function demoFresh(){
   const cfg = newConfig(true), entries = [];
   cfg.months['2026-09'] = {stores:{}};
@@ -289,7 +524,7 @@ function demoFresh(){
     }));
   });
   const stores = {}; cfg.stores.forEach(s => { stores[s.id] = '1234'; });
-  return {config:cfg, entries:entries, requests:[], pins:{gerencia:'1234', stores:stores}, today:'2026-09-21'};
+  return {config:cfg, entries:entries, requests:[], pins:{gerencia:'1234', stores:stores, vend:Object.assign({}, stores)}, today:'2026-09-21'};
 }
 function demoState(){ let s = null; try { s = JSON.parse(localStorage.getItem(DKEY) || 'null'); } catch (e) {} if (!s || !s.config) { s = demoFresh(); demoSave(s); } return s; }
 function demoSave(s){ try { localStorage.setItem(DKEY, JSON.stringify(s)); } catch (e) {} }
@@ -302,19 +537,25 @@ async function demoApi(action, p){
     }
     case 'login':
       if (p.role === 'gerencia') return p.pin === s.pins.gerencia ? ok({token:'demo-g'}) : {ok:false, error:'Senha incorreta.'};
+      if (p.role === 'vendedor'){ if (!s.pins.vend[p.store]) return {ok:false, error:'A gerência ainda não criou a senha de acesso desta loja.'}; return p.pin === s.pins.vend[p.store] ? ok({token:'demo-v-' + p.store}) : {ok:false, error:'Senha da loja incorreta.'}; }
       if (!s.pins.stores[p.store]) return {ok:false, error:'A gerência ainda não criou a senha desta loja.'};
       return p.pin === s.pins.stores[p.store] ? ok({token:'demo-s-' + p.store}) : {ok:false, error:'Senha incorreta.'};
     case 'saveEntry': {
+      if (!isG && p.token !== 'demo-v-' + p.store) return {ok:false, error:'auth'};
       if (!isG && [s.today, addDays(s.today, -1)].indexOf(p.date) < 0) return {ok:false, error:'Só a gerência pode alterar dias anteriores a ontem.'};
+      const lj = s.config.stores.find(x => x.id === p.store), vd = lj && lj.sellers.find(x => x.id === p.seller);
+      if (!vd) return {ok:false, error:'Vendedor não encontrado nesta loja. Atualize o app.'};
+      if (!isG && vd.archived) return {ok:false, error:'Este vendedor está desativado. Fale com a gerência.'};
+      if (!p.folga) for (const k in p.v){ const n = Number(p.v[k]); if (!isFinite(n) || n < 0) return {ok:false, error:'Há um número inválido no lançamento (' + k + ').'}; if (k === 'venda' ? n > 10000000 : n > 99999) return {ok:false, error:'Um dos números está alto demais (' + k + '). Confira o que foi digitado.'}; }
       if (!p.folga && check(p.v).length) return {ok:false, error:check(p.v)[0]};
       s.entries = s.entries.filter(e => !(e.date === p.date && e.store === p.store && e.seller === p.seller));
       s.entries.push({date:p.date, store:p.store, seller:p.seller, folga:!!p.folga, v:p.folga ? {} : p.v, by:p.by}); demoSave(s); return ok();
     }
-    case 'requestFix': s.requests.push({id:uid('r'), created:new Date().toISOString(), store:p.store, seller:p.seller, date:p.date, msg:p.msg, status:'aberto'}); demoSave(s); return ok();
+    case 'requestFix': if (p.token !== 'demo-v-' + p.store) return {ok:false, error:'auth'}; s.requests.push({id:uid('r'), created:new Date().toISOString(), store:p.store, seller:p.seller, date:p.date, msg:p.msg, status:'aberto'}); demoSave(s); return ok();
     case 'resolveRequest': if (!isG) return {ok:false, error:'auth'}; s.requests.forEach(r => { if (r.id === p.id) r.status = 'resolvido'; }); demoSave(s); return ok();
-    case 'saveConfig': if (!isG) return {ok:false, error:'auth'}; s.config = p.config; demoSave(s); return ok();
-    case 'getPins': if (!isG) return {ok:false, error:'auth'}; return ok({stores:s.pins.stores});
-    case 'setPin': if (!isG) return {ok:false, error:'auth'}; if (p.target === 'gerencia') s.pins.gerencia = p.pin; else s.pins.stores[p.store] = p.pin; demoSave(s); return ok();
+    case 'saveConfig': if (!isG) return {ok:false, error:'auth'}; if (s.config && (p.config.rev || 0) !== (s.config.rev || 0)) return {ok:false, error:'conflict'}; p.config.rev = (s.config && s.config.rev || 0) + 1; s.config = p.config; demoSave(s); return ok();
+    case 'getPins': if (!isG) return {ok:false, error:'auth'}; return ok({stores:s.pins.stores, vend:s.pins.vend});
+    case 'setPin': if (!isG) return {ok:false, error:'auth'}; if (p.target === 'gerencia') s.pins.gerencia = p.pin; else if (p.target === 'vendedor') s.pins.vend[p.store] = p.pin; else s.pins.stores[p.store] = p.pin; demoSave(s); return ok();
     case 'demoToday': s.today = p.today; demoSave(s); return ok();
     case 'demoReset': localStorage.removeItem(DKEY); return ok();
   }
@@ -324,12 +565,52 @@ async function demoApi(action, p){
 /* ---------- comunicação com a planilha ---------- */
 let SESSION = (() => { try { return JSON.parse(localStorage.getItem('rd-sessao') || '{}'); } catch (e) { return {}; } })();
 function saveSession(){ try { localStorage.setItem('rd-sessao', JSON.stringify(SESSION)); } catch (e) {} }
+let OFFLINE = false, DEMO_NET_DOWN = false, LAST_AT = null;
+function netError(msg){ const e = new Error(msg); e.net = true; return e; }
 async function api(action, payload){
   const body = Object.assign({action:action}, payload || {}); if (SESSION.token) body.token = SESSION.token;
-  if (DEMO) return demoApi(action, clone(body));
-  const r = await fetch(API_URL, {method:'POST', body:JSON.stringify(body)}); // texto simples: funciona com o Apps Script
-  if (!r.ok) throw new Error('A planilha respondeu com erro ' + r.status);
-  return r.json();
+  if (DEMO){ if (DEMO_NET_DOWN){ OFFLINE = true; throw netError('Sem conexão com a internet.'); } const d = await demoApi(action, clone(body)); OFFLINE = false; return d; }
+  const ctrl = typeof AbortController !== 'undefined' ? new AbortController() : null, tm = setTimeout(() => { if (ctrl) ctrl.abort(); }, 25000);
+  let r;
+  try { r = await fetch(API_URL, {method:'POST', body:JSON.stringify(body), signal: ctrl ? ctrl.signal : undefined}); } // texto simples: funciona com o Apps Script
+  catch (e) { OFFLINE = true; throw netError(e && e.name === 'AbortError' ? 'A planilha demorou demais para responder. Tente de novo.' : 'Sem conexão com a internet.'); }
+  finally { clearTimeout(tm); }
+  OFFLINE = false;
+  if (!r.ok){ const e = new Error('A planilha respondeu com erro ' + r.status + '. Tente de novo em instantes.'); if (r.status >= 500) e.net = true; throw e; }
+  const txt = await r.text();
+  try { return JSON.parse(txt); } catch (e) { throw new Error('A planilha não respondeu direito. Confira se a implantação do Apps Script está com “Quem pode acessar: Qualquer pessoa”.'); }
+}
+/* cópia dos últimos dados no aparelho, para abrir mesmo sem internet */
+function saveCache(){ try { localStorage.setItem('rd-cache', JSON.stringify({today:TODAY, config:CONFIG, requests:REQS, hasG:HAS_GPIN, entries:Object.keys(ENTRIES).map(k => ENTRIES[k]).filter(e => !e.pending)})); } catch (e) {} }
+function loadCache(){
+  try {
+    const c = JSON.parse(localStorage.getItem('rd-cache') || 'null'); if (!c || !c.config) return false;
+    CONFIG = c.config; REQS = c.requests || []; HAS_GPIN = c.hasG !== false; ENTRIES = {};
+    (c.entries || []).forEach(e => { ENTRIES[e.store + '|' + e.seller + '|' + e.date] = e; });
+    const d = new Date(), local = d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+    TODAY = DEMO || !c.today || local < c.today ? c.today : local; applyOutbox(); return true;
+  } catch (e) { return false; }
+}
+/* fila: lançamentos feitos sem internet esperam aqui e são enviados sozinhos depois */
+let OUTBOX = (() => { try { return JSON.parse(localStorage.getItem('rd-fila') || '[]'); } catch (e) { return []; } })(), FLUSHING = false;
+function saveOutbox(){ try { localStorage.setItem('rd-fila', JSON.stringify(OUTBOX)); } catch (e) {} }
+function applyOutbox(){ OUTBOX.forEach(it => { const p = it.payload; ENTRIES[it.key] = {date:p.date, store:p.store, seller:p.seller, folga:!!p.folga, v:p.v || {}, pending:true}; }); }
+function enqueue(payload){ const key = payload.store + '|' + payload.seller + '|' + payload.date; OUTBOX = OUTBOX.filter(it => it.key !== key); OUTBOX.push({action:'saveEntry', payload:payload, key:key, at:Date.now()}); saveOutbox(); applyOutbox(); }
+async function flushOutbox(){
+  if (FLUSHING || !OUTBOX.length) return; FLUSHING = true; let sent = 0; const failed = [];
+  try {
+    while (OUTBOX.length){
+      const it = OUTBOX[0]; let r;
+      try { r = await api(it.action, it.payload); } catch (e) { if (e.net) break; r = {ok:false, error:e.message}; }
+      if (r.ok){ OUTBOX.shift(); saveOutbox(); sent++; continue; }
+      if (r.error === 'auth'){ handleError(r); break; }
+      OUTBOX.shift(); saveOutbox(); delete ENTRIES[it.key];
+      if (!it.payload.folga){ DRAFTS[it.key] = it.payload.v; try { localStorage.setItem('rd-rascunhos', JSON.stringify(DRAFTS)); } catch (e) {} }
+      failed.push(dlabel(it.payload.date) + ' (' + (r.error || 'erro') + ')');
+    }
+  } finally { FLUSHING = false; }
+  if (sent){ try { await loadData(); } catch (e) {} }
+  if (sent || failed.length){ render(); toast(failed.length ? 'Não deu para enviar o lançamento de ' + failed[0] + '. Ele voltou como rascunho.' : sent === 1 ? 'O lançamento guardado foi enviado à planilha.' : sent + ' lançamentos guardados foram enviados à planilha.'); }
 }
 let CONFIG = null, TODAY = null, ENTRIES = {}, REQS = [], HAS_GPIN = true, LOADED = new Set(), PINS = null;
 let LOADING = true, LOAD_ERR = null, BUSY = false;
@@ -341,6 +622,7 @@ async function loadData(months){
   Object.keys(ENTRIES).forEach(k => { if (ms.indexOf(k.split('|')[2].slice(0, 7)) >= 0) delete ENTRIES[k]; });
   (r.entries || []).forEach(e => { ENTRIES[e.store + '|' + e.seller + '|' + e.date] = e; });
   ms.forEach(m => LOADED.add(m));
+  LAST_AT = new Date(); applyOutbox(); saveCache();
 }
 function neededMonths(){ if (!TODAY) return []; const s = new Set([mkOf(TODAY), mkOf(addDays(TODAY, -1))]); if (ui.month) s.add(ui.month); return Array.from(s); }
 async function refresh(){ await loadData(); }
@@ -421,7 +703,7 @@ function storeAlerts(sid, mk){
 let MODAL = null;
 function modal(o){
   return new Promise(res => {
-    MODAL = {res:res, validate:o.validate};
+    MODAL = {res:res, validate:o.validate, back:document.activeElement}; const app = $('#app'); if (app) app.inert = true;
     const el = $('#modal');
     el.innerHTML = '<div class="overlay" data-overlay><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="m-title"><h2 id="m-title">' + o.title + '</h2><div class="mbody">' + o.body + '<div class="merr" id="m-err" role="alert"></div></div><div class="mact">' +
       o.actions.map(a => '<button class="btn ' + (a.primary ? 'primary' : '') + (a.danger ? ' danger' : '') + '" data-mact="' + a.act + '">' + a.label + '</button>').join('') + '</div></div></div>';
@@ -433,18 +715,21 @@ function modalValues(){ const v = {}; document.querySelectorAll('#modal [data-k]
 function closeModal(act){
   if (!MODAL) return; const values = modalValues();
   if (act !== 'no' && MODAL.validate){ const err = MODAL.validate(values, act); if (err){ $('#m-err').textContent = err; return; } }
-  const el = $('#modal'); el.hidden = true; el.innerHTML = ''; const r = MODAL.res; MODAL = null; r({act:act, values:values});
+  const el = $('#modal'); el.hidden = true; el.innerHTML = ''; const r = MODAL.res, back = MODAL.back; MODAL = null; const app = $('#app'); if (app) app.inert = false;
+  if (back && document.contains(back) && back.focus) try { back.focus({preventScroll:true}); } catch (e) {}
+  r({act:act, values:values});
 }
 async function ask(title, body, yes, danger){ const r = await modal({title:title, body:body, actions:[{label:'Voltar', act:'no'}, {label:yes, act:'yes', primary:!danger, danger:!!danger}]}); return r.act === 'yes'; }
-function toast(msg){ const t = $('#toast'); t.textContent = msg; t.hidden = false; clearTimeout(toast._t); toast._t = setTimeout(() => { t.hidden = true; }, 3200); }
+function toast(msg){ const t = $('#toast'); t.classList.toggle('top', !!MODAL); t.textContent = msg; t.hidden = false; clearTimeout(toast._t); toast._t = setTimeout(() => { t.hidden = true; }, Math.max(3200, msg.length * 55)); }
 async function run(fn, okMsg){
   if (BUSY) return; BUSY = true; toast('Salvando…');
   try { const r = await fn(); if (r && r.ok === false){ handleError(r); return false; } await refresh(); render(); if (okMsg) toast(okMsg); return true; }
-  catch (e){ toast('Sem conexão com a planilha. Confira a internet e tente de novo.'); return false; }
+  catch (e){ toast(e.net ? 'Sem conexão com a planilha. Confira a internet e tente de novo. Nada foi alterado.' : e.message); if (e.net) render(); return false; }
   finally { BUSY = false; }
 }
 function handleError(r){
-  if (r.error === 'auth'){ SESSION.token = null; saveSession(); toast('Sua sessão expirou. Digite a senha de novo.'); const role = SESSION.role; SESSION = {}; saveSession(); go({step:'pin', pickRole:role, pickStore:role === 'gerente' ? ui.pickStore : null}); return; }
+  if (r.error === 'auth'){ SESSION.token = null; saveSession(); toast('Digite a senha de novo para continuar.'); const role = SESSION.role; const ps = SESSION.store || ui.pickStore; SESSION = {}; saveSession(); go({step:'pin', pickRole:role, pickStore:role === 'gerencia' ? null : ps}); return; }
+  if (r.error === 'conflict'){ refresh().then(render).catch(() => {}); toast('A configuração foi mudada em outro aparelho. Atualizei os dados: confira e faça a alteração de novo.'); return; }
   toast(r.error || 'Não deu certo. Tente de novo.');
 }
 
@@ -453,13 +738,14 @@ let ui = {step:'home'};
 function go(ch){ Object.assign(ui, ch); render(); window.scrollTo(0, 0); }
 
 /* ---------- pedaços de tela ---------- */
-function bar(p, pace, thin){ const w = Math.max(0, Math.min(100, p || 0)); return '<div class="bar' + (thin ? ' thin' : '') + '"><i class="' + ((p || 0) >= (pace != null ? pace : 100) ? '' : 'warn') + '" style="width:' + w + '%"></i>' + (pace != null ? '<b style="left:' + Math.min(100, pace) + '%"></b>' : '') + '</div>'; }
+function tone(p, ref){ if (p == null || !isFinite(p)) return 'c-muted'; if (!ref || p >= ref) return 'c-good'; return p >= ref * 0.85 ? 'c-mid' : 'c-warn'; }
+function bar(p, pace, thin){ const w = Math.max(0, Math.min(100, p || 0)), t = tone(p || 0, pace != null ? pace : 100); return '<div class="bar' + (thin ? ' thin' : '') + '"><i class="' + (t === 'c-good' ? '' : t === 'c-mid' ? 'mid' : 'warn') + '" style="width:' + w + '%"></i>' + (pace != null ? '<b style="left:' + Math.min(100, pace) + '%"></b>' : '') + '</div>'; }
 function kpi(label, v, meta, ok){ return '<div class="kpi"><span class="label">' + label + '</span><span class="v">' + (v == null ? '–' : v) + '</span><span class="small">meta ' + meta + '</span>' + (v == null ? '<span class="small">sem vendas</span>' : ok ? '<span class="tag-ok">● Na meta</span>' : '<span class="tag-bad">▲ Abaixo</span>') + '</div>'; }
 function kpiRow(m){ const M = CONFIG.metas; return '<div class="kpis">' + kpi('P.A.', m.pa == null ? null : dec1(m.pa), dec1(M.pa), m.pa >= M.pa) + kpi('Ticket médio', m.tm == null ? null : brl(m.tm), brl(M.tm), m.tm >= M.tm) + kpi('Conversão', m.conv == null ? null : pct(m.conv), M.conv + '%', m.conv >= M.conv) + '</div>'; }
 function prodCard(m, sid, pid, mk, title){
   const pl = prodLines(m, sid, pid, mk); if (!pl.lines.length) return '';
   return '<section class="card"><div class="stack"><h2>' + title + '</h2><span class="small">Sobre ' + pl.R + ' ' + esc(pl.refName) + ' vendidos no mês · meta de 100% em cada uma</span></div>' +
-    pl.lines.map(r => '<div class="prod"><span>' + esc(r.label) + '</span>' + bar(r.v, null, true) + '<span class="p ' + (r.v == null ? 'c-muted' : r.v >= 100 ? 'c-good' : 'c-warn') + '">' + pct(r.v) + '</span></div>').join('') + '</section>';
+    pl.lines.map(r => '<div class="prod"><span>' + esc(r.label) + '</span>' + bar(r.v, null, true) + '<span class="p ' + (tone(r.v, 100)) + '">' + pct(r.v) + '</span></div>').join('') + '</section>';
 }
 function chart(sid, pids, c){
   const vals = []; let max = 1; for (let d = 1; d <= c.D; d++){ const v = sum(sid, pids, 'venda', c.mk, d, d); vals.push(v); if (d <= c.t && v > max) max = v; }
@@ -474,61 +760,80 @@ function dezCard(C, sid, pids, c, anoant){
     const state = c.t > r[1] ? 'fechada' : c.t >= r[0] ? 'em andamento' : 'prévia';
     if (state === 'prévia') return '<div class="stack"><div class="row"><strong>' + z + 'ª dezena</strong><span class="small">começa ' + dlabel(dateOf(c.mk, r[0])) + '</span></div><span class="small">Cota prevista hoje: ' + brl(cd) + '</span></div>';
     const p = cd > 0 ? s / cd * 100 : 100;
-    return '<div class="stack"><div class="row"><strong>' + z + 'ª dezena <span class="small">(' + state + ')</span></strong><span class="' + (p >= 100 ? 'c-good' : 'c-warn') + '" style="font-weight:800">' + pct(p) + '</span></div>' + bar(p, null) + '<span class="small">' + brl(s) + ' de ' + brl(cd) + '</span></div>';
+    return '<div class="stack"><div class="row"><strong>' + z + 'ª dezena <span class="small">(' + state + ')</span></strong><span class="' + tone(p, 100) + '" style="font-weight:800">' + pct(p) + '</span></div>' + bar(p, null) + '<span class="small">' + brl(s) + ' de ' + brl(cd) + '</span></div>';
   }).join('');
   const mp = C ? sold / C * 100 : 0, ano = anoant ? anoant * el / c.D : 0;
-  return '<section class="card"><h2>Cota</h2>' + rows + '<div class="stack"><div class="row"><strong>Mês</strong><span class="' + (mp >= pace ? 'c-good' : 'c-warn') + '" style="font-weight:800">' + pct(mp) + '</span></div>' + bar(mp, pace) +
+  return '<section class="card"><h2>Cota</h2>' + rows + '<div class="stack"><div class="row"><strong>Mês</strong><span class="' + tone(mp, pace) + '" style="font-weight:800">' + pct(mp) + '</span></div>' + bar(mp, pace) +
     '<span class="small">' + brl(sold) + ' de ' + brl(C) + ' · a linha marca o ritmo esperado (' + pct(pace) + ')</span></div>' +
-    '<div class="row" style="background:var(--surface2);border-radius:12px;padding:10px 12px"><span class="label">Comparado ao ano anterior</span><strong>' + (ano ? pct(sold / ano * 100) : '– não preenchido') + '</strong></div></section>';
+    (ano ? '<div class="row" style="background:var(--surface2);border-radius:12px;padding:10px 12px"><span class="label">Comparado ao mesmo período do ano passado</span><strong>' + pct(sold / ano * 100) + '</strong></div>' : '') + '</section>';
 }
-function monthNav(){ const cur = mkOf(TODAY); return '<div class="mnav"><button class="linkbtn" data-act="month" data-d="-1" aria-label="Mês anterior">' + icon('left', 18) + '</button><strong>' + mlabel(ui.month) + '</strong><button class="linkbtn" data-act="month" data-d="1" aria-label="Próximo mês"' + (ui.month >= cur ? ' disabled' : '') + '>' + icon('right', 18) + '</button></div>'; }
+function monthNav(){ const cur = mkOf(TODAY); return '<div class="mnav"><button class="linkbtn" data-act="month" data-d="-1" aria-label="Mês anterior">' + icon('left', 18) + '</button><strong>' + mlabel(ui.month) + '</strong><button class="linkbtn" data-act="month" data-d="1" aria-label="Próximo mês"' + (ui.month >= (ui.tab === 'config' ? addMonths(cur, 1) : cur) ? ' disabled' : '') + '>' + icon('right', 18) + '</button></div>'; }
 function band(o){
-  return '<header class="band"><div class="band-in"><div class="row"><span class="brand"><img class="mark" src="' + MARK + '" alt="Studio do Sono"><span class="eyebrow">' + o.eyebrow + '</span></span>' +
+  return '<header class="band"><div class="band-in"><div class="row"><span class="brand"><img class="mark" src="' + MARK + '" alt="Studio do Sono">' + (o.title ? '<h1 class="inline">' + o.title + '</h1>' : '') + '</span>' +
     (SESSION.role ? '<span class="row" style="gap:6px"><button class="linkbtn" data-act="refresh" aria-label="Atualizar dados">' + icon('refresh', 18) + '</button><button class="linkbtn" data-act="logout">Sair</button></span>' : '') + '</div>' +
-    (o.title ? '<h1>' + o.title + '</h1>' : '') + (o.sub ? '<span class="sub">' + o.sub + '</span>' : '') + (o.month ? monthNav() : '') + (o.chip ? '<span class="chip">' + o.chip + '</span>' : '') + '</div></header>';
+    '<span class="sub">' + [o.eyebrow, o.sub, SESSION.role && LAST_AT && !OFFLINE ? 'atualizado às ' + pad(LAST_AT.getHours()) + ':' + pad(LAST_AT.getMinutes()) : ''].filter(Boolean).join(' · ') + '</span>' + (o.nav ? o.nav : '') + (o.month ? monthNav() : '') + (o.chip ? '<span class="chip">' + o.chip + '</span>' : '') + '</div></header>';
 }
+function topTabs(list){ return '<nav class="toptabs" aria-label="Seções">' + list.map(t => '<button class="tt" data-act="tab" data-tab="' + t[0] + '"' + (ui.tab === t[0] ? ' aria-current="page"' : '') + '>' + icon(t[2], 18) + t[1] + '</button>').join('') + '</nav>'; }
 function tabs(list){ return '<nav class="tabs" aria-label="Seções"><div class="tabs-in">' + list.map(t => '<button class="tab" data-act="tab" data-tab="' + t[0] + '"' + (ui.tab === t[0] ? ' aria-current="page"' : '') + '>' + icon(t[2]) + '<span>' + t[1] + '</span></button>').join('') + '</div></nav>'; }
-function page(b, body, t){ return b + '<main><div class="main-in">' + body + '</div></main>' + (t || ''); }
+function netBar(){
+  if (!SESSION.role) return '';
+  const n = OUTBOX.length, fila = n ? n + (n === 1 ? ' lançamento guardado' : ' lançamentos guardados') + ' no aparelho' : '';
+  if (OFFLINE) return '<div class="netbar" role="status">' + icon('alert', 18) + '<span><strong>Sem internet.</strong> ' + (n ? fila + ', envio automático quando a conexão voltar.' : 'Você pode continuar lançando: fica guardado no aparelho e vai para a planilha quando a conexão voltar.') + '</span><button class="btn small" data-act="flush">Tentar agora</button></div>';
+  if (n) return '<div class="netbar" role="status">' + icon('refresh', 18) + '<span>' + fila + ' esperando envio.</span><button class="btn small" data-act="flush">Enviar agora</button></div>';
+  return '';
+}
+function page(b, body, t){ return b + '<main><div class="main-in">' + netBar() + body + '</div></main>' + (t || ''); }
 function choice(act, ic, t, sub, extra){ return '<button class="choice" data-act="' + act + '" ' + (extra || '') + '><span class="ico">' + icon(ic) + '</span><span class="stack"><span class="t">' + t + '</span>' + (sub ? '<span class="small">' + sub + '</span>' : '') + '</span><span class="go">' + icon('right', 20) + '</span></button>'; }
 function backBtn(step){ return '<button class="btn small" data-act="step" data-step="' + step + '">' + icon('left', 16) + ' Voltar</button>'; }
 
 /* ---------- telas de entrada ---------- */
-function startBand(sub){ return '<header class="band"><div class="band-in center" style="align-items:center"><img class="logo-full" src="' + LOGO + '" alt="Studio do Sono"><h1>Resumo de Desempenho</h1><span class="sub">' + sub + '</span></div></header>'; }
+function startBand(sub){ return '<header class="band welcome"><div class="band-in"><img class="logo-full" src="' + LOGO + '" alt="Studio do Sono"><h1>Resumo de Desempenho</h1><span class="sub">' + sub + '</span></div></header>'; }
+function greet(){ const h = new Date().getHours(); return h < 12 ? 'Bom dia!' : h < 18 ? 'Boa tarde!' : 'Boa noite!'; }
+/* topo das telas de entrada: voltar, passo e título grande */
+function flowBand(back, step, total, title, sub){
+  return '<header class="band welcome flow"><div class="band-in"><div class="row"><button class="linkbtn round" data-act="step" data-step="' + back + '" aria-label="Voltar">' + icon('left', 20) + '</button>' +
+    (step ? '<span class="steps-dots" aria-label="Passo ' + step + ' de ' + total + '">' + Array.from({length:total}, (_, i) => '<i' + (i < step ? ' class="on"' : '') + '></i>').join('') + '<em>' + step + ' de ' + total + '</em></span>' : '') +
+    '<img class="mark" src="' + MARK + '" alt=""></div><h1>' + title + '</h1>' + (sub ? '<span class="sub">' + sub + '</span>' : '') + '</div></header>';
+}
+function listRow(act, ic, t, sub, extra){ return '<button class="lchoice" data-act="' + act + '" ' + (extra || '') + '><span class="ico">' + icon(ic) + '</span><span class="stack"><span class="t">' + t + '</span>' + (sub ? '<span class="small">' + sub + '</span>' : '') + '</span>' + icon('right', 20) + '</button>'; }
 function viewStart(){
   const s = ui.step;
   if (s === 'store'){
-    return page(startBand(ui.pickRole === 'vendedor' ? 'Passo 1 de 3 · escolha a sua loja' : 'Escolha a loja que você gerencia'),
-      '<section class="card hero"><div class="row"><h2>Qual é a sua loja?</h2>' + backBtn('home') + '</div>' + activeStores().map(st => choice('pick-store', 'store', esc(st.name), sellersOf(st.id).length + ' vendedores', 'data-store="' + st.id + '"')).join('') + '</section>');
+    return page(flowBand('home', ui.pickRole === 'vendedor' ? 1 : 0, 4, 'Qual é a sua loja?', ui.pickRole === 'vendedor' ? 'Escolha a loja onde você trabalha.' : 'Escolha a loja que você gerencia.'),
+      '<section class="card flush lgroup">' + activeStores().map(st => listRow('pick-store', 'store', esc(st.name), sellersOf(st.id).length + (sellersOf(st.id).length === 1 ? ' vendedor' : ' vendedores'), 'data-store="' + st.id + '"')).join('') + '</section>');
   }
   if (s === 'seller'){
     const st = store(ui.pickStore);
-    return page(startBand('Passo 2 de 3 · loja ' + esc(st.name)), '<section class="card hero"><div class="row"><h2>Quem é você?</h2>' + backBtn('store') + '</div>' +
-      (sellersOf(st.id).length ? sellersOf(st.id).map(p => choice('pick-seller', 'user', esc(p.name), '', 'data-pid="' + p.id + '"')).join('') : '<div class="alert">Esta loja ainda não tem vendedores cadastrados. Fale com a gerência.</div>') + '</section>');
+    return page(flowBand('store', 3, 4, 'Quem é você?', 'Loja ' + esc(st.name)),
+      (sellersOf(st.id).length ? '<section class="card flush lgroup">' + sellersOf(st.id).map(p => listRow('pick-seller', 'user', esc(p.name), '', 'data-pid="' + p.id + '"')).join('') + '</section>' : '<div class="alert">Esta loja ainda não tem vendedores cadastrados. Fale com a gerência.</div>'));
   }
   if (s === 'confirm'){
-    const st = store(ui.pickStore);
-    return page(startBand('Passo 3 de 3 · confirme'), '<section class="card hero center"><span class="ico" style="width:56px;height:56px">' + icon('user', 28) + '</span>' +
-      '<p class="who">Você é ' + esc(sellerName(st.id, ui.pickSeller)) + ',<br>da loja ' + esc(st.name) + '?</p><span class="small">Tudo o que você lançar fica registrado no seu nome. Este aparelho vai lembrar de você.</span>' +
-      '<button class="btn block primary" data-act="confirm-seller">Sim, sou eu · continuar</button><button class="btn" data-act="step" data-step="seller">Não sou eu</button></section>');
+    const st = store(ui.pickStore), nm = esc(sellerName(st.id, ui.pickSeller));
+    return page(flowBand('seller', 4, 4, 'Confirme quem é você', 'Loja ' + esc(st.name)),
+      '<section class="card hero center confirm"><span class="avatar">' + nm.slice(0, 1).toUpperCase() + '</span>' +
+      '<h2 class="who">Você é ' + nm + ',<br>da loja ' + esc(st.name) + '?</h2><span class="small">Tudo o que você lançar fica registrado no seu nome. Este aparelho vai lembrar de você.</span>' +
+      '<button class="btn block primary" data-act="confirm-seller">Sim, sou eu · continuar</button><button class="btn block ghost" data-act="step" data-step="seller">Não sou eu</button></section>');
   }
   if (s === 'pin'){
-    const g = ui.pickRole === 'gerencia', st = g ? null : store(ui.pickStore), setup = g && !HAS_GPIN;
-    return page(startBand(g ? 'Gerência geral' : 'Gerente · ' + esc(st.name)),
-      '<section class="card hero"><div class="row"><h2>' + (setup ? 'Crie a senha da gerência' : 'Digite a senha') + '</h2>' + backBtn(g ? 'home' : 'store') + '</div>' +
+    const g = ui.pickRole === 'gerencia', vd = ui.pickRole === 'vendedor', st = g ? null : store(ui.pickStore), setup = g && !HAS_GPIN;
+    return page(flowBand(g ? 'home' : 'store', vd ? 2 : 0, 4, setup ? 'Crie a senha da gerência' : vd ? 'Senha da loja' : g ? 'Gerência geral' : 'Gerente · ' + esc(st.name), setup ? 'Primeiro acesso' : vd ? 'Loja ' + esc(st.name) : 'Digite a sua senha'),
+      '<section class="card hero pinbox"><span class="lockico">' + icon('lock', 26) + '</span>' +
       (setup ? '<span class="small">É o primeiro acesso. Escolha uma senha só de números (4 a 8). Guarde bem: ela protege toda a configuração.</span>' + pinField('pin', 'Nova senha') + pinField('pin2', 'Repita a senha')
-        : '<span class="small">' + (g ? 'Senha da gerência geral.' : 'Senha do gerente desta loja. Quem define é a gerência geral.') + (DEMO ? ' Na demonstração, a senha é 1234.' : '') + '</span>' + pinField('pin', 'Senha')) +
+        : '<span class="small">' + (g ? 'Senha da gerência geral.' : vd ? 'É a mesma senha para todos os vendedores de ' + esc(st.name) + '. Se não souber, peça ao gerente da loja. Este aparelho lembra a senha.' : 'Senha do gerente desta loja. Quem define é a gerência geral.') + (DEMO ? ' Na demonstração, a senha é 1234.' : '') + '</span>' + pinField('pin', 'Senha')) +
       '<button class="btn block primary" data-act="' + (setup ? 'setup-pin' : 'login') + '">' + (setup ? 'Criar senha e entrar' : 'Entrar') + '</button></section>');
   }
   if (!CONFIG && s !== 'home') ui.step = 'home';
-  return page(startBand(DEMO ? 'Demonstração com os dados de setembro/26' : 'Lançamento diário e cotas das lojas'),
+  const tile = (role, ic, t, sub) => '<button class="role-tile" data-act="role" data-role="' + role + '"><span class="ico">' + icon(ic, 24) + '</span><span class="t">' + t + '</span><span class="small">' + sub + '</span></button>';
+  return page('<header class="band welcome home"><div class="band-in"><div class="row"><img class="logo-full" src="' + LOGO + '" alt="Studio do Sono"><button class="linkbtn" data-act="install-help">' + icon('phone', 18) + ' Instalar</button></div>' +
+      '<span class="hello">' + greet() + '</span><h1>Resumo de Desempenho</h1><span class="sub">' + (DEMO ? 'Demonstração com os dados de setembro/26' : 'Lançamento diário e cotas das lojas') + '</span></div></header>',
     (!CONFIG ? '<div class="alert"><strong>O app ainda não foi configurado.</strong><span>A gerência geral precisa entrar primeiro para cadastrar as lojas.</span></div>' : '') +
-    '<section class="card hero"><h2>Quem está usando?</h2>' +
-    (CONFIG ? choice('role', 'user', 'Sou vendedor', 'Lançar o meu dia e ver a minha cota', 'data-role="vendedor"') + choice('role', 'store', 'Sou gerente de loja', 'Acompanhar a loja e os vendedores', 'data-role="gerente"') : '') +
-    choice('role', 'lock', 'Gerência geral', 'Painel das lojas, configuração e senhas', 'data-role="gerencia"') + '</section>' +
-    '<button class="btn" data-act="install-help">' + icon('phone', 18) + ' Como instalar no celular</button>' +
-    (DEMO ? '<section class="card"><h2>Modo demonstração</h2><span class="small">Nada aqui vai para a planilha: fica só neste aparelho. Senha de teste da gerência e de todas as lojas: 1234. Avance a data para testar dias novos.</span>' +
+    '<h2 class="sect">Como você vai entrar?</h2>' +
+    (CONFIG ? '<button class="role-main feature" data-act="role" data-role="vendedor"><span class="ico">' + icon('user', 26) + '</span><span class="stack"><span class="t">Sou vendedor</span><span class="small">Lançar o meu dia e ver a minha cota</span></span><span class="go">' + icon('right', 22) + '</span></button>' : '') +
+    '<div class="roles2">' + (CONFIG ? tile('gerente', 'store', 'Gerente de loja', 'Acompanhar a loja e os vendedores') : '') + tile('gerencia', 'lock', 'Gerência geral', 'Painel, configuração e senhas') + '</div>' +
+    (DEMO ? '<details class="grp demo"><summary><span class="stack"><strong>Modo demonstração</strong><span class="small">Senha de tudo: 1234 · data e testes</span></span><span class="chev">' + icon('chev', 20) + '</span></summary><div class="inner"><span class="small">Nada aqui vai para a planilha: fica só neste aparelho. Avance a data para testar dias novos.</span>' +
       '<div class="row"><button class="sq" data-act="demo-day" data-d="-1" aria-label="Dia anterior">' + icon('left') + '</button><strong>' + dlong(TODAY) + '</strong><button class="sq" data-act="demo-day" data-d="1" aria-label="Próximo dia">' + icon('right') + '</button></div>' +
-      '<button class="btn danger" data-act="demo-reset">Apagar testes e voltar aos dados de setembro</button></section>' : ''));
+      '<button class="btn" data-act="demo-net">' + (DEMO_NET_DOWN ? 'Religar a internet (simulação)' : 'Simular queda de internet') + '</button>' +
+      '<button class="btn danger" data-act="demo-reset">Apagar testes e voltar aos dados de setembro</button></div></details>' : ''));
 }
 
 /* ---------- vendedor ---------- */
@@ -544,22 +849,25 @@ function viewSeller(){
   return page(band({eyebrow:esc(st.name) + ' · ' + name, title:title, sub:dlong(TODAY)}), body, tabs([['lancar', 'Lançar', 'edit'], ['painel', 'Meu painel', 'chart'], ['hist', 'Lançamentos', 'list']]));
 }
 let EDITOR = null, draft = null;
+let DRAFTS = (() => { try { return JSON.parse(localStorage.getItem('rd-rascunhos') || '{}'); } catch (e) { return {}; } })();
+function keepDraft(){ if (!EDITOR || !draft) return; DRAFTS[EDITOR.key] = clone(draft); try { localStorage.setItem('rd-rascunhos', JSON.stringify(DRAFTS)); } catch (e) {} }
+function dropDraft(key){ delete DRAFTS[key]; try { localStorage.setItem('rd-rascunhos', JSON.stringify(DRAFTS)); } catch (e) {} }
 function zeros(){ const o = {}; allFields().forEach(f => { o[f] = 0; }); return o; }
-function openDraft(sid, pid, date, mode){ const key = sid + '|' + pid + '|' + date; if (!EDITOR || EDITOR.key !== key){ const e = ENTRIES[key]; draft = zeros(); if (e && !e.folga && e.v) Object.keys(e.v).forEach(f => { draft[f] = +e.v[f] || 0; }); EDITOR = {key:key, sid:sid, pid:pid, date:date}; } EDITOR.mode = mode; }
+function openDraft(sid, pid, date, mode){ const key = sid + '|' + pid + '|' + date; if (!EDITOR || EDITOR.key !== key){ const e = ENTRIES[key]; draft = zeros(); if (DRAFTS[key]) Object.assign(draft, DRAFTS[key]); else if (e && !e.folga && e.v) Object.keys(e.v).forEach(f => { draft[f] = +e.v[f] || 0; }); EDITOR = {key:key, sid:sid, pid:pid, date:date}; } EDITOR.mode = mode; }
 function editor(sid, pid, date, mode){
   openDraft(sid, pid, date, mode);
-  const mk = mkOf(date), e = ENTRIES[sid + '|' + pid + '|' + date], q = quota(mk, sid, pid), has = hasCota(mk, sid);
+  const mk = mkOf(date), e = ENTRIES[sid + '|' + pid + '|' + date], q = quota(mk, sid, pid), has = hasCota(mk, sid) && daysOf(mk, sid, pid) > 0;
   let banner = '';
   if (mode === 'seller' && date !== TODAY) banner = '<div class="alert"><strong>Você está corrigindo ontem, ' + dlabel(date) + '.</strong><span>Hoje é o último dia em que você pode mexer neste lançamento. Depois, só a gerência.</span></div>';
   if (mode === 'gerencia') banner = '<div class="alert"><strong>Correção pela gerência · uso excepcional</strong><span>' + esc(sellerName(sid, pid)) + ', ' + dlabel(date) + '. A alteração muda resultados já calculados e fica registrada no histórico da planilha.</span></div>';
-  const status = e ? (e.folga ? '<span class="chip mute">Marcado como folga</span>' : '<span class="chip ok">Já lançado · mudar = correção</span>') : '<span class="chip mute">Ainda não lançado</span>';
+  const status = DRAFTS[sid + '|' + pid + '|' + date] ? '<span class="chip warn">Rascunho guardado · falta salvar</span>' : e ? (e.folga ? '<span class="chip mute">Marcado como folga</span>' : '<span class="chip ok">Já lançado · mudar = correção</span>') : '<span class="chip mute">Ainda não lançado</span>';
   let html = banner;
   if (has){
     const ci = cotaDia(q, sid, [pid], date);
-    html += '<section class="card hero"><div class="row"><div class="stack"><span class="label">Cota ' + (date === TODAY ? 'de hoje' : 'deste dia') + '</span><span class="big">' + (ci.dia > 0 ? brl(ci.dia) : 'Batida') + '</span></div><div class="stack" style="align-items:flex-end"><span class="label">Lançado</span><span class="mid c-good" id="live-pct"></span></div></div><div id="live-bar"></div>' +
+    html += '<section class="card hero feature"><div class="row"><div class="stack"><span class="label">Cota ' + (date === TODAY ? 'de hoje' : 'deste dia') + '</span><span class="big">' + (ci.dia > 0 ? brl(ci.dia) : 'Batida') + '</span></div><div class="stack" style="align-items:flex-end"><span class="label">Lançado</span><span class="mid c-good" id="live-pct"></span></div></div><div id="live-bar"></div>' +
       '<div class="row" style="flex-wrap:wrap"><span class="small">' + ci.z + 'ª dezena · dia ' + (P(date).d - ci.a + 1) + ' de ' + (ci.b - ci.a + 1) + ' · faltavam ' + brl(Math.max(0, ci.falta)) + ' na dezena</span>' + status + '</div></section>';
-  } else html += '<section class="card hero"><div class="row"><h2>' + dlong(date) + '</h2>' + status + '</div><span class="small">A gerência ainda não definiu a cota de ' + mlabel(mk).toLowerCase() + '. Você já pode lançar normalmente.</span></section>';
-  html += '<section class="card flush"><div class="head stack" style="gap:10px"><h2>Funil do dia</h2><label class="label" for="f-venda">Valor vendido</label><div class="money"><span>R$</span><input id="f-venda" ' + NUMKEY + ' data-mask="money" data-f="venda" value="' + fmtMoneyInput(Math.round(draft.venda * 100)) + '"></div><span class="small">Digite só os números: 1 vira 0,01; 12345 vira 123,45.</span></div>' +
+  } else html += '<section class="card hero"><div class="row"><h2>' + dlong(date) + '</h2>' + status + '</div><span class="small">' + (hasCota(mk, sid) ? 'Você está sem dias trabalhados em ' + mlabel(mk).toLowerCase() + ', então não tem cota neste mês. Se for engano, fale com a gerência.' : 'A gerência ainda não definiu a cota de ' + mlabel(mk).toLowerCase() + '.') + ' Você pode lançar normalmente.</span></section>';
+  html += '<section class="card flush"><div class="head stack" style="gap:10px"><h2>Funil do dia</h2><label class="label" for="f-venda">Valor vendido</label><label class="money" for="f-venda"><span>R$</span><input id="f-venda" ' + NUMKEY + ' data-mask="money" data-f="venda" value="' + fmtMoneyInput(Math.round(draft.venda * 100)) + '"></label><span class="small">Digite só os números: 1 vira 0,01; 12345 vira 123,45.</span></div>' +
     ['atend', 'ret', 'vendas', 'pecas'].map(f => stepLine(f, FUNIL_LBL[f], HINT[f])).join('') + '<div style="height:6px"></div></section><div id="live-kpis"></div><div id="live-check"></div>';
   html += CONFIG.categories.filter(c => !c.archived && c.products.some(p => !p.archived)).map((c, i) => '<details class="grp"' + (i === 0 ? ' open' : '') + '><summary><span class="stack"><strong>' + esc(c.name) + '</strong><span class="small" data-gsum="' + c.id + '"></span></span><span class="chev">' + icon('chev', 20) + '</span></summary>' +
     c.products.filter(p => !p.archived).map(p => stepLine(p.id, p.name)).join('') + '</details>').join('');
@@ -573,14 +881,26 @@ function stepLine(f, label, hint){
 }
 function refreshLive(){
   if (!EDITOR || !draft) return; const {sid, pid, date} = EDITOR, mk = mkOf(date);
-  if (hasCota(mk, sid)){ const ci = cotaDia(quota(mk, sid, pid), sid, [pid], date), pp = ci.dia > 0 ? draft.venda / ci.dia * 100 : 100; const a = $('#live-pct'); if (a) a.textContent = pct(pp) + ' da cota'; const b = $('#live-bar'); if (b) b.innerHTML = bar(pp, null); }
+  if (hasCota(mk, sid)){ const ci = cotaDia(quota(mk, sid, pid), sid, [pid], date), pp = ci.dia > 0 ? draft.venda / ci.dia * 100 : 100; const a = $('#live-pct'); if (a){ a.textContent = pct(pp) + ' da cota'; a.className = 'mid ' + tone(pp, 100); } const b = $('#live-bar'); if (b) b.innerHTML = bar(pp, null); }
   const den = draft.atend + draft.ret, m = {pa: draft.vendas ? draft.pecas / draft.vendas : null, tm: draft.vendas ? draft.venda / draft.vendas : null, conv: den ? draft.vendas / den * 100 : null};
   const k = $('#live-kpis'); if (k) k.innerHTML = kpiRow(m);
   const c = check(draft), el = $('#live-check');
-  if (el) el.innerHTML = c.length ? '<div class="alert" role="alert"><strong>Confira antes de salvar</strong>' + c.map(x => '<span>• ' + x + '</span>').join('') + '</div>' : '<div class="note">' + icon('check', 18) + '<span>Números conferidos. Tudo certo para salvar.</span></div>';
+  const sc = c.length ? [] : softCheck(draft, draftDia());
+  if (el) el.innerHTML = c.length ? '<div class="alert" role="alert"><strong>Corrija antes de salvar</strong>' + c.map(x => '<span>• ' + x + '</span>').join('') + '</div>'
+    : sc.length ? '<div class="soft" role="status"><strong>Confira antes de salvar</strong>' + sc.map(x => '<span>• ' + x + '</span>').join('') + '<span>Se estiver certo, pode salvar.</span></div>'
+    : '<div class="note">' + icon('check', 18) + '<span>Números conferidos. Tudo certo para salvar.</span></div>';
   const btn = $('#save-btn'); if (btn){ btn.disabled = c.length > 0; btn.textContent = c.length ? 'Corrija os avisos para salvar' : (ENTRIES[EDITOR.key] ? 'Salvar correção' : 'Salvar o dia'); }
   CONFIG.categories.forEach(cat => { const n = cat.products.filter(p => !p.archived).reduce((a, p) => a + (draft[p.id] || 0), 0); const s = document.querySelector('[data-gsum="' + cat.id + '"]'); if (s) s.textContent = n ? n + (n === 1 ? ' item lançado' : ' itens lançados') : 'Nada lançado'; });
 }
+function softCheck(v, dia){
+  const out = [], prodSum = products().reduce((a, p) => a + (+v[p.id] || 0), 0);
+  if (prodSum > (v.pecas || 0)) out.push('Os produtos somam ' + prodSum + (prodSum === 1 ? ' item' : ' itens') + ', mais que as ' + (v.pecas || 0) + ' peças vendidas.');
+  if (v.venda > Math.max(30000, (dia || 0) * 4)) out.push('O valor de ' + money(v.venda) + ' está bem acima do normal para um dia. Confira se não sobrou um zero.');
+  if ((v.atend || 0) + (v.ret || 0) > 150) out.push('Mais de 150 atendimentos e retornos num dia. Confira.');
+  if ((v.pecas || 0) > 200) out.push('Mais de 200 peças num dia. Confira.');
+  return out;
+}
+function draftDia(){ if (!EDITOR) return 0; const mk = mkOf(EDITOR.date); return hasCota(mk, EDITOR.sid) ? Math.max(0, cotaDia(quota(mk, EDITOR.sid, EDITOR.pid), EDITOR.sid, [EDITOR.pid], EDITOR.date).dia) : 0; }
 function fmtField(f, v){ return f === 'venda' ? money(v) : String(v || 0); }
 function summaryHtml(v){
   const rows = FUNIL.map(f => '<li>' + FUNIL_LBL[f] + ': <strong>' + fmtField(f, v[f]) + '</strong></li>').join('') + products().filter(p => v[p.id] > 0).map(p => '<li>' + esc(p.name) + ': <strong>' + v[p.id] + '</strong></li>').join('');
@@ -596,35 +916,41 @@ async function saveDraft(folga){
   if (folga){ body = '<p>Marcar <strong>' + dlow(E.date) + '</strong> como <strong>dia sem venda / folga</strong> de ' + esc(sellerName(E.sid, E.pid)) + '?</p>' + (prev && !prev.folga ? '<div class="alert">Os números já lançados neste dia serão apagados.</div>' : ''); }
   else {
     if (check(draft).length) return toast('Corrija os avisos antes de salvar');
+    const sc = softCheck(draft, draftDia());
     if (fix){ const d = diffList(prev, draft); if (!d.length) return toast('Nada mudou neste dia.'); body = '<p>Você está <strong>corrigindo</strong> ' + dlow(E.date) + '. Confira o que muda:</p><ul class="diff">' + d.map(x => '<li>' + x + '</li>').join('') + '</ul>'; }
     else body = '<p>Confira o lançamento de <strong>' + dlow(E.date) + '</strong> antes de gravar:</p>' + summaryHtml(draft);
+    if (sc.length) body = '<div class="soft"><strong>Atenção</strong>' + sc.map(x => '<span>• ' + x + '</span>').join('') + '</div>' + body;
   }
   if (E.mode === 'seller') body += '<p class="small">' + (E.date === TODAY ? 'Você ainda pode corrigir este dia hoje e amanhã. Depois, só a gerência.' : 'Hoje é o último dia para corrigir este lançamento. Depois, só a gerência.') + '</p>';
   if (E.mode === 'gerencia') body += '<div class="alert"><strong>Correção pela gerência.</strong><span>Muda resultados já calculados e fica registrada no histórico da planilha.</span></div>';
   if (!(await ask(folga ? 'Confirmar folga?' : fix ? 'Confirmar correção?' : 'Confirmar lançamento?', body, folga ? 'Sim, marcar folga' : fix ? 'Sim, salvar correção' : 'Sim, salvar'))) return;
-  const d0 = E.date, by = SESSION.role === 'gerencia' ? 'Gerência geral' : sellerName(E.sid, E.pid);
-  const ok = await run(() => api('saveEntry', {store:E.sid, seller:E.pid, date:E.date, folga:!!folga, v: folga ? {} : clone(draft), by:by}), (folga ? 'Folga registrada · ' : fix ? 'Correção salva · ' : 'Lançamento salvo · ') + dlabel(d0));
-  if (ok){ EDITOR = null; if (ui.editDate){ ui.editDate = null; } if (ui.fix){ ui.fix = null; } render(); }
+  const d0 = E.date, k0 = E.key, by = SESSION.role === 'gerencia' ? 'Gerência geral' : sellerName(E.sid, E.pid);
+  const payload = {store:E.sid, seller:E.pid, date:E.date, folga:!!folga, v: folga ? {} : clone(draft), by:by}, okMsg = (folga ? 'Folga registrada · ' : fix ? 'Correção salva · ' : 'Lançamento salvo · ') + dlabel(d0);
+  if (BUSY) return; BUSY = true; toast('Salvando…'); let ok = false;
+  try { const r = await api('saveEntry', payload); if (r.ok === false) handleError(r); else { ok = true; try { await refresh(); } catch (e) {} toast(okMsg); } }
+  catch (e){ if (e.net && E.mode === 'seller'){ enqueue(payload); ok = true; toast('Sem internet agora. O lançamento ficou guardado no aparelho e vai para a planilha sozinho quando a conexão voltar.'); } else toast(e.net ? 'Sem conexão com a planilha. Nada foi salvo: tente de novo.' : e.message); }
+  finally { BUSY = false; }
+  if (ok){ dropDraft(k0); EDITOR = null; if (ui.editDate){ ui.editDate = null; } if (ui.fix){ ui.fix = null; } render(); }
 }
 function sellerDash(sid, pid){
   const c = ctx(mkOf(TODAY)), pids = [pid], mc = mcfg(c.mk, sid);
   if (!mc || !mc.cota) return '<section class="card hero"><h2>Cota de ' + mlabel(c.mk).toLowerCase() + ' ainda não definida</h2><span class="small">Assim que a gerência definir, o seu painel aparece aqui. Seus lançamentos já estão sendo guardados.</span></section>';
   if (!daysOf(c.mk, sid, pid)) return '<section class="card hero"><h2>Sem cota neste mês</h2><span class="small">A gerência marcou você sem dias trabalhados em ' + mlabel(c.mk).toLowerCase() + '.</span></section>';
   const sp = split(mc.cota || 0, c.mk, sid)[pid], q = sp.v, ci = cotaDia(q, sid, pids, TODAY), m = metrics(sid, pids, c);
-  return '<section class="card hero"><span class="label">Cota de hoje · ' + ci.z + 'ª dezena</span><span class="big">' + (ci.dia > 0 ? brl(ci.dia) : 'Dezena batida') + '</span><span class="small">Faltam ' + brl(Math.max(0, ci.falta)) + ' na dezena, em ' + ci.dias + ' dias. Sua cota do mês: ' + brl(q) + ' (' + howText(sp, mc.cota, c.D) + ').</span></section>' +
+  return '<section class="card hero feature"><span class="label">Cota de hoje · ' + ci.z + 'ª dezena</span><span class="big">' + (ci.dia > 0 ? brl(ci.dia) : 'Dezena batida') + '</span><span class="small">Faltam ' + brl(Math.max(0, ci.falta)) + ' na dezena, em ' + ci.dias + ' dias. Sua cota do mês: ' + brl(q) + ' (' + howText(sp, mc.cota, c.D) + ').</span></section>' +
     dezCard(q, sid, pids, c, mc.sellerAno ? mc.sellerAno[pid] : 0) + chart(sid, pids, c) + kpiRow(m) + prodCard(m, sid, pid, c.mk, 'Cotas de produtos');
 }
 function sellerHist(sid, pid){
   const y = addDays(TODAY, -1), dates = []; for (let d = P(TODAY).d; d >= 1; d--) dates.push(dateOf(mkOf(TODAY), d)); if (mkOf(y) !== mkOf(TODAY)) dates.splice(1, 0, y);
   const rows = dates.map(date => {
     const e = ENTRIES[sid + '|' + pid + '|' + date], c = e && !e.folga ? check(e.v) : [], req = REQS.filter(r => r.store === sid && r.seller === pid && r.date === date && r.status === 'aberto')[0];
-    const chip = !e ? (date < y ? '<span class="chip warn">Não lançado</span>' : '<span class="chip mute">Pendente</span>') : e.folga ? '<span class="chip mute">Folga</span>' : c.length ? '<span class="chip warn">Revisar</span>' : '<span class="chip ok">Lançado</span>';
+    const chip = e && e.pending ? '<span class="chip wait">Esperando internet</span>' : !e ? (date < y ? '<span class="chip warn">Não lançado</span>' : '<span class="chip mute">Pendente</span>') : e.folga ? '<span class="chip mute">Folga</span>' : c.length ? '<span class="chip warn">Números não batem</span>' : '<span class="chip ok">Lançado</span>';
     const can = date === TODAY || date === y;
     const btn = can ? '<button class="btn small" data-act="edit-day" data-date="' + date + '">' + (e ? 'Corrigir' : 'Lançar') + '</button>' : req ? '<span class="chip ok">Correção pedida</span>' : '<button class="btn small" data-act="ask-fix" data-date="' + date + '">' + icon('lock', 14) + ' Pedir correção</button>';
-    return '<tr><td><strong>' + dlabel(date) + '</strong>' + (date === TODAY ? ' <span class="small">hoje</span>' : date === y ? ' <span class="small">ontem</span>' : '') + '</td><td class="r">' + (e && !e.folga ? brl(e.v.venda) : '–') + '</td><td>' + chip + '</td><td class="r">' + btn + '</td></tr>';
+    return '<div class="lrow"><span class="stack"><strong>' + dlabel(date) + (date === TODAY ? ' · hoje' : date === y ? ' · ontem' : '') + '</strong><span class="row start" style="gap:8px">' + chip + (e && !e.folga ? '<span class="small">' + brl(e.v.venda) + '</span>' : '') + '</span></span>' + btn + '</div>';
   }).join('');
   return '<div class="note">' + icon('lock', 18) + '<span>Você pode lançar ou corrigir hoje e ontem. Dias mais antigos só a gerência altera: use “Pedir correção”.</span></div>' +
-    '<section class="card flush"><div class="head"><h2>' + mlabel(mkOf(TODAY)) + '</h2></div><div class="scroll"><table class="t"><thead><tr><th>Dia</th><th class="r">Valor</th><th>Situação</th><th></th></tr></thead><tbody>' + rows + '</tbody></table></div></section>';
+    '<section class="card flush"><div class="head"><h2>' + mlabel(mkOf(TODAY)) + '</h2></div>' + rows + '</section>';
 }
 async function askFix(sid, pid, date){
   const r = await modal({title:'Pedir correção à gerência', body:'<p>Você não pode mais alterar <strong>' + dlow(date) + '</strong>. Explique o que precisa mudar e a gerência faz a correção.</p><label class="field" for="f-msg">O que está errado?<textarea id="f-msg" data-k="msg" rows="3" placeholder="Ex.: esqueci de lançar 1 travesseiro"></textarea></label>',
@@ -637,11 +963,11 @@ async function askFix(sid, pid, date){
 function storeDash(sid, mk, who){
   const c = ctx(mk), pids = sellersOf(sid).map(p => p.id), mc = mcfg(mk, sid), m = metrics(sid, pids, c), el = elapsed(sid, pids, c), pace = el / c.D * 100;
   const C = mc ? mc.cota || 0 : 0, mp = C ? m.venda / C * 100 : 0, proj = el ? m.venda / el * c.D : 0, ano = mc && mc.anoant ? mc.anoant * el / c.D : 0;
-  let html = '<section class="card hero"><div class="row"><div class="stack"><span class="label">Vendido em ' + mlabel(mk).toLowerCase() + '</span><span class="big">' + brl(m.venda) + '</span></div>' + (C ? '<span class="mid ' + (mp >= pace ? 'c-good' : 'c-warn') + '">' + pct(mp) + '</span>' : '') + '</div>';
+  let html = '<section class="card hero feature"><div class="row"><div class="stack"><span class="label">Vendido em ' + mlabel(mk).toLowerCase() + '</span><span class="big">' + brl(m.venda) + '</span></div>' + (C ? '<span class="mid ' + tone(mp, pace) + '">' + pct(mp) + '</span>' : '') + '</div>';
   if (C){
     const ci = c.t && mk === mkOf(TODAY) ? cotaDia(C, sid, pids, TODAY) : null;
     html += bar(mp, pace) + '<span class="small">Cota ' + brl(C) + ' · a linha marca o ritmo esperado (' + pct(pace) + ')</span><div class="tiles">' +
-      '<div class="stack"><span class="small">Projeção do mês</span><span class="mid">' + short(proj) + '</span><span class="small ' + (proj >= C ? 'c-good' : 'c-warn') + '" style="font-weight:700">' + pct(proj / C * 100) + ' da cota</span></div>' +
+      '<div class="stack"><span class="small">Projeção do mês</span><span class="mid">' + short(proj) + '</span><span class="small ' + tone(proj, C) + '" style="font-weight:700">' + pct(proj / C * 100) + ' da cota</span></div>' +
       '<div class="stack"><span class="small">Cota de hoje</span><span class="mid">' + (ci ? (ci.dia > 0 ? brl(ci.dia) : 'Batida') : '–') + '</span><span class="small">loja inteira</span></div>' +
       '<div class="stack"><span class="small">Ano anterior</span><span class="mid">' + (ano ? pct(m.venda / ano * 100) : '–') + '</span><span class="small">' + (ano ? 'até agora' : 'não preenchido') + '</span></div></div>';
   } else html += '<div class="alert"><strong>Cota do mês não definida.</strong><span>' + (who === 'gerencia' ? 'Defina em Configurar › Mês.' : 'A gerência geral ainda vai definir.') + '</span></div>';
@@ -649,7 +975,7 @@ function storeDash(sid, mk, who){
   const sp = mc ? split(C, mk, sid) : {};
   const ranked = sellersOf(sid).filter(p => daysOf(mk, sid, p.id) > 0).map(p => { const mm = metrics(sid, [p.id], c), q = sp[p.id] ? sp[p.id].v : 0; return {p:p, m:mm, q:q, pct: q ? mm.venda / q * 100 : 0}; }).sort((a, b) => b.pct - a.pct || b.m.venda - a.m.venda);
   html += '<section class="card flush"><div class="head row"><h2>Vendedores</h2><span class="small">% da cota individual</span></div>' + (ranked.length ? ranked.map((r, i) =>
-    '<div class="stepline" style="flex-direction:column;align-items:stretch;gap:8px"><div class="row"><span class="row start" style="gap:10px;min-width:0"><span class="chip ok">' + (i + 1) + '</span><strong>' + esc(r.p.name) + '</strong></span><span><strong>' + brl(r.m.venda) + '</strong> <strong class="' + (r.pct >= pace ? 'c-good' : 'c-warn') + '">' + (r.q ? pct(r.pct) : '') + '</strong></span></div>' +
+    '<div class="stepline" style="flex-direction:column;align-items:stretch;gap:8px"><div class="row"><span class="row start" style="gap:10px;min-width:0"><span class="chip ok">' + (i + 1) + '</span><strong>' + esc(r.p.name) + '</strong></span><span><strong>' + brl(r.m.venda) + '</strong> <strong class="' + tone(r.pct, pace) + '">' + (r.q ? pct(r.pct) : '') + '</strong></span></div>' +
     (r.q ? bar(r.pct, pace, true) : '') + '<span class="small">' + (r.q ? 'Cota ' + brl(r.q) + ' · ' : '') + 'P.A. ' + (r.m.pa == null ? '–' : dec1(r.m.pa)) + ' · Ticket ' + (r.m.tm == null ? '–' : brl(r.m.tm)) + ' · Conversão ' + pct(r.m.conv) + '</span></div>').join('') : '<div class="stepline small">Nenhum vendedor ativo.</div>') + '</section>';
   return html + kpiRow(m) + prodCard(m, sid, null, mk, 'Cotas de produtos da loja') + chart(sid, pids, c);
 }
@@ -660,7 +986,7 @@ function storeGrid(sid, mk){
       if (!e) return '<td class="r">' + (daysOf(mk, sid, p.id) ? '<span class="chip ' + (date < TODAY ? 'warn' : 'mute') + '">' + (date < TODAY ? 'Falta' : 'Pendente') + '</span>' : '–') + '</td>';
       if (e.folga) return '<td class="r"><span class="chip mute">Folga</span></td>';
       const ch = check(e.v); return '<td class="r ' + (ch.length ? 'c-warn' : '') + '" title="' + esc(ch.join(' ')) + '">' + brl(e.v.venda) + (ch.length ? ' ▲' : '') + '</td>'; }).join('') + '<td class="r"><strong>' + brl(sum(sid, ps.map(p => p.id), 'venda', mk, d, d)) + '</strong></td></tr>'; }
-  return '<section class="card flush"><div class="head stack"><h2>Lançamentos por dia</h2><span class="small">▲ = lançamento com números que não batem.</span></div><div class="scroll"><table class="t"><thead><tr><th>Dia</th>' + ps.map(p => '<th class="r">' + esc(p.name) + '</th>').join('') + '<th class="r">Loja</th></tr></thead><tbody>' + (rows || '<tr><td colspan="9" class="small">Nenhum dia neste mês ainda.</td></tr>') + '</tbody></table></div></section>';
+  return '<section class="card flush"><div class="head stack"><h2>Lançamentos por dia</h2><span class="small">▲ = lançamento com números que não batem.</span></div>' + (ps.length > 2 ? '<div class="drag-hint">Arraste a tabela para o lado para ver todos.</div>' : '') + '<div class="scroll"><table class="t"><thead><tr><th>Dia</th>' + ps.map(p => '<th class="r">' + esc(p.name) + '</th>').join('') + '<th class="r">Loja</th></tr></thead><tbody>' + (rows || '<tr><td colspan="9" class="small">Nenhum dia neste mês ainda.</td></tr>') + '</tbody></table></div></section>';
 }
 function storeConf(sid, mk, who){
   const a = storeAlerts(sid, mk); if (!a.length) return '<div class="note">' + icon('check', 18) + '<span>Nada para conferir. Todos lançaram e os números batem.</span></div>';
@@ -679,13 +1005,17 @@ function viewGerente(){
 /* ---------- gerência geral ---------- */
 function viewGerencia(){
   if (!ui.month) ui.month = mkOf(TODAY);
-  const tab = ui.tab || 'rede'; let body, title = 'Painel das lojas', month = true;
+  const tab = ui.tab || 'rede'; if (tab !== 'config' && ui.month > mkOf(TODAY)) ui.month = mkOf(TODAY); let body, title = 'Painel das lojas', month = true;
   if (tab === 'rede') body = network(ui.month);
   else if (tab === 'lojas'){ const sid = ui.store && store(ui.store) ? ui.store : activeStores()[0].id; ui.store = sid; title = esc(store(sid).name); body = storePicker(false) + gerStore(sid, ui.month); }
   else { title = 'Configurar'; month = ui.sub === 'mes' || !ui.sub; body = configView(); }
-  return page(band({eyebrow:'Gerência geral', title:title, sub:dlong(TODAY), month:month}), body, tabs([['rede', 'Lojas', 'net'], ['lojas', 'Detalhe', 'store'], ['config', 'Configurar', 'gear']]));
+  const tl = [['rede', 'Todas as lojas', 'net'], ['lojas', 'Uma loja', 'store'], ['config', 'Configurar', 'gear']];
+  return page(band({eyebrow:'Gerência geral', title:title, sub:dlong(TODAY), month:month, nav:topTabs(tl)}), body, tabs(tl));
 }
-function storePicker(withNew){ if (!ui.store || !store(ui.store)) ui.store = activeStores()[0] ? activeStores()[0].id : null; return '<section class="card"><div class="pills" role="group" aria-label="Loja">' + activeStores().map(st => '<button class="pill" data-act="pick-ger-store" data-store="' + st.id + '" aria-pressed="' + (ui.store === st.id) + '">' + esc(st.name) + '</button>').join('') + (withNew ? '<button class="pill add" data-act="store-new">+ Nova loja</button>' : '') + '</div></section>'; }
+function storePicker(withNew){ if (!ui.store || !store(ui.store)) ui.store = activeStores()[0] ? activeStores()[0].id : null;
+  return '<section class="card storesel"><label class="field" for="g-store">Selecione a loja<span class="selwrap"><span class="ico">' + icon('store', 20) + '</span><select id="g-store" data-change="pick-ger-store">' +
+    activeStores().map(st => '<option value="' + st.id + '"' + (ui.store === st.id ? ' selected' : '') + '>' + esc(st.name) + '</option>').join('') + '</select><span class="caret">' + icon('chev', 20) + '</span></span></label>' +
+    (withNew ? '<button class="btn small" data-act="store-new">+ Nova loja</button>' : '') + '</section>'; }
 function gerStore(sid, mk){
   let fix = '';
   const c = ctx(mk), ps = sellersOf(sid), open = !!(ui.fix && ui.fix.sid === sid);
@@ -704,21 +1034,25 @@ function network(mk){
     return {st:st, m:m, C:C, pace:el / c.D * 100, pct: C ? m.venda / C * 100 : null, proj: C ? proj / C * 100 : null, yoy: ano ? m.venda / ano * 100 : null, alerts:storeAlerts(st.id, mk), need: C ? Math.max(0, C - m.venda) / Math.max(1, c.D - c.t + (mk === mkOf(TODAY) ? 1 : 0)) : 0}; })
     .sort((a, b) => (b.proj == null ? -1 : b.proj) - (a.proj == null ? -1 : a.proj));
   const M = CONFIG.metas, onPace = rows.filter(r => r.C && r.pct >= r.pace).length, reqs = REQS.filter(r => r.status === 'aberto').length, tp = tot.c ? tot.v / tot.c * 100 : null;
-  let html = '<div class="kpis" style="grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr))"><div class="kpi"><span class="label">Vendido nas lojas</span><span class="v">' + brl(tot.v) + '</span><span class="small">de ' + brl(tot.c) + ' de cota</span></div>' +
-    '<div class="kpi"><span class="label">% da cota</span><span class="v ' + (tp >= pace ? 'c-good' : 'c-warn') + '">' + pct(tp) + '</span><span class="small">ritmo esperado: ' + pct(pace) + '</span></div>' +
-    '<div class="kpi"><span class="label">Projeção do mês</span><span class="v">' + short(tot.p) + '</span><span class="small ' + (tot.p >= tot.c ? 'c-good' : 'c-warn') + '" style="font-weight:700">' + pct(tot.c ? tot.p / tot.c * 100 : null) + ' da cota</span></div>' +
+  let html = '<div class="kpis loose" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr))"><div class="kpi feature"><span class="label">Vendido nas lojas</span><span class="v">' + brl(tot.v) + '</span><span class="small">de ' + brl(tot.c) + ' de cota</span></div>' +
+    '<div class="kpi"><span class="label">% da cota</span><span class="v ' + tone(tp, pace) + '">' + pct(tp) + '</span><span class="small">ritmo esperado: ' + pct(pace) + '</span></div>' +
+    '<div class="kpi"><span class="label">Projeção do mês</span><span class="v">' + short(tot.p) + '</span><span class="small ' + tone(tot.p, tot.c) + '" style="font-weight:700">' + pct(tot.c ? tot.p / tot.c * 100 : null) + ' da cota</span></div>' +
     '<div class="kpi"><span class="label">Lojas no ritmo</span><span class="v">' + onPace + ' de ' + rows.length + '</span><span class="small">' + (reqs ? reqs + (reqs === 1 ? ' pedido de correção aberto' : ' pedidos de correção abertos') : 'sem pedidos de correção') + '</span></div></div>';
-  html += '<div class="split"><section class="card flush main"><div class="head row" style="flex-wrap:wrap"><h2>Lojas</h2><span class="small">ordenadas pela projeção · toque para abrir</span></div><div class="scroll"><table class="t"><thead><tr><th>Loja</th><th class="r">Vendido</th><th style="min-width:170px">% da cota</th><th class="r">Projeção</th><th class="r">Ano ant.</th><th class="r">P.A.</th><th class="r">Ticket</th><th class="r">Conv.</th><th class="r">Avisos</th></tr></thead><tbody>' +
-    rows.map(r => '<tr class="click" data-act="open-store" data-store="' + r.st.id + '" tabindex="0"><td><strong>' + esc(r.st.name) + '</strong></td><td class="r">' + brl(r.m.venda) + '</td><td>' + (r.C ? '<div class="row" style="gap:8px"><div style="flex:1">' + bar(r.pct, r.pace, true) + '</div><strong class="' + (r.pct >= r.pace ? 'c-good' : 'c-warn') + '">' + pct(r.pct) + '</strong></div>' : '<span class="chip warn">Cota não definida</span>') + '</td>' +
-      '<td class="r ' + (r.proj >= 100 ? 'c-good' : 'c-warn') + '"><strong>' + pct(r.proj) + '</strong></td><td class="r">' + pct(r.yoy) + '</td><td class="r ' + (r.m.pa >= M.pa ? 'c-good' : 'c-warn') + '">' + (r.m.pa == null ? '–' : dec1(r.m.pa)) + '</td><td class="r">' + (r.m.tm == null ? '–' : brl(r.m.tm)) + '</td><td class="r ' + (r.m.conv >= M.conv ? 'c-good' : 'c-warn') + '">' + pct(r.m.conv) + '</td>' +
+  html += '<section class="card flush only-narrow" style="flex-direction:column"><div class="head stack"><h2>Lojas</h2><span class="small">ordenadas pela projeção · toque para abrir</span></div>' +
+    rows.map(r => '<button class="lrow" data-act="open-store" data-store="' + r.st.id + '"><span class="stack" style="flex:1"><span class="row"><strong>' + esc(r.st.name) + '</strong><span><strong>' + brl(r.m.venda) + '</strong>' + (r.C ? ' <strong class="' + tone(r.pct, r.pace) + '">' + pct(r.pct) + '</strong>' : '') + '</span></span>' +
+      (r.C ? bar(r.pct, r.pace, true) + '<span class="small">Projeção ' + pct(r.proj) + ' · P.A. ' + (r.m.pa == null ? '–' : dec1(r.m.pa)) + ' · Conv. ' + pct(r.m.conv) + (r.alerts.length ? ' · ' + r.alerts.length + (r.alerts.length === 1 ? ' aviso' : ' avisos') : '') + '</span>' : '<span class="chip warn">Cota não definida</span>') + '</span></button>').join('') + '</section>';
+  html += '<div class="split"><section class="card flush main only-wide"><div class="head row" style="flex-wrap:wrap"><h2>Lojas</h2><span class="small">ordenadas pela projeção · toque para abrir</span></div><div class="scroll"><table class="t"><thead><tr><th>Loja</th><th class="r">Vendido</th><th style="min-width:170px">% da cota</th><th class="r">Projeção</th><th class="r">Ano ant.</th><th class="r">P.A.</th><th class="r">Ticket</th><th class="r">Conv.</th><th class="r">Avisos</th></tr></thead><tbody>' +
+    rows.map(r => '<tr class="click" data-act="open-store" data-store="' + r.st.id + '" tabindex="0"><td><strong>' + esc(r.st.name) + '</strong></td><td class="r">' + brl(r.m.venda) + '</td><td>' + (r.C ? '<div class="row" style="gap:8px"><div style="flex:1">' + bar(r.pct, r.pace, true) + '</div><strong class="' + tone(r.pct, r.pace) + '">' + pct(r.pct) + '</strong></div>' : '<span class="chip warn">Cota não definida</span>') + '</td>' +
+      '<td class="r ' + tone(r.proj, 100) + '"><strong>' + pct(r.proj) + '</strong></td><td class="r">' + pct(r.yoy) + '</td><td class="r ' + tone(r.m.pa, M.pa) + '">' + (r.m.pa == null ? '–' : dec1(r.m.pa)) + '</td><td class="r">' + (r.m.tm == null ? '–' : brl(r.m.tm)) + '</td><td class="r ' + tone(r.m.conv, M.conv) + '">' + pct(r.m.conv) + '</td>' +
       '<td class="r">' + (r.alerts.length ? '<span class="chip warn">' + r.alerts.length + '</span>' : '<span class="chip ok">0</span>') + '</td></tr>').join('') + '</tbody></table></div></section><div class="side"><h2>Atenção</h2>';
-  const side = rows.map(r => { const parts = [], cnt = k => r.alerts.filter(a => a.kind === k).length;
+  const side = rows.map(r => { const parts = [], info = [], cnt = k => r.alerts.filter(a => a.kind === k).length;
     if (cnt('req')) parts.push(cnt('req') + (cnt('req') === 1 ? ' pedido de correção.' : ' pedidos de correção.'));
     r.alerts.filter(a => a.kind === 'late').forEach(a => parts.push(a.text));
     if (cnt('bad')) parts.push(cnt('bad') + (cnt('bad') === 1 ? ' lançamento com números que não batem.' : ' lançamentos com números que não batem.'));
-    if (!r.C) parts.push('Cota do mês não definida.'); else if (!(mcfg(mk, r.st.id) || {}).anoant) parts.push('Venda do ano anterior não preenchida.');
-    if (r.C && r.proj < 100 && mk === mkOf(TODAY)) parts.push('Precisa de ' + brl(r.need) + ' por dia até o fim do mês.');
-    return parts.length ? '<div class="alert"><strong>' + esc(r.st.name) + '</strong>' + parts.map(x => '<span>' + x + '</span>').join('') + '</div>' : ''; }).join('');
+    if (!r.C) parts.push('Cota do mês não definida.'); else if (!(mcfg(mk, r.st.id) || {}).anoant) info.push('Venda do ano anterior não preenchida.');
+    if (r.C && r.proj < 100 && mk === mkOf(TODAY)) info.push('Precisa de ' + brl(r.need) + ' por dia até o fim do mês.');
+    if (!parts.length && !info.length) return '';
+    return '<div class="' + (parts.length ? 'alert' : 'info') + '"><strong>' + esc(r.st.name) + '</strong>' + parts.map(x => '<span>' + x + '</span>').join('') + info.map(x => '<span style="color:var(--ink)">' + x + '</span>').join('') + '</div>'; }).join('');
   return html + (side || '<div class="note">' + icon('check', 18) + '<span>Nada pedindo atenção.</span></div>') + '</div></div>';
 }
 
@@ -757,11 +1091,11 @@ function sellersCard(sid, mk, mc){
     '<div style="padding:12px 16px">' + (!mc ? '' : !ss.length ? '<div class="alert"><strong>Loja sem vendedores.</strong><span>Adicione os vendedores para dividir a cota.</span></div>' : ok ? '<div class="note">' + icon('check', 18) + '<span>Soma das cotas = cota da loja (' + brl(mc.cota) + ').</span></div>' : '<div class="alert"><strong>A soma não fecha.</strong><span>Ninguém trabalha o mês inteiro, então sobram ' + brl((mc.cota || 0) - total) + ' sem dono. Ajuste os dias.</span></div>') + '</div></section>';
 }
 function cfgStores(){
-  const pins = PINS || {};
+  const pins = PINS ? PINS.g : {}, vp = PINS ? PINS.v : {}, show = (x) => PINS == null ? '<span class="small">carregando…</span>' : x ? '<strong style="letter-spacing:.1em">' + esc(x) + '</strong>' : '<span class="chip warn">Não definida</span>';
   return '<section class="card"><div class="row"><div class="stack"><h2>Senha da gerência geral</h2><span class="small">Só números, de 4 a 8. Use uma que só você saiba.</span></div><button class="btn small" data-act="gpin-edit">Alterar</button></div></section>' +
-    '<section class="card flush"><div class="head row" style="flex-wrap:wrap"><div class="stack"><h2>Lojas e senhas dos gerentes</h2><span class="small">Cada loja tem a sua senha. Passe a senha só para o gerente daquela loja.</span></div><button class="btn small primary" data-act="store-new">+ Nova loja</button></div>' +
-    '<div class="scroll"><table class="t"><thead><tr><th>Loja</th><th class="r">Vendedores</th><th>Senha do gerente</th><th></th></tr></thead><tbody>' +
-    activeStores().map(st => '<tr><td><strong>' + esc(st.name) + '</strong></td><td class="r">' + sellersOf(st.id).length + '</td><td>' + (PINS == null ? '<span class="small">carregando…</span>' : pins[st.id] ? '<strong style="letter-spacing:.1em">' + esc(pins[st.id]) + '</strong>' : '<span class="chip warn">Não definida</span>') + '</td><td class="r"><button class="btn small" data-act="store-edit" data-store="' + st.id + '">Editar</button></td></tr>').join('') + '</tbody></table></div></section>' +
+    '<section class="card flush"><div class="head row" style="flex-wrap:wrap"><div class="stack"><h2>Lojas e senhas</h2><span class="small">Cada loja tem duas senhas: a de <strong>acesso da loja</strong>, que todos os vendedores daquela loja usam para entrar e lançar, e a do <strong>gerente</strong>, só para o gerente.</span></div><button class="btn small primary" data-act="store-new">+ Nova loja</button></div>' +
+    '<div class="scroll"><table class="t"><thead><tr><th>Loja</th><th class="r">Vendedores</th><th>Acesso da loja (vendedores)</th><th>Senha do gerente</th><th></th></tr></thead><tbody>' +
+    activeStores().map(st => '<tr><td><strong>' + esc(st.name) + '</strong></td><td class="r">' + sellersOf(st.id).length + '</td><td>' + show(vp[st.id]) + '</td><td>' + show(pins[st.id]) + '</td><td class="r"><button class="btn small" data-act="store-edit" data-store="' + st.id + '">Editar</button></td></tr>').join('') + '</tbody></table></div></section>' +
     (CONFIG.stores.some(s => s.archived) ? '<section class="card"><h2>Lojas desativadas</h2>' + CONFIG.stores.filter(s => s.archived).map(s => '<div class="row"><span>' + esc(s.name) + '</span><button class="btn small" data-act="store-restore" data-store="' + s.id + '">Reativar</button></div>').join('') + '</section>' : '');
 }
 function cfgProducts(){
@@ -809,7 +1143,7 @@ async function sellerEdit(pid){
 }
 async function sellerNew(){
   const sid = ui.store, mk = ui.month, D = daysIn(mk);
-  const r = await modal({title:'Adicionar vendedor · ' + esc(store(sid).name), body: textField('name', '', 'Nome', 'Nome do vendedor') + '<label class="field" for="f-start">Começa em ' + mlabel(mk).toLowerCase() + '<select id="f-start" data-k="start"><option value="0">Mês inteiro</option>' + Array.from({length:D - 1}, (_, i) => i + 2).map(d => '<option value="' + d + '">Dia ' + d + ' (' + (D - d) + ' dias)</option>').join('') + '</select><span class="hint">Contagem como no seu exemplo: entra no dia 10 → 20 dias.</span></label>',
+  const r = await modal({title:'Adicionar vendedor · ' + esc(store(sid).name), body: textField('name', '', 'Nome', 'Nome do vendedor') + '<label class="field" for="f-start">Começa em ' + mlabel(mk).toLowerCase() + '<select id="f-start" data-k="start"><option value="0">Mês inteiro</option>' + Array.from({length:D - 1}, (_, i) => i + 2).map(d => '<option value="' + d + '">Dia ' + d + ' (' + (D - d) + ' dias)</option>').join('') + '</select><span class="hint">Quem entra no dia 10 fica com 20 dias no mês.</span></label>',
     actions:[{label:'Cancelar', act:'no'}, {label:'Adicionar', act:'yes', primary:true}], validate:v => !v.name.trim() ? 'Escreva o nome.' : sellersOf(sid).some(p => p.name.toLowerCase() === v.name.trim().toLowerCase()) ? 'Já existe alguém com esse nome nesta loja.' : ''});
   if (r.act !== 'yes') return;
   const name = r.values.name.trim(), start = +r.values.start, days = start ? D - start : D, id = uid('v');
@@ -817,27 +1151,28 @@ async function sellerNew(){
   saveCfg(cfg => { cfg.stores.filter(s => s.id === sid)[0].sellers.push({id:id, name:name}); const o = cfgMonthObj(cfg, mk, sid); o.days = o.days || {}; o.days[id] = days; }, name + ' adicionado(a)');
 }
 async function storeEditOrNew(sid){
-  const st = sid ? store(sid) : null, pins = PINS || {}, mk = mkOf(TODAY);
-  const body = textField('name', st ? st.name : '', 'Nome da loja', 'Ex.: Barra') + pinField('pin', 'Senha do gerente da loja', 'Só números, de 4 a 8. Você pode ver e trocar quando quiser.', true, st ? pins[sid] : '') +
+  const st = sid ? store(sid) : null, pins = PINS ? PINS.g : {}, vp = PINS ? PINS.v : {}, mk = mkOf(TODAY);
+  const body = textField('name', st ? st.name : '', 'Nome da loja', 'Ex.: Barra') + pinField('vpin', 'Senha de acesso da loja (vendedores)', 'Todos os vendedores desta loja usam esta senha para entrar. Só números, de 4 a 8.', true, st ? vp[sid] : '') + pinField('pin', 'Senha do gerente da loja', 'Só o gerente usa. Precisa ser diferente da senha de acesso.', true, st ? pins[sid] : '') +
     (st ? '' : moneyField('cota', 0, 'Cota de ' + mlabel(mk).toLowerCase()) + moneyField('anoant', 0, 'Venda no mesmo mês do ano anterior', 'Deixe 0,00 se não houver.'));
   const acts = st ? [{label:'Desativar loja', act:'off', danger:true}, {label:'Cancelar', act:'no'}, {label:'Salvar', act:'yes', primary:true}] : [{label:'Cancelar', act:'no'}, {label:'Criar loja', act:'yes', primary:true}];
   const r = await modal({title: st ? 'Editar ' + esc(st.name) : 'Nova loja', body:body, actions:acts, validate:(v, a) => {
     if (a === 'off') return ''; const n = v.name.trim(); if (!n) return 'Escreva o nome da loja.';
     if (CONFIG.stores.some(s => s.id !== sid && s.name.toLowerCase() === n.toLowerCase())) return 'Já existe uma loja com esse nome.';
-    if (v.pin && v.pin.length < 4) return 'A senha precisa ter de 4 a 8 números.'; if (!st && readMoney(v.cota) <= 0) return 'Informe a cota do mês.'; return ''; }});
+    if ((v.pin && v.pin.length < 4) || (v.vpin && v.vpin.length < 4)) return 'Cada senha precisa ter de 4 a 8 números.'; if (v.pin && v.vpin && v.pin === v.vpin) return 'A senha do gerente e a de acesso da loja precisam ser diferentes. Senão, um vendedor consegue entrar como gerente.'; if (!st && readMoney(v.cota) <= 0) return 'Informe a cota do mês.'; return ''; }});
   if (r.act === 'off'){
     if (!(await ask('Desativar ' + esc(st.name) + '?', '<p>A loja some dos painéis e da lista de lojas. Nada é apagado: você pode reativar depois em Lojas e senhas.</p>', 'Sim, desativar', true))) return;
     return saveCfg(cfg => { cfg.stores.forEach(s => { if (s.id === sid) s.archived = true; }); }, esc(st.name) + ' desativada');
   }
   if (r.act !== 'yes') return;
-  const name = r.values.name.trim(), pin = r.values.pin;
-  const changes = []; if (st && name !== st.name) changes.push('Nome: ' + esc(st.name) + ' → <strong>' + esc(name) + '</strong>'); if (st && pin && pin !== pins[sid]) changes.push('Senha do gerente: nova senha <strong>' + esc(pin) + '</strong>');
+  const name = r.values.name.trim(), pin = r.values.pin, vpin = r.values.vpin;
+  const changes = []; if (st && name !== st.name) changes.push('Nome: ' + esc(st.name) + ' → <strong>' + esc(name) + '</strong>'); if (st && vpin && vpin !== vp[sid]) changes.push('Senha de acesso da loja: nova senha <strong>' + esc(vpin) + '</strong> (os vendedores vão precisar digitar de novo)'); if (st && pin && pin !== pins[sid]) changes.push('Senha do gerente: nova senha <strong>' + esc(pin) + '</strong>');
   if (st && !changes.length) return toast('Nada mudou.');
-  const msg = st ? '<ul class="diff">' + changes.map(c => '<li>' + c + '</li>').join('') + '</ul>' : '<p>Criar a loja <strong>' + esc(name) + '</strong> com cota de ' + money(readMoney(r.values.cota)) + ' em ' + mlabel(mk).toLowerCase() + (pin ? ' e senha do gerente <strong>' + esc(pin) + '</strong>' : ' (sem senha de gerente por enquanto)') + '?</p><p class="small">Depois, adicione os vendedores em Configurar › Mês e vendedores.</p>';
+  const msg = st ? '<ul class="diff">' + changes.map(c => '<li>' + c + '</li>').join('') + '</ul>' : '<p>Criar a loja <strong>' + esc(name) + '</strong> com cota de ' + money(readMoney(r.values.cota)) + ' em ' + mlabel(mk).toLowerCase() + '?</p><ul class="diff"><li>Acesso da loja (vendedores): ' + (vpin ? '<strong>' + esc(vpin) + '</strong>' : 'não definida, ninguém consegue lançar até você criar') + '</li><li>Senha do gerente: ' + (pin ? '<strong>' + esc(pin) + '</strong>' : 'não definida') + '</li></ul><p class="small">Depois, adicione os vendedores em Configurar › Mês e vendedores.</p>';
   if (!(await ask(st ? 'Salvar alterações?' : 'Criar loja?', msg, st ? 'Sim, salvar' : 'Sim, criar'))) return;
   const id = sid || uid('l');
   const ok = await run(async () => {
     if (!st || name !== st.name){ const cfg = clone(CONFIG); if (st) cfg.stores.forEach(s => { if (s.id === sid) s.name = name; }); else { cfg.stores.push({id:id, name:name, sellers:[]}); const o = cfgMonthObj(cfg, mk, id); o.cota = readMoney(r.values.cota); o.anoant = readMoney(r.values.anoant); } const a = await api('saveConfig', {config:cfg}); if (!a.ok) return a; }
+    if (vpin && vpin !== vp[sid]){ const c = await api('setPin', {target:'vendedor', store:id, pin:vpin}); if (!c.ok) return c; }
     if (pin && pin !== pins[sid]){ const b = await api('setPin', {target:'store', store:id, pin:pin}); if (!b.ok) return b; }
     return {ok:true};
   }, st ? 'Loja atualizada' : name + ' criada. Agora adicione os vendedores.');
@@ -890,7 +1225,7 @@ async function metasSave(){
   saveCfg(cfg => { cfg.metas = n; }, 'Metas salvas');
 }
 function modalLess(){ const v = {}; document.querySelectorAll('main [data-k]').forEach(i => { v[i.dataset.k] = i.value; }); return v; }
-async function loadPins(){ try { const r = await api('getPins', {}); PINS = r.ok ? r.stores || {} : {}; if (!r.ok && r.error === 'auth') handleError(r); } catch (e) { PINS = {}; } }
+async function loadPins(){ try { const r = await api('getPins', {}); PINS = r.ok ? {g:r.stores || {}, v:r.vend || {}} : {g:{}, v:{}}; if (!r.ok && r.error === 'auth') handleError(r); } catch (e) { PINS = {g:{}, v:{}}; } }
 
 /* ---------- instalar no celular ---------- */
 let INSTALL_EVT = null;
@@ -920,7 +1255,7 @@ function render(){
 
 /* ---------- toques e digitação ---------- */
 document.addEventListener('click', async ev => {
-  if (ev.target.matches('[data-overlay]')) return closeModal('no');
+  if (ev.target.matches('[data-overlay]')){ if (!document.querySelector('#modal input, #modal textarea, #modal select')) closeModal('no'); return; }
   const mb = ev.target.closest('[data-mact]'); if (mb) return closeModal(mb.dataset.mact);
   const b = ev.target.closest('[data-act]'); if (!b || b.disabled) return;
   const a = b.dataset.act, d = b.dataset;
@@ -928,16 +1263,17 @@ document.addEventListener('click', async ev => {
     case 'retry': boot(); break;
     case 'role': if (d.role === 'gerencia') go({step:'pin', pickRole:'gerencia'}); else go({step:'store', pickRole:d.role}); break;
     case 'step': go({step:d.step}); break;
-    case 'pick-store': if (ui.pickRole === 'vendedor') go({step:'seller', pickStore:d.store}); else go({step:'pin', pickStore:d.store}); break;
+    case 'pick-store': go({step:'pin', pickStore:d.store}); break;
     case 'pick-seller': go({step:'confirm', pickSeller:d.pid}); break;
-    case 'confirm-seller': SESSION = {role:'vendedor', store:ui.pickStore, seller:ui.pickSeller}; saveSession(); EDITOR = null; go({step:'home', tab:'lancar'}); toast('Olá, ' + sellerName(SESSION.store, SESSION.seller) + '!'); break;
+    case 'confirm-seller': SESSION = {role:'vendedor', store:ui.pickStore, seller:ui.pickSeller, token:ui.storeToken}; saveSession(); EDITOR = null; go({step:'home', tab:'lancar'}); toast('Olá, ' + sellerName(SESSION.store, SESSION.seller) + '!'); break;
     case 'login': case 'setup-pin': {
-      const pin = ($('#f-pin') || {}).value || '', g = ui.pickRole === 'gerencia';
+      const pin = ($('#f-pin') || {}).value || '', g = ui.pickRole === 'gerencia', vd = ui.pickRole === 'vendedor';
       if (pin.length < 4) return toast('A senha tem de 4 a 8 números.');
       if (a === 'setup-pin' && pin !== ($('#f-pin2') || {}).value) return toast('As duas senhas não são iguais.');
       try {
-        const r = a === 'setup-pin' ? await api('setupGerencia', {pin:pin}) : await api('login', {role:g ? 'gerencia' : 'gerente', store:ui.pickStore, pin:pin});
-        if (!r.ok){ if (r.needSetup){ HAS_GPIN = false; render(); return; } return toast(r.error || 'Senha incorreta.'); }
+        const r = a === 'setup-pin' ? await api('setupGerencia', {pin:pin}) : await api('login', {role:g ? 'gerencia' : vd ? 'vendedor' : 'gerente', store:ui.pickStore, pin:pin});
+        if (!r.ok){ if (r.needSetup){ HAS_GPIN = false; render(); return; } const f = $('#f-pin'); if (f){ f.value = ''; f.focus(); } return toast(r.error || 'Senha incorreta.'); }
+        if (vd){ ui.storeToken = r.token; go({step:'seller'}); return; }
         SESSION = {role:g ? 'gerencia' : 'gerente', store:g ? null : ui.pickStore, token:r.token}; saveSession();
         if (g && !CONFIG){ await api('saveConfig', {config:newConfig(false)}); await refresh(); toast('Lojas iniciais cadastradas. Confira tudo em Configurar.'); }
         if (g) loadPins();
@@ -945,23 +1281,33 @@ document.addEventListener('click', async ev => {
       } catch (e) { toast('Sem conexão com a planilha.'); }
       break; }
     case 'logout':
+      if (SESSION.role === 'vendedor'){
+        const rr = await modal({title:'Sair ou trocar de vendedor?', body:'<p>Se outra pessoa da mesma loja vai lançar neste aparelho, use <strong>Trocar de vendedor</strong>: não precisa digitar a senha da loja de novo.</p>' + (OUTBOX.length ? '<div class="soft">Há lançamentos guardados esperando internet. Eles continuam guardados e serão enviados.</div>' : ''),
+          actions:[{label:'Cancelar', act:'no'}, {label:'Sair da loja', act:'out'}, {label:'Trocar de vendedor', act:'switch', primary:true}]});
+        if (rr.act === 'no') return;
+        const st = SESSION.store, tk = SESSION.token; SESSION = {}; saveSession(); EDITOR = null;
+        if (rr.act === 'switch'){ go({step:'seller', pickRole:'vendedor', pickStore:st, storeToken:tk, tab:null, editDate:null, fix:null}); return; }
+        go({step:'home', tab:null, editDate:null, fix:null}); return;
+      }
       if (!(await ask('Sair?', SESSION.role === 'vendedor' ? '<p>Na próxima vez, você escolhe a loja e o seu nome de novo.</p>' : '<p>Para entrar de novo, vai precisar da senha.</p>', 'Sim, sair'))) return;
       SESSION = {}; saveSession(); EDITOR = null; PINS = null; go({step:'home', tab:null, editDate:null, fix:null}); break;
-    case 'refresh': try { await refresh(); render(); toast('Dados atualizados'); } catch (e) { toast('Sem conexão com a planilha.'); } break;
+    case 'refresh': try { await refresh(); await flushOutbox(); render(); toast('Dados atualizados'); } catch (e) { render(); toast(e.message || 'Sem conexão com a planilha.'); } break;
+    case 'flush': try { await refresh(); } catch (e) {} await flushOutbox(); render(); if (OFFLINE) toast('Ainda sem internet. Os lançamentos continuam guardados.'); break;
+    case 'demo-net': DEMO_NET_DOWN = !DEMO_NET_DOWN; if (!DEMO_NET_DOWN){ OFFLINE = false; await flushOutbox(); } render(); toast(DEMO_NET_DOWN ? 'Internet desligada (simulação)' : 'Internet ligada de novo (simulação)'); break;
     case 'tab': EDITOR = null; go({tab:d.tab, editDate:null, fix:null}); if (d.tab === 'config' && SESSION.role === 'gerencia' && !PINS){ await loadPins(); render(); } break;
-    case 'inc': case 'dec': { const f = d.f; draft[f] = Math.max(0, (draft[f] || 0) + (a === 'inc' ? 1 : -1)); const i = document.querySelector('input.n[data-f="' + f + '"]'); if (i) i.value = draft[f]; refreshLive(); break; }
+    case 'inc': case 'dec': { const f = d.f; draft[f] = Math.max(0, (draft[f] || 0) + (a === 'inc' ? 1 : -1)); const i = document.querySelector('input.n[data-f="' + f + '"]'); if (i) i.value = draft[f]; keepDraft(); refreshLive(); break; }
     case 'save': saveDraft(false); break;
     case 'folga': saveDraft(true); break;
     case 'edit-day': EDITOR = null; go({editDate:d.date}); break;
     case 'hist-back': EDITOR = null; go({editDate:null}); break;
     case 'ask-fix': askFix(SESSION.store, SESSION.seller, d.date); break;
-    case 'month': { const nm = addMonths(ui.month, +d.d); if (nm > mkOf(TODAY)) return; ui.month = nm; if (!LOADED.has(nm)){ try { await loadData([nm]); } catch (e) { toast('Sem conexão com a planilha.'); } } render(); break; }
+    case 'month': { const nm = addMonths(ui.month, +d.d); if (nm > (ui.tab === 'config' ? addMonths(mkOf(TODAY), 1) : mkOf(TODAY))) return; ui.month = nm; if (!LOADED.has(nm)){ try { await loadData([nm]); } catch (e) { toast('Sem conexão com a planilha.'); } } render(); break; }
     case 'open-store': go({tab:'lojas', store:d.store, fix:null}); break;
     case 'pick-ger-store': EDITOR = null; go({store:d.store, fix:null}); break;
-    case 'fix-pick': EDITOR = null; ui.fix = {sid:ui.store, pid:$('#fx-p').value, date:$('#fx-d').value}; render(); setTimeout(() => { const f = $('#fix-box'); if (f) f.scrollIntoView({behavior:'smooth'}); }, 50); break;
+    case 'fix-pick': EDITOR = null; ui.fix = {sid:ui.store, pid:$('#fx-p').value, date:$('#fx-d').value}; render(); setTimeout(() => { const f = $('#fix-box'); if (f) f.scrollIntoView({behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'}); }, 50); break;
     case 'fix-open': {
       if (!(await ask('Abrir correção?', '<p>Você vai alterar o lançamento de <strong>' + esc(sellerName(d.store, d.pid)) + '</strong> em <strong>' + dlow(d.date) + '</strong>.</p><p class="small">Use só quando o vendedor não puder corrigir. Tudo fica registrado no histórico.</p>', 'Sim, abrir'))) return;
-      EDITOR = null; const mk = mkOf(d.date); if (!LOADED.has(mk)) await loadData([mk]); ui.month = mk; ui.fix = {sid:d.store, pid:d.pid, date:d.date}; ui.tab = 'lojas'; ui.store = d.store; render(); setTimeout(() => { const f = $('#fix-box'); if (f) f.scrollIntoView({behavior:'smooth'}); }, 50); break; }
+      EDITOR = null; const mk = mkOf(d.date); if (!LOADED.has(mk)) await loadData([mk]); ui.month = mk; ui.fix = {sid:d.store, pid:d.pid, date:d.date}; ui.tab = 'lojas'; ui.store = d.store; render(); setTimeout(() => { const f = $('#fix-box'); if (f) f.scrollIntoView({behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'}); }, 50); break; }
     case 'fix-close': EDITOR = null; go({fix:null}); break;
     case 'req-done': if (await ask('Marcar como resolvido?', '<p>O pedido sai da lista de atenção. Faça isso depois de corrigir o lançamento.</p>', 'Sim, resolvido')) run(() => api('resolveRequest', {id:d.id}), 'Pedido resolvido'); break;
     case 'sub': go({sub:d.sub}); if (d.sub === 'lojas' && !PINS){ await loadPins(); render(); } break;
@@ -989,18 +1335,36 @@ document.addEventListener('keydown', ev => {
   if ((ev.key === 'Enter' || ev.key === ' ') && ev.target.matches('tr[data-act]')){ ev.preventDefault(); ev.target.click(); }
   if (ev.key === 'Enter' && ev.target.id === 'f-pin' && !MODAL){ const btn = document.querySelector('[data-act="login"],[data-act="setup-pin"]'); if (btn) btn.click(); }
 });
+/* valores em R$ e decimais: o número sempre entra pela direita, onde quer que o dedo toque */
+document.addEventListener('beforeinput', ev => {
+  const el = ev.target; if (!el.dataset || (el.dataset.mask !== 'money' && el.dataset.mask !== 'dec1')) return;
+  const t = ev.inputType || ''; let d = digits(el.value).replace(/^0+/, '');
+  if (t === 'insertText' && ev.data != null){ const add = digits(ev.data); ev.preventDefault(); if (!add) return; d += add; }
+  else if (t.indexOf('delete') === 0){ ev.preventDefault(); d = d.slice(0, -1); }
+  else return;
+  el.value = d; applyMask(el); el.dispatchEvent(new Event('input', {bubbles:true}));
+});
+document.addEventListener('change', ev => {
+  const el = ev.target.closest('select[data-change="pick-ger-store"]'); if (!el) return;
+  EDITOR = null; go({store:el.value, fix:null});
+});
 document.addEventListener('input', ev => {
   const el = ev.target; if (el.dataset.mask) applyMask(el);
-  if (el.dataset.f && draft){ draft[el.dataset.f] = el.dataset.mask === 'money' ? readMoney(el.value) : readInt(el.value); refreshLive(); }
+  if (el.dataset.f && draft){ draft[el.dataset.f] = el.dataset.mask === 'money' ? readMoney(el.value) : readInt(el.value); keepDraft(); refreshLive(); }
 });
-document.addEventListener('focusin', ev => { const el = ev.target; if (el.dataset && el.dataset.mask){ setTimeout(() => { try { const L = el.value.length; el.setSelectionRange(L, L); } catch (e) {} }, 0); } });
-document.addEventListener('visibilitychange', async () => { if (!document.hidden && SESSION.role && !MODAL && !BUSY){ try { await refresh(); render(); } catch (e) {} } });
+document.addEventListener('focusin', ev => { const el = ev.target; if (el.dataset && el.dataset.mask && el.dataset.mask !== 'pin'){ setTimeout(() => { try { const L = el.value.length; el.setSelectionRange(L, L); } catch (e) {} }, 0); } });
+window.addEventListener('online', async () => { OFFLINE = false; try { await refresh(); } catch (e) {} await flushOutbox(); render(); });
+window.addEventListener('offline', () => { OFFLINE = true; render(); });
+document.addEventListener('visibilitychange', async () => { if (!document.hidden && SESSION.role && !MODAL && !BUSY){ try { await refresh(); await flushOutbox(); render(); } catch (e) { render(); } } });
 
 /* ---------- início ---------- */
 async function boot(){
   LOADING = true; LOAD_ERR = null; render();
   try { await loadData([]); LOADING = false; }
-  catch (e) { LOADING = false; LOAD_ERR = e.message || 'Erro desconhecido'; }
+  catch (e) { LOADING = false; if (loadCache()){ OFFLINE = true; setTimeout(() => toast('Sem conexão: mostrando os últimos dados guardados no aparelho.'), 300); } else LOAD_ERR = e.message || 'Erro desconhecido'; }
+  if (TODAY){ const lim = addDays(TODAY, -3); let mud = false; Object.keys(DRAFTS).forEach(k => { if (k.split('|')[2] < lim){ delete DRAFTS[k]; mud = true; } }); if (mud) try { localStorage.setItem('rd-rascunhos', JSON.stringify(DRAFTS)); } catch (e) {} }
+  if (!OFFLINE && !LOAD_ERR) flushOutbox();
+  if (SESSION.role === 'vendedor' && !SESSION.token){ ui = {step:'pin', pickRole:'vendedor', pickStore:SESSION.store}; SESSION = {}; saveSession(); }
   if (SESSION.role === 'gerencia') { ui.month = mkOf(TODAY || '2026-01-01'); loadPins().then(render); }
   render();
   let seen = null; try { seen = localStorage.getItem('rd-instalar-visto'); } catch (e) {}
