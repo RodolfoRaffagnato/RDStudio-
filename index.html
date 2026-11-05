@@ -402,6 +402,17 @@ details.demo{box-shadow:none;background:transparent;border:1.5px dashed var(--li
 .selwrap .ico{position:absolute;left:8px;width:36px;height:36px;border-radius:12px;pointer-events:none}
 .selwrap .caret{position:absolute;right:14px;color:var(--muted);pointer-events:none;display:flex}
 .field .selwrap select{appearance:none;-webkit-appearance:none;min-height:56px;padding:0 44px 0 56px;font-size:18px;font-weight:800;border-radius:16px;background:var(--surface2);border:1.5px solid var(--line-strong);cursor:pointer}
+
+/* indicadores por loja */
+.indrow{display:grid;grid-template-columns:minmax(0,1.3fr) repeat(3,minmax(0,1fr));align-items:center;gap:12px;padding:12px 18px;border-top:1px solid var(--line)}
+.indname{display:flex;flex-direction:column;align-items:flex-start;gap:4px;background:none;border:0;padding:0;text-align:left;color:var(--ink);cursor:pointer;font:inherit;min-width:0}
+.ind{display:flex;flex-direction:column;gap:1px;min-width:0}
+.ind strong{font-size:17px;font-weight:800;letter-spacing:-.01em}
+@media (max-width:719px){.indrow{grid-template-columns:repeat(3,minmax(0,1fr));row-gap:8px}.indname{grid-column:1/-1;flex-direction:row;align-items:center;gap:8px}}
+.dim{opacity:.45}
+.checkrow{display:flex;align-items:center;gap:10px;font-weight:700;min-height:44px;cursor:pointer}
+.checkrow input{width:22px;height:22px;accent-color:var(--accent)}
+button.lrow>.btn{pointer-events:none}
 </style>
 </head>
 <body>
@@ -541,8 +552,10 @@ async function demoApi(action, p){
       if (!s.pins.stores[p.store]) return {ok:false, error:'A gerência ainda não criou a senha desta loja.'};
       return p.pin === s.pins.stores[p.store] ? ok({token:'demo-s-' + p.store}) : {ok:false, error:'Senha incorreta.'};
     case 'saveEntry': {
-      if (!isG && p.token !== 'demo-v-' + p.store) return {ok:false, error:'auth'};
-      if (!isG && [s.today, addDays(s.today, -1)].indexOf(p.date) < 0) return {ok:false, error:'Só a gerência pode alterar dias anteriores a ontem.'};
+      const isRetro = !isG && p.token === 'demo-s-' + p.store;
+      if (!isG && !isRetro && p.token !== 'demo-v-' + p.store) return {ok:false, error:'auth'};
+      if (isRetro){ const r = s.config.retro || {}, cur = s.today.slice(0, 7), mk = p.date.slice(0, 7); if (r.on === false || mk >= cur || mk < (r.desde || addMonths(cur, -12)) || mk > (r.ate || addMonths(cur, -1))) return {ok:false, error:'Este mês não está liberado para lançamento retroativo.'}; }
+      else if (!isG && [s.today, addDays(s.today, -1)].indexOf(p.date) < 0) return {ok:false, error:'Só a gerência pode alterar dias anteriores a ontem.'};
       const lj = s.config.stores.find(x => x.id === p.store), vd = lj && lj.sellers.find(x => x.id === p.seller);
       if (!vd) return {ok:false, error:'Vendedor não encontrado nesta loja. Atualize o app.'};
       if (!isG && vd.archived) return {ok:false, error:'Este vendedor está desativado. Fale com a gerência.'};
@@ -624,7 +637,7 @@ async function loadData(months){
   ms.forEach(m => LOADED.add(m));
   LAST_AT = new Date(); applyOutbox(); saveCache();
 }
-function neededMonths(){ if (!TODAY) return []; const s = new Set([mkOf(TODAY), mkOf(addDays(TODAY, -1))]); if (ui.month) s.add(ui.month); return Array.from(s); }
+function neededMonths(){ if (!TODAY) return []; const s = new Set([mkOf(TODAY), mkOf(addDays(TODAY, -1))]); if (ui.month) s.add(ui.month); if (ui.retro && ui.retro.mk && SESSION.role === 'gerente') s.add(ui.retro.mk); return Array.from(s); }
 async function refresh(){ await loadData(); }
 
 /* ---------- cálculos (mesma lógica da planilha RD) ---------- */
@@ -633,6 +646,11 @@ function activeStores(){ return CONFIG.stores.filter(s => !s.archived); }
 function sellersOf(sid){ const s = store(sid); return s ? s.sellers.filter(p => !p.archived) : []; }
 function sellerName(sid, pid){ const s = store(sid); const p = s && s.sellers.filter(x => x.id === pid)[0]; return p ? p.name : pid; }
 function mcfg(mk, sid){ return CONFIG.months && CONFIG.months[mk] && CONFIG.months[mk].stores ? CONFIG.months[mk].stores[sid] || null : null; }
+function metasOf(sid){ const st = sid ? store(sid) : null; return Object.assign({}, CONFIG.metas, st && st.metas ? st.metas : {}); }
+/* lançamento retroativo pelos gerentes de loja: meses anteriores, dentro da janela liberada pela gerência */
+function retroCfg(){ const cur = mkOf(TODAY), r = CONFIG.retro || {}; return {on: r.on !== false, desde: r.desde || addMonths(cur, -12), ate: r.ate || addMonths(cur, -1)}; }
+function retroMonths(){ const r = retroCfg(), cur = mkOf(TODAY), out = []; if (!r.on) return out; let m = r.ate < cur ? r.ate : addMonths(cur, -1); while (m >= r.desde && out.length < 36){ out.push(m); m = addMonths(m, -1); } return out; }
+function retroOk(date){ const r = retroCfg(), mk = mkOf(date); return r.on && mk < mkOf(TODAY) && mk >= r.desde && mk <= r.ate; }
 function hasCota(mk, sid){ const mc = mcfg(mk, sid); return !!(mc && mc.cota > 0); }
 function products(all){ const out = []; CONFIG.categories.forEach(c => { if (c.archived && !all) return; c.products.forEach(p => { if (all || !p.archived) out.push(Object.assign({cat:c.id}, p)); }); }); return out; }
 function allFields(){ return FUNIL.concat(products(true).map(p => p.id)); }
@@ -741,7 +759,7 @@ function go(ch){ Object.assign(ui, ch); render(); window.scrollTo(0, 0); }
 function tone(p, ref){ if (p == null || !isFinite(p)) return 'c-muted'; if (!ref || p >= ref) return 'c-good'; return p >= ref * 0.85 ? 'c-mid' : 'c-warn'; }
 function bar(p, pace, thin){ const w = Math.max(0, Math.min(100, p || 0)), t = tone(p || 0, pace != null ? pace : 100); return '<div class="bar' + (thin ? ' thin' : '') + '"><i class="' + (t === 'c-good' ? '' : t === 'c-mid' ? 'mid' : 'warn') + '" style="width:' + w + '%"></i>' + (pace != null ? '<b style="left:' + Math.min(100, pace) + '%"></b>' : '') + '</div>'; }
 function kpi(label, v, meta, ok){ return '<div class="kpi"><span class="label">' + label + '</span><span class="v">' + (v == null ? '–' : v) + '</span><span class="small">meta ' + meta + '</span>' + (v == null ? '<span class="small">sem vendas</span>' : ok ? '<span class="tag-ok">● Na meta</span>' : '<span class="tag-bad">▲ Abaixo</span>') + '</div>'; }
-function kpiRow(m){ const M = CONFIG.metas; return '<div class="kpis">' + kpi('P.A.', m.pa == null ? null : dec1(m.pa), dec1(M.pa), m.pa >= M.pa) + kpi('Ticket médio', m.tm == null ? null : brl(m.tm), brl(M.tm), m.tm >= M.tm) + kpi('Conversão', m.conv == null ? null : pct(m.conv), M.conv + '%', m.conv >= M.conv) + '</div>'; }
+function kpiRow(m, sid){ const M = metasOf(sid); return '<div class="kpis">' + kpi('P.A.', m.pa == null ? null : dec1(m.pa), dec1(M.pa), m.pa >= M.pa) + kpi('Ticket médio', m.tm == null ? null : brl(m.tm), brl(M.tm), m.tm >= M.tm) + kpi('Conversão', m.conv == null ? null : pct(m.conv), M.conv + '%', m.conv >= M.conv) + '</div>'; }
 function prodCard(m, sid, pid, mk, title){
   const pl = prodLines(m, sid, pid, mk); if (!pl.lines.length) return '';
   return '<section class="card"><div class="stack"><h2>' + title + '</h2><span class="small">Sobre ' + pl.R + ' ' + esc(pl.refName) + ' vendidos no mês · meta de 100% em cada uma</span></div>' +
@@ -859,6 +877,7 @@ function editor(sid, pid, date, mode){
   const mk = mkOf(date), e = ENTRIES[sid + '|' + pid + '|' + date], q = quota(mk, sid, pid), has = hasCota(mk, sid) && daysOf(mk, sid, pid) > 0;
   let banner = '';
   if (mode === 'seller' && date !== TODAY) banner = '<div class="alert"><strong>Você está corrigindo ontem, ' + dlabel(date) + '.</strong><span>Hoje é o último dia em que você pode mexer neste lançamento. Depois, só a gerência.</span></div>';
+  if (mode === 'retro') banner = '<div class="soft"><strong>Lançamento retroativo · ' + esc(sellerName(sid, pid)) + '</strong><span>' + dlong(date) + '. Depois de salvar, o app abre o próximo dia que ainda não foi lançado.</span></div>';
   if (mode === 'gerencia') banner = '<div class="alert"><strong>Correção pela gerência · uso excepcional</strong><span>' + esc(sellerName(sid, pid)) + ', ' + dlabel(date) + '. A alteração muda resultados já calculados e fica registrada no histórico da planilha.</span></div>';
   const status = DRAFTS[sid + '|' + pid + '|' + date] ? '<span class="chip warn">Rascunho guardado · falta salvar</span>' : e ? (e.folga ? '<span class="chip mute">Marcado como folga</span>' : '<span class="chip ok">Já lançado · mudar = correção</span>') : '<span class="chip mute">Ainda não lançado</span>';
   let html = banner;
@@ -866,7 +885,7 @@ function editor(sid, pid, date, mode){
     const ci = cotaDia(q, sid, [pid], date);
     html += '<section class="card hero feature"><div class="row"><div class="stack"><span class="label">Cota ' + (date === TODAY ? 'de hoje' : 'deste dia') + '</span><span class="big">' + (ci.dia > 0 ? brl(ci.dia) : 'Batida') + '</span></div><div class="stack" style="align-items:flex-end"><span class="label">Lançado</span><span class="mid c-good" id="live-pct"></span></div></div><div id="live-bar"></div>' +
       '<div class="row" style="flex-wrap:wrap"><span class="small">' + ci.z + 'ª dezena · dia ' + (P(date).d - ci.a + 1) + ' de ' + (ci.b - ci.a + 1) + ' · faltavam ' + brl(Math.max(0, ci.falta)) + ' na dezena</span>' + status + '</div></section>';
-  } else html += '<section class="card hero"><div class="row"><h2>' + dlong(date) + '</h2>' + status + '</div><span class="small">' + (hasCota(mk, sid) ? 'Você está sem dias trabalhados em ' + mlabel(mk).toLowerCase() + ', então não tem cota neste mês. Se for engano, fale com a gerência.' : 'A gerência ainda não definiu a cota de ' + mlabel(mk).toLowerCase() + '.') + ' Você pode lançar normalmente.</span></section>';
+  } else html += '<section class="card hero"><div class="row"><h2>' + dlong(date) + '</h2>' + status + '</div><span class="small">' + (mode === 'retro' ? 'Digite os números deste dia como estão na planilha antiga.' : hasCota(mk, sid) ? 'Você está sem dias trabalhados em ' + mlabel(mk).toLowerCase() + ', então não tem cota neste mês. Se for engano, fale com a gerência.' : 'A gerência ainda não definiu a cota de ' + mlabel(mk).toLowerCase() + '.') + (mode === 'retro' ? '' : ' Você pode lançar normalmente.') + '</span></section>';
   html += '<section class="card flush"><div class="head stack" style="gap:10px"><h2>Funil do dia</h2><label class="label" for="f-venda">Valor vendido</label><label class="money" for="f-venda"><span>R$</span><input id="f-venda" ' + NUMKEY + ' data-mask="money" data-f="venda" value="' + fmtMoneyInput(Math.round(draft.venda * 100)) + '"></label><span class="small">Digite só os números: 1 vira 0,01; 12345 vira 123,45.</span></div>' +
     ['atend', 'ret', 'vendas', 'pecas'].map(f => stepLine(f, FUNIL_LBL[f], HINT[f])).join('') + '<div style="height:6px"></div></section><div id="live-kpis"></div><div id="live-check"></div>';
   html += CONFIG.categories.filter(c => !c.archived && c.products.some(p => !p.archived)).map((c, i) => '<details class="grp"' + (i === 0 ? ' open' : '') + '><summary><span class="stack"><strong>' + esc(c.name) + '</strong><span class="small" data-gsum="' + c.id + '"></span></span><span class="chev">' + icon('chev', 20) + '</span></summary>' +
@@ -883,7 +902,7 @@ function refreshLive(){
   if (!EDITOR || !draft) return; const {sid, pid, date} = EDITOR, mk = mkOf(date);
   if (hasCota(mk, sid)){ const ci = cotaDia(quota(mk, sid, pid), sid, [pid], date), pp = ci.dia > 0 ? draft.venda / ci.dia * 100 : 100; const a = $('#live-pct'); if (a){ a.textContent = pct(pp) + ' da cota'; a.className = 'mid ' + tone(pp, 100); } const b = $('#live-bar'); if (b) b.innerHTML = bar(pp, null); }
   const den = draft.atend + draft.ret, m = {pa: draft.vendas ? draft.pecas / draft.vendas : null, tm: draft.vendas ? draft.venda / draft.vendas : null, conv: den ? draft.vendas / den * 100 : null};
-  const k = $('#live-kpis'); if (k) k.innerHTML = kpiRow(m);
+  const k = $('#live-kpis'); if (k) k.innerHTML = kpiRow(m, sid);
   const c = check(draft), el = $('#live-check');
   const sc = c.length ? [] : softCheck(draft, draftDia());
   if (el) el.innerHTML = c.length ? '<div class="alert" role="alert"><strong>Corrija antes de salvar</strong>' + c.map(x => '<span>• ' + x + '</span>').join('') + '</div>'
@@ -922,15 +941,18 @@ async function saveDraft(folga){
     if (sc.length) body = '<div class="soft"><strong>Atenção</strong>' + sc.map(x => '<span>• ' + x + '</span>').join('') + '</div>' + body;
   }
   if (E.mode === 'seller') body += '<p class="small">' + (E.date === TODAY ? 'Você ainda pode corrigir este dia hoje e amanhã. Depois, só a gerência.' : 'Hoje é o último dia para corrigir este lançamento. Depois, só a gerência.') + '</p>';
+  if (E.mode === 'retro') body += '<p class="small">Lançamento retroativo feito pelo gerente da loja. Fica registrado no histórico da planilha.</p>';
   if (E.mode === 'gerencia') body += '<div class="alert"><strong>Correção pela gerência.</strong><span>Muda resultados já calculados e fica registrada no histórico da planilha.</span></div>';
   if (!(await ask(folga ? 'Confirmar folga?' : fix ? 'Confirmar correção?' : 'Confirmar lançamento?', body, folga ? 'Sim, marcar folga' : fix ? 'Sim, salvar correção' : 'Sim, salvar'))) return;
-  const d0 = E.date, k0 = E.key, by = SESSION.role === 'gerencia' ? 'Gerência geral' : sellerName(E.sid, E.pid);
+  const d0 = E.date, k0 = E.key, by = SESSION.role === 'gerencia' ? 'Gerência geral' : SESSION.role === 'gerente' ? 'Gerente · ' + store(E.sid).name : sellerName(E.sid, E.pid);
   const payload = {store:E.sid, seller:E.pid, date:E.date, folga:!!folga, v: folga ? {} : clone(draft), by:by}, okMsg = (folga ? 'Folga registrada · ' : fix ? 'Correção salva · ' : 'Lançamento salvo · ') + dlabel(d0);
   if (BUSY) return; BUSY = true; toast('Salvando…'); let ok = false;
   try { const r = await api('saveEntry', payload); if (r.ok === false) handleError(r); else { ok = true; try { await refresh(); } catch (e) {} toast(okMsg); } }
   catch (e){ if (e.net && E.mode === 'seller'){ enqueue(payload); ok = true; toast('Sem internet agora. O lançamento ficou guardado no aparelho e vai para a planilha sozinho quando a conexão voltar.'); } else toast(e.net ? 'Sem conexão com a planilha. Nada foi salvo: tente de novo.' : e.message); }
   finally { BUSY = false; }
-  if (ok){ dropDraft(k0); EDITOR = null; if (ui.editDate){ ui.editDate = null; } if (ui.fix){ ui.fix = null; } render(); }
+  if (ok){ dropDraft(k0); const wasRetro = E.mode === 'retro'; EDITOR = null; if (ui.editDate){ ui.editDate = null; } if (ui.fix){ ui.fix = null; }
+    if (wasRetro && ui.retro){ const nx = nextRetroDay(E.sid, E.pid, d0); ui.retro = Object.assign({}, ui.retro, {date:nx}); }
+    render(); if (wasRetro) window.scrollTo(0, 0); }
 }
 function sellerDash(sid, pid){
   const c = ctx(mkOf(TODAY)), pids = [pid], mc = mcfg(c.mk, sid);
@@ -938,7 +960,7 @@ function sellerDash(sid, pid){
   if (!daysOf(c.mk, sid, pid)) return '<section class="card hero"><h2>Sem cota neste mês</h2><span class="small">A gerência marcou você sem dias trabalhados em ' + mlabel(c.mk).toLowerCase() + '.</span></section>';
   const sp = split(mc.cota || 0, c.mk, sid)[pid], q = sp.v, ci = cotaDia(q, sid, pids, TODAY), m = metrics(sid, pids, c);
   return '<section class="card hero feature"><span class="label">Cota de hoje · ' + ci.z + 'ª dezena</span><span class="big">' + (ci.dia > 0 ? brl(ci.dia) : 'Dezena batida') + '</span><span class="small">Faltam ' + brl(Math.max(0, ci.falta)) + ' na dezena, em ' + ci.dias + ' dias. Sua cota do mês: ' + brl(q) + ' (' + howText(sp, mc.cota, c.D) + ').</span></section>' +
-    dezCard(q, sid, pids, c, mc.sellerAno ? mc.sellerAno[pid] : 0) + chart(sid, pids, c) + kpiRow(m) + prodCard(m, sid, pid, c.mk, 'Cotas de produtos');
+    dezCard(q, sid, pids, c, mc.sellerAno ? mc.sellerAno[pid] : 0) + chart(sid, pids, c) + kpiRow(m, sid) + prodCard(m, sid, pid, c.mk, 'Cotas de produtos');
 }
 function sellerHist(sid, pid){
   const y = addDays(TODAY, -1), dates = []; for (let d = P(TODAY).d; d >= 1; d--) dates.push(dateOf(mkOf(TODAY), d)); if (mkOf(y) !== mkOf(TODAY)) dates.splice(1, 0, y);
@@ -977,7 +999,7 @@ function storeDash(sid, mk, who){
   html += '<section class="card flush"><div class="head row"><h2>Vendedores</h2><span class="small">% da cota individual</span></div>' + (ranked.length ? ranked.map((r, i) =>
     '<div class="stepline" style="flex-direction:column;align-items:stretch;gap:8px"><div class="row"><span class="row start" style="gap:10px;min-width:0"><span class="chip ok">' + (i + 1) + '</span><strong>' + esc(r.p.name) + '</strong></span><span><strong>' + brl(r.m.venda) + '</strong> <strong class="' + tone(r.pct, pace) + '">' + (r.q ? pct(r.pct) : '') + '</strong></span></div>' +
     (r.q ? bar(r.pct, pace, true) : '') + '<span class="small">' + (r.q ? 'Cota ' + brl(r.q) + ' · ' : '') + 'P.A. ' + (r.m.pa == null ? '–' : dec1(r.m.pa)) + ' · Ticket ' + (r.m.tm == null ? '–' : brl(r.m.tm)) + ' · Conversão ' + pct(r.m.conv) + '</span></div>').join('') : '<div class="stepline small">Nenhum vendedor ativo.</div>') + '</section>';
-  return html + kpiRow(m) + prodCard(m, sid, null, mk, 'Cotas de produtos da loja') + chart(sid, pids, c);
+  return html + kpiRow(m, sid) + prodCard(m, sid, null, mk, 'Cotas de produtos da loja') + chart(sid, pids, c);
 }
 function storeGrid(sid, mk){
   const c = ctx(mk), ps = sellersOf(sid); let rows = '';
@@ -997,10 +1019,30 @@ function storeConf(sid, mk, who){
 }
 function viewGerente(){
   const sid = SESSION.store, st = store(sid); if (!st){ SESSION = {}; saveSession(); return viewStart(); }
-  const tab = ui.tab || 'loja', mk = mkOf(TODAY), n = storeAlerts(sid, mk).length;
-  const body = tab === 'loja' ? storeDash(sid, mk, 'gerente') : tab === 'grid' ? storeGrid(sid, mk) : storeConf(sid, mk, 'gerente');
-  return page(band({eyebrow:'Gerente da loja', title:esc(st.name), sub:dlong(TODAY) + ' · ' + sellersOf(sid).length + ' vendedores'}), body, tabs([['loja', 'Loja', 'store'], ['grid', 'Lançamentos', 'list'], ['conf', 'Conferência' + (n ? ' (' + n + ')' : ''), 'alert']]));
+  if (!ui.month || ui.month > mkOf(TODAY)) ui.month = mkOf(TODAY);
+  const tab = ui.tab || 'loja', mk = ui.month, n = storeAlerts(sid, mkOf(TODAY)).length;
+  const body = tab === 'loja' ? storeDash(sid, mk, 'gerente') : tab === 'grid' ? storeGrid(sid, mk) : tab === 'retro' ? retroView(sid) : storeConf(sid, mkOf(TODAY), 'gerente');
+  const tl = [['loja', 'Loja', 'store'], ['grid', 'Lançamentos', 'list'], ['retro', 'Retroativo', 'edit'], ['conf', 'Conferência' + (n ? ' (' + n + ')' : ''), 'alert']];
+  return page(band({eyebrow:'Gerente da loja', title:esc(st.name), sub:dlong(TODAY) + ' · ' + sellersOf(sid).length + ' vendedores', month: tab === 'loja' || tab === 'grid'}), body, tabs(tl));
 }
+function retroView(sid){
+  const ms = retroMonths();
+  if (!ms.length) return '<div class="info"><strong>Lançamento retroativo fechado</strong><span>A gerência geral não liberou meses anteriores para lançar. Se precisar, fale com a gerência.</span></div>';
+  const ps = sellersOf(sid); if (!ps.length) return '<div class="alert">Esta loja ainda não tem vendedores cadastrados.</div>';
+  const R = ui.retro = Object.assign({mk:ms[0], pid:ps[0].id, date:null}, ui.retro || {});
+  if (ms.indexOf(R.mk) < 0) R.mk = ms[0]; if (!ps.some(p => p.id === R.pid)) R.pid = ps[0].id; if (R.date && (mkOf(R.date) !== R.mk || !retroOk(R.date))) R.date = null;
+  if (!LOADED.has(R.mk)){ loadData([R.mk]).then(render).catch(() => toast('Sem conexão com a planilha.')); return '<div class="card"><span class="small">Carregando ' + mlabel(R.mk).toLowerCase() + '…</span></div>'; }
+  if (R.date) return '<button class="btn small" data-act="retro-back" style="align-self:flex-start">' + icon('left', 16) + ' Voltar à lista de dias</button>' + editor(sid, R.pid, R.date, 'retro');
+  const D = daysIn(R.mk), dates = Array.from({length:D}, (_, i) => dateOf(R.mk, i + 1));
+  const done = dates.filter(dt => ENTRIES[sid + '|' + R.pid + '|' + dt]).length, tot = dates.reduce((a, dt) => a + val(sid, R.pid, dt, 'venda'), 0);
+  const sel = (id, lbl, opts, cur) => '<label class="field" for="' + id + '">' + lbl + '<span class="selwrap"><select id="' + id + '" data-change="' + id + '" style="padding-left:16px">' + opts.map(o => '<option value="' + o[0] + '"' + (o[0] === cur ? ' selected' : '') + '>' + o[1] + '</option>').join('') + '</select><span class="caret">' + icon('chev', 20) + '</span></span></label>';
+  return '<div class="note">' + icon('edit', 18) + '<span>Aqui você lança os dias de <strong>meses anteriores</strong> para os vendedores da loja, por exemplo o que estava na planilha antes do app. Cada dia salvo fica registrado no histórico com o seu nome.</span></div>' +
+    '<section class="card storesel"><div class="grid2">' + sel('retro-mk', 'Mês', ms.map(m => [m, mlabel(m)]), R.mk) + sel('retro-pid', 'Vendedor', ps.map(p => [p.id, esc(p.name)]), R.pid) + '</div></section>' +
+    '<section class="card hero feature"><div class="row"><div class="stack"><span class="label">' + esc(sellerName(sid, R.pid)) + ' · ' + mlabel(R.mk).toLowerCase() + '</span><span class="big">' + brl(tot) + '</span></div><div class="stack" style="align-items:flex-end"><span class="label">Dias lançados</span><span class="mid">' + done + ' de ' + D + '</span></div></div>' + bar(done / D * 100, null) + '</section>' +
+    '<section class="card flush"><div class="head row"><h2>Dias do mês</h2><span class="small">Toque para lançar</span></div>' + dates.map(dt => { const e = ENTRIES[sid + '|' + R.pid + '|' + dt];
+      return '<button class="lrow" data-act="retro-day" data-date="' + dt + '"><span class="stack"><strong>' + dlabel(dt) + '</strong><span class="row start" style="gap:8px">' + (!e ? '<span class="chip mute">Não lançado</span>' : e.folga ? '<span class="chip mute">Folga</span>' : '<span class="chip ok">Lançado</span><span class="small">' + brl(e.v.venda) + '</span>') + '</span></span><span class="btn small">' + (e ? 'Corrigir' : 'Lançar') + '</span></button>'; }).join('') + '</section>';
+}
+function nextRetroDay(sid, pid, date){ const mk = mkOf(date), D = daysIn(mk); for (let d = P(date).d + 1; d <= D; d++){ const dt = dateOf(mk, d); if (!ENTRIES[sid + '|' + pid + '|' + dt]) return dt; } return null; }
 
 /* ---------- gerência geral ---------- */
 function viewGerencia(){
@@ -1043,7 +1085,7 @@ function network(mk){
       (r.C ? bar(r.pct, r.pace, true) + '<span class="small">Projeção ' + pct(r.proj) + ' · P.A. ' + (r.m.pa == null ? '–' : dec1(r.m.pa)) + ' · Conv. ' + pct(r.m.conv) + (r.alerts.length ? ' · ' + r.alerts.length + (r.alerts.length === 1 ? ' aviso' : ' avisos') : '') + '</span>' : '<span class="chip warn">Cota não definida</span>') + '</span></button>').join('') + '</section>';
   html += '<div class="split"><section class="card flush main only-wide"><div class="head row" style="flex-wrap:wrap"><h2>Lojas</h2><span class="small">ordenadas pela projeção · toque para abrir</span></div><div class="scroll"><table class="t"><thead><tr><th>Loja</th><th class="r">Vendido</th><th style="min-width:170px">% da cota</th><th class="r">Projeção</th><th class="r">Ano ant.</th><th class="r">P.A.</th><th class="r">Ticket</th><th class="r">Conv.</th><th class="r">Avisos</th></tr></thead><tbody>' +
     rows.map(r => '<tr class="click" data-act="open-store" data-store="' + r.st.id + '" tabindex="0"><td><strong>' + esc(r.st.name) + '</strong></td><td class="r">' + brl(r.m.venda) + '</td><td>' + (r.C ? '<div class="row" style="gap:8px"><div style="flex:1">' + bar(r.pct, r.pace, true) + '</div><strong class="' + tone(r.pct, r.pace) + '">' + pct(r.pct) + '</strong></div>' : '<span class="chip warn">Cota não definida</span>') + '</td>' +
-      '<td class="r ' + tone(r.proj, 100) + '"><strong>' + pct(r.proj) + '</strong></td><td class="r">' + pct(r.yoy) + '</td><td class="r ' + tone(r.m.pa, M.pa) + '">' + (r.m.pa == null ? '–' : dec1(r.m.pa)) + '</td><td class="r">' + (r.m.tm == null ? '–' : brl(r.m.tm)) + '</td><td class="r ' + tone(r.m.conv, M.conv) + '">' + pct(r.m.conv) + '</td>' +
+      '<td class="r ' + tone(r.proj, 100) + '"><strong>' + pct(r.proj) + '</strong></td><td class="r">' + pct(r.yoy) + '</td><td class="r ' + tone(r.m.pa, metasOf(r.st.id).pa) + '">' + (r.m.pa == null ? '–' : dec1(r.m.pa)) + '</td><td class="r ' + tone(r.m.tm, metasOf(r.st.id).tm) + '">' + (r.m.tm == null ? '–' : brl(r.m.tm)) + '</td><td class="r ' + tone(r.m.conv, metasOf(r.st.id).conv) + '">' + pct(r.m.conv) + '</td>' +
       '<td class="r">' + (r.alerts.length ? '<span class="chip warn">' + r.alerts.length + '</span>' : '<span class="chip ok">0</span>') + '</td></tr>').join('') + '</tbody></table></div></section><div class="side"><h2>Atenção</h2>';
   const side = rows.map(r => { const parts = [], info = [], cnt = k => r.alerts.filter(a => a.kind === k).length;
     if (cnt('req')) parts.push(cnt('req') + (cnt('req') === 1 ? ' pedido de correção.' : ' pedidos de correção.'));
@@ -1053,7 +1095,15 @@ function network(mk){
     if (r.C && r.proj < 100 && mk === mkOf(TODAY)) info.push('Precisa de ' + brl(r.need) + ' por dia até o fim do mês.');
     if (!parts.length && !info.length) return '';
     return '<div class="' + (parts.length ? 'alert' : 'info') + '"><strong>' + esc(r.st.name) + '</strong>' + parts.map(x => '<span>' + x + '</span>').join('') + info.map(x => '<span style="color:var(--ink)">' + x + '</span>').join('') + '</div>'; }).join('');
-  return html + (side || '<div class="note">' + icon('check', 18) + '<span>Nada pedindo atenção.</span></div>') + '</div></div>';
+  return html + (side || '<div class="note">' + icon('check', 18) + '<span>Nada pedindo atenção.</span></div>') + '</div></div>' + indCard(rows);
+}
+/* indicadores de cada loja comparados com a meta da própria loja */
+function indCard(rows){
+  const cell = (lbl, v, fmt, meta) => '<div class="ind"><span class="small">' + lbl + '</span><strong class="' + tone(v, meta) + '">' + (v == null ? '–' : fmt(v)) + '</strong><span class="small">meta ' + fmt(meta) + '</span></div>';
+  return '<section class="card flush"><div class="head row" style="flex-wrap:wrap"><div class="stack"><h2>Indicadores por loja</h2><span class="small">Cada loja comparada com a sua própria meta · verde = bateu</span></div><button class="btn small" data-act="go-metas">Ajustar metas</button></div>' +
+    rows.slice().sort((a, b) => a.st.name.localeCompare(b.st.name)).map(r => { const M = metasOf(r.st.id);
+      return '<div class="indrow"><button class="indname" data-act="open-store" data-store="' + r.st.id + '"><strong>' + esc(r.st.name) + '</strong>' + (r.st.metas ? '<span class="chip ok">meta própria</span>' : '<span class="chip mute">meta padrão</span>') + '</button>' +
+        cell('P.A.', r.m.pa, dec1, M.pa) + cell('Ticket médio', r.m.tm, brl, M.tm) + cell('Conversão', r.m.conv, v => pct(v), M.conv) + '</div>'; }).join('') + '</section>';
 }
 
 /* ---------- configurar ---------- */
@@ -1090,12 +1140,27 @@ function sellersCard(sid, mk, mc){
     (mc && ss.length ? '<tfoot><tr><td><strong>Soma</strong></td><td></td><td></td><td class="r"><strong>' + brl(total) + '</strong></td>' + units.map(u => '<td></td>').join('') + '<td></td><td></td></tr></tfoot>' : '') + '</table></div>' +
     '<div style="padding:12px 16px">' + (!mc ? '' : !ss.length ? '<div class="alert"><strong>Loja sem vendedores.</strong><span>Adicione os vendedores para dividir a cota.</span></div>' : ok ? '<div class="note">' + icon('check', 18) + '<span>Soma das cotas = cota da loja (' + brl(mc.cota) + ').</span></div>' : '<div class="alert"><strong>A soma não fecha.</strong><span>Ninguém trabalha o mês inteiro, então sobram ' + brl((mc.cota || 0) - total) + ' sem dono. Ajuste os dias.</span></div>') + '</div></section>';
 }
+function retroCard(){
+  const r = retroCfg(), cur = mkOf(TODAY), opts = []; for (let m = addMonths(cur, -1), i = 0; i < 36; i++, m = addMonths(m, -1)) opts.push(m);
+  const sel = (k, v) => '<span class="selwrap"><select id="rt-' + k + '" data-k="rt' + k + '" style="padding-left:16px">' + opts.map(m => '<option value="' + m + '"' + (m === v ? ' selected' : '') + '>' + mlabel(m) + '</option>').join('') + '</select><span class="caret">' + icon('chev', 20) + '</span></span>';
+  return '<section class="card"><div class="row" style="flex-wrap:wrap"><div class="stack"><h2>Lançamento retroativo pelas lojas</h2><span class="small">O gerente de cada loja pode lançar dias de meses anteriores (aba “Retroativo”), por exemplo o que estava na planilha antes do app. O mês atual continua com a regra normal.</span></div>' +
+    '<span class="chip ' + (r.on ? 'ok' : 'mute') + '">' + (r.on ? 'Liberado' : 'Fechado') + '</span></div>' +
+    '<div class="grid2"><label class="field" for="rt-desde">Liberado a partir de' + sel('desde', r.desde) + '</label><label class="field" for="rt-ate">Até' + sel('ate', r.ate) + '</label></div>' +
+    '<div class="row start"><button class="btn small primary" data-act="retro-cfg" data-on="1">' + (r.on ? 'Salvar período' : 'Liberar') + '</button>' + (r.on ? '<button class="btn small" data-act="retro-cfg" data-on="0">Fechar retroativo</button>' : '') + '</div></section>';
+}
+async function retroCfgSave(on){
+  const desde = $('#rt-desde').value, ate = $('#rt-ate').value;
+  if (on && desde > ate) return toast('O mês inicial precisa ser antes do mês final.');
+  if (!(await ask(on ? 'Liberar lançamento retroativo?' : 'Fechar lançamento retroativo?', on ? '<p>Os gerentes de loja poderão lançar e corrigir dias de <strong>' + mlabel(desde).toLowerCase() + '</strong> até <strong>' + mlabel(ate).toLowerCase() + '</strong>.</p><p class="small">Tudo fica registrado no histórico da planilha.</p>' : '<p>Os gerentes de loja não vão mais conseguir lançar meses anteriores. Você continua podendo corrigir pela aba “Uma loja”.</p>', on ? 'Sim, liberar' : 'Sim, fechar'))) return;
+  saveCfg(cfg => { cfg.retro = {on:!!on, desde:desde, ate:ate}; }, on ? 'Retroativo liberado' : 'Retroativo fechado');
+}
 function cfgStores(){
   const pins = PINS ? PINS.g : {}, vp = PINS ? PINS.v : {}, show = (x) => PINS == null ? '<span class="small">carregando…</span>' : x ? '<strong style="letter-spacing:.1em">' + esc(x) + '</strong>' : '<span class="chip warn">Não definida</span>';
   return '<section class="card"><div class="row"><div class="stack"><h2>Senha da gerência geral</h2><span class="small">Só números, de 4 a 8. Use uma que só você saiba.</span></div><button class="btn small" data-act="gpin-edit">Alterar</button></div></section>' +
     '<section class="card flush"><div class="head row" style="flex-wrap:wrap"><div class="stack"><h2>Lojas e senhas</h2><span class="small">Cada loja tem duas senhas: a de <strong>acesso da loja</strong>, que todos os vendedores daquela loja usam para entrar e lançar, e a do <strong>gerente</strong>, só para o gerente.</span></div><button class="btn small primary" data-act="store-new">+ Nova loja</button></div>' +
     '<div class="scroll"><table class="t"><thead><tr><th>Loja</th><th class="r">Vendedores</th><th>Acesso da loja (vendedores)</th><th>Senha do gerente</th><th></th></tr></thead><tbody>' +
     activeStores().map(st => '<tr><td><strong>' + esc(st.name) + '</strong></td><td class="r">' + sellersOf(st.id).length + '</td><td>' + show(vp[st.id]) + '</td><td>' + show(pins[st.id]) + '</td><td class="r"><button class="btn small" data-act="store-edit" data-store="' + st.id + '">Editar</button></td></tr>').join('') + '</tbody></table></div></section>' +
+    retroCard() +
     (CONFIG.stores.some(s => s.archived) ? '<section class="card"><h2>Lojas desativadas</h2>' + CONFIG.stores.filter(s => s.archived).map(s => '<div class="row"><span>' + esc(s.name) + '</span><button class="btn small" data-act="store-restore" data-store="' + s.id + '">Reativar</button></div>').join('') + '</section>' : '');
 }
 function cfgProducts(){
@@ -1106,7 +1171,22 @@ function cfgProducts(){
     (products(true).some(p => p.archived) ? '<section class="card"><h2>Produtos desativados</h2>' + products(true).filter(p => p.archived).map(p => '<div class="row"><span>' + esc(p.name) + '</span><button class="btn small" data-act="prod-restore" data-pid="' + p.id + '">Reativar</button></div>').join('') + '</section>' : '');
 }
 function ruleText(p){ if (p.rule === 'porColchao') return 'Cota: ' + dec1(p.fator || 1) + ' por colchão vendido'; if (p.rule === 'base') return 'Cota de bases · peso ' + dec1(p.peso || 0); if (p.rule === 'ref') return 'Base das cotas por colchão'; if (p.rule === 'cotaMensal') return 'Cota mensal em unidades (definida por loja no mês)'; return 'Só contagem'; }
-function cfgMetas(){ const M = CONFIG.metas; return '<section class="card"><h2>Metas dos indicadores · todas as lojas</h2>' + dec1Field('pa', M.pa, 'P.A. (peças por venda)', 'Digite 40 para 4,0') + moneyField('tm', M.tm, 'Ticket médio') + intField('conv', M.conv, 'Conversão (%)', 'Vendas ÷ (atendimentos + retornos)') + '<button class="btn primary" data-act="metas-save" style="align-self:flex-start">Salvar metas</button></section>'; }
+function cfgMetas(){
+  const M = CONFIG.metas, line = m => 'P.A. <strong>' + dec1(m.pa) + '</strong> · Ticket <strong>' + brl(m.tm) + '</strong> · Conversão <strong>' + m.conv + '%</strong>';
+  return '<section class="card flush"><div class="head stack"><h2>Metas dos indicadores por loja</h2><span class="small">Cada loja pode ter as suas metas de P.A., ticket médio e conversão. Toque em uma loja para mudar.</span></div>' +
+    activeStores().map(st => '<button class="lrow" data-act="meta-store" data-store="' + st.id + '"><span class="stack" style="flex:1"><span class="row start" style="gap:8px"><strong>' + esc(st.name) + '</strong>' + (st.metas ? '<span class="chip ok">Meta própria</span>' : '<span class="chip mute">Usa o padrão</span>') + '</span><span class="small">' + line(metasOf(st.id)) + '</span></span>' + icon('edit', 18) + '</button>').join('') + '</section>' +
+    '<section class="card"><div class="stack"><h2>Meta padrão da rede</h2><span class="small">Vale para as lojas marcadas “Usa o padrão” e para lojas novas.</span></div>' + dec1Field('pa', M.pa, 'P.A. (peças por venda)', 'Digite 40 para 4,0') + moneyField('tm', M.tm, 'Ticket médio') + intField('conv', M.conv, 'Conversão (%)', 'Vendas ÷ (atendimentos + retornos)') + '<button class="btn primary" data-act="metas-save" style="align-self:flex-start">Salvar meta padrão</button></section>';
+}
+async function metaStoreEdit(sid){
+  const st = store(sid), M = metasOf(sid), own = !!st.metas;
+  const body = '<label class="checkrow"><input type="checkbox" id="m-padrao" data-k="padrao"' + (own ? '' : ' checked') + '> Usar a meta padrão da rede</label>' +
+    '<div class="stack' + (own ? '' : ' dim') + '" style="gap:12px" id="m-own">' + dec1Field('mpa', M.pa, 'P.A. (peças por venda)', 'Digite 40 para 4,0') + moneyField('mtm', M.tm, 'Ticket médio') + intField('mconv', M.conv, 'Conversão (%)') + '</div>';
+  const r = await modal({title:'Metas · ' + esc(st.name), body:body, actions:[{label:'Cancelar', act:'no'}, {label:'Salvar metas', act:'yes', primary:true}]});
+  if (r.act !== 'yes') return;
+  const n = {pa:readDec1(r.values.mpa), tm:readMoney(r.values.mtm), conv:readInt(r.values.mconv)};
+  const usePad = r.values.padrao === true;
+  saveCfg(cfg => { const x = cfg.stores.filter(y => y.id === sid)[0]; if (usePad) delete x.metas; else x.metas = n; }, usePad ? 'Loja ' + st.name + ' voltou para a meta padrão' : 'Metas de ' + st.name + ' salvas');
+}
 
 /* ações de configuração (todas com aviso antes de gravar) */
 async function saveCfg(mut, msg){ const cfg = clone(CONFIG); mut(cfg); await run(() => api('saveConfig', {config:cfg}), msg); }
@@ -1221,7 +1301,7 @@ async function metasSave(){
   const v = modalLess(), M = CONFIG.metas, n = {pa:readDec1(v.pa), tm:readMoney(v.tm), conv:readInt(v.conv)}, ch = [];
   if (n.pa !== M.pa) ch.push('P.A.: ' + dec1(M.pa) + ' → <strong>' + dec1(n.pa) + '</strong>'); if (n.tm !== M.tm) ch.push('Ticket médio: ' + money(M.tm) + ' → <strong>' + money(n.tm) + '</strong>'); if (n.conv !== M.conv) ch.push('Conversão: ' + M.conv + '% → <strong>' + n.conv + '%</strong>');
   if (!ch.length) return toast('Nada mudou.');
-  if (!(await ask('Salvar novas metas?', '<ul class="diff">' + ch.map(x => '<li>' + x + '</li>').join('') + '</ul><p class="small">Vale para todas as lojas e todos os meses nos painéis.</p>', 'Sim, salvar'))) return;
+  if (!(await ask('Salvar novas metas?', '<ul class="diff">' + ch.map(x => '<li>' + x + '</li>').join('') + '</ul><p class="small">Vale para as lojas que usam a meta padrão' + (activeStores().some(st => st.metas) ? ' (' + activeStores().filter(st => st.metas).map(st => esc(st.name)).join(', ') + ' têm meta própria e não mudam)' : '') + '.</p>', 'Sim, salvar'))) return;
   saveCfg(cfg => { cfg.metas = n; }, 'Metas salvas');
 }
 function modalLess(){ const v = {}; document.querySelectorAll('main [data-k]').forEach(i => { v[i.dataset.k] = i.value; }); return v; }
@@ -1325,6 +1405,11 @@ document.addEventListener('click', async ev => {
     case 'cat-new': catEditOrNew(null); break;
     case 'cat-edit': catEditOrNew(d.cat); break;
     case 'metas-save': metasSave(); break;
+    case 'meta-store': metaStoreEdit(d.store); break;
+    case 'go-metas': EDITOR = null; go({tab:'config', sub:'metas'}); break;
+    case 'retro-day': EDITOR = null; ui.retro = Object.assign({}, ui.retro, {date:d.date}); render(); window.scrollTo(0, 0); break;
+    case 'retro-back': EDITOR = null; ui.retro = Object.assign({}, ui.retro, {date:null}); render(); break;
+    case 'retro-cfg': retroCfgSave(d.on === '1'); break;
     case 'install-help': installHelp(); break;
     case 'demo-day': await api('demoToday', {today:addDays(TODAY, +d.d)}); EDITOR = null; await refresh(); render(); break;
     case 'demo-reset': if (await ask('Apagar os testes?', '<p>Tudo o que foi lançado e configurado nesta demonstração some, e os dados de setembro voltam.</p>', 'Sim, apagar', true)){ await api('demoReset', {}); SESSION = {}; saveSession(); EDITOR = null; ENTRIES = {}; LOADED = new Set(); await refresh(); go({step:'home'}); toast('Demonstração reiniciada'); } break;
@@ -1345,6 +1430,9 @@ document.addEventListener('beforeinput', ev => {
   el.value = d; applyMask(el); el.dispatchEvent(new Event('input', {bubbles:true}));
 });
 document.addEventListener('change', ev => {
+  if (ev.target.id === 'm-padrao'){ const o = $('#m-own'); if (o) o.classList.toggle('dim', ev.target.checked); return; }
+  const rs = ev.target.closest('select[data-change="retro-mk"], select[data-change="retro-pid"]');
+  if (rs){ EDITOR = null; ui.retro = Object.assign({}, ui.retro, rs.id === 'retro-mk' ? {mk:rs.value, date:null} : {pid:rs.value, date:null}); render(); return; }
   const el = ev.target.closest('select[data-change="pick-ger-store"]'); if (!el) return;
   EDITOR = null; go({store:el.value, fix:null});
 });
