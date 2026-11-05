@@ -438,7 +438,9 @@ const LOGO = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAARgAAAEYBAMAAAB1oPS/
 
 const FUNIL = ['venda','atend','ret','vendas','pecas'];
 const FUNIL_LBL = {venda:'Valor vendido', atend:'Atendimentos', ret:'Retornos', vendas:'Vendas', pecas:'Peças vendidas'};
-const HINT = {atend:'Clientes novos atendidos', ret:'Clientes que voltaram', vendas:'Pedidos fechados', pecas:'Total de itens nos pedidos'};
+const HINT = {atend:'Clientes novos atendidos', ret:'Clientes que voltaram e compraram · conta como venda', vendas:'Pedidos fechados com clientes novos', pecas:'Total de itens (vendas + retornos)'};
+/* regra: todo retorno fechou venda. Total de vendas = vendas + retornos */
+function totVendas(v){ return (+(v || {}).vendas || 0) + (+(v || {}).ret || 0); }
 const RULES = {none:'Só contagem (sem cota)', ref:'Base das cotas (colchões)', porColchao:'Cota por colchão vendido', base:'Entra na cota de bases', cotaMensal:'Cota mensal em unidades'};
 const WD = ['dom','seg','ter','qua','qui','sex','sáb'];
 const WDL = ['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];
@@ -685,8 +687,8 @@ function cotaDia(C, sid, pids, date){
 function elapsed(sid, pids, c){ if (!c.t) return 0; if (c.mk !== mkOf(TODAY)) return c.t; return pids.some(pid => ENTRIES[sid + '|' + pid + '|' + dateOf(c.mk, c.t)]) ? c.t : c.t - 1; }
 function metrics(sid, pids, c){
   const m = {}; allFields().forEach(f => { m[f] = sum(sid, pids, f, c.mk, 1, c.t); });
-  const den = m.atend + m.ret;
-  m.pa = m.vendas ? m.pecas / m.vendas : null; m.tm = m.vendas ? m.venda / m.vendas : null; m.conv = den ? m.vendas / den * 100 : null;
+  const den = m.atend + m.ret, tv = m.vendas + m.ret; m.tv = tv;
+  m.pa = tv ? m.pecas / tv : null; m.tm = tv ? m.venda / tv : null; m.conv = den ? tv / den * 100 : null;
   return m;
 }
 function prodLines(m, sid, pid, mk){
@@ -700,10 +702,11 @@ function prodLines(m, sid, pid, mk){
 }
 function check(v){
   v = v || {}; const out = [], den = (v.atend || 0) + (v.ret || 0);
-  if (v.venda > 0 && !v.vendas) out.push('Há valor em R$, mas 0 vendas.');
-  if (v.vendas > 0 && !v.venda) out.push('Há vendas, mas o valor em R$ está zerado.');
-  if ((v.vendas || 0) > den) out.push('Vendas maior que atendimentos + retornos.');
-  if ((v.pecas || 0) < (v.vendas || 0)) out.push('Peças vendidas menor que o número de vendas.');
+  const tv = totVendas(v);
+  if (v.venda > 0 && !tv) out.push('Há valor em R$, mas nenhuma venda nem retorno.');
+  if (tv > 0 && !v.venda) out.push('Há vendas ou retornos, mas o valor em R$ está zerado.');
+  if ((v.vendas || 0) > (v.atend || 0)) out.push('Vendas maior que atendimentos. Lembre: quem voltou e comprou vai só em Retornos.');
+  if ((v.pecas || 0) < tv) out.push('Peças vendidas menor que vendas + retornos.');
   return out;
 }
 function storeAlerts(sid, mk){
@@ -902,8 +905,8 @@ function stepLine(f, label, hint){
 function refreshLive(){
   if (!EDITOR || !draft) return; const {sid, pid, date} = EDITOR, mk = mkOf(date);
   if (hasCota(mk, sid)){ const ci = cotaDia(quota(mk, sid, pid), sid, [pid], date), pp = ci.dia > 0 ? draft.venda / ci.dia * 100 : 100; const a = $('#live-pct'); if (a){ a.textContent = pct(pp) + ' da cota'; a.className = 'mid ' + tone(pp, 100); } const b = $('#live-bar'); if (b) b.innerHTML = bar(pp, null); }
-  const den = draft.atend + draft.ret, m = {pa: draft.vendas ? draft.pecas / draft.vendas : null, tm: draft.vendas ? draft.venda / draft.vendas : null, conv: den ? draft.vendas / den * 100 : null};
-  const k = $('#live-kpis'); if (k) k.innerHTML = kpiRow(m, sid);
+  const den = draft.atend + draft.ret, tv = totVendas(draft), m = {pa: tv ? draft.pecas / tv : null, tm: tv ? draft.venda / tv : null, conv: den ? tv / den * 100 : null};
+  const k = $('#live-kpis'); if (k) k.innerHTML = '<div class="info row" style="flex-direction:row"><span>Total de vendas do dia <span class="small">(vendas + retornos)</span></span><strong style="font-size:18px">' + tv + '</strong></div>' + kpiRow(m, sid);
   const c = check(draft), el = $('#live-check');
   const sc = c.length ? [] : softCheck(draft, draftDia());
   if (el) el.innerHTML = c.length ? '<div class="alert" role="alert"><strong>Corrija antes de salvar</strong>' + c.map(x => '<span>• ' + x + '</span>').join('') + '</div>'
@@ -1176,7 +1179,7 @@ function cfgMetas(){
   const M = CONFIG.metas, line = m => 'P.A. <strong>' + dec1(m.pa) + '</strong> · Ticket <strong>' + brl(m.tm) + '</strong> · Conversão <strong>' + m.conv + '%</strong>';
   return '<section class="card flush"><div class="head stack"><h2>Metas dos indicadores por loja</h2><span class="small">Cada loja pode ter as suas metas de P.A., ticket médio e conversão. Toque em uma loja para mudar.</span></div>' +
     activeStores().map(st => '<button class="lrow" data-act="meta-store" data-store="' + st.id + '"><span class="stack" style="flex:1"><span class="row start" style="gap:8px"><strong>' + esc(st.name) + '</strong>' + (st.metas ? '<span class="chip ok">Meta própria</span>' : '<span class="chip mute">Usa o padrão</span>') + '</span><span class="small">' + line(metasOf(st.id)) + '</span></span>' + icon('edit', 18) + '</button>').join('') + '</section>' +
-    '<section class="card"><div class="stack"><h2>Meta padrão da rede</h2><span class="small">Vale para as lojas marcadas “Usa o padrão” e para lojas novas.</span></div>' + dec1Field('pa', M.pa, 'P.A. (peças por venda)', 'Digite 40 para 4,0') + moneyField('tm', M.tm, 'Ticket médio') + intField('conv', M.conv, 'Conversão (%)', 'Vendas ÷ (atendimentos + retornos)') + '<button class="btn primary" data-act="metas-save" style="align-self:flex-start">Salvar meta padrão</button></section>';
+    '<section class="card"><div class="stack"><h2>Meta padrão da rede</h2><span class="small">Vale para as lojas marcadas “Usa o padrão” e para lojas novas.</span></div>' + dec1Field('pa', M.pa, 'P.A. (peças por venda)', 'Digite 40 para 4,0') + moneyField('tm', M.tm, 'Ticket médio') + intField('conv', M.conv, 'Conversão (%)', '(Vendas + retornos) ÷ (atendimentos + retornos)') + '<button class="btn primary" data-act="metas-save" style="align-self:flex-start">Salvar meta padrão</button></section>';
 }
 async function metaStoreEdit(sid){
   const st = store(sid), M = metasOf(sid), own = !!st.metas;
