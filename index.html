@@ -554,7 +554,7 @@ async function demoApi(action, p){
     case 'saveEntry': {
       const isRetro = !isG && p.token === 'demo-s-' + p.store;
       if (!isG && !isRetro && p.token !== 'demo-v-' + p.store) return {ok:false, error:'auth'};
-      if (isRetro){ const r = s.config.retro || {}, cur = s.today.slice(0, 7), mk = p.date.slice(0, 7); if (r.on === false || mk >= cur || mk < (r.desde || addMonths(cur, -12)) || mk > (r.ate || addMonths(cur, -1))) return {ok:false, error:'Este mês não está liberado para lançamento retroativo.'}; }
+      if (isRetro){ const r = s.config.retro || {}, cur = s.today.slice(0, 7), mk = p.date.slice(0, 7); if (r.on === false || p.date > s.today || mk < (r.desde || cur.slice(0, 4) + '-01') || mk > (r.ate || cur)) return {ok:false, error:'Este mês não está liberado para lançamento retroativo.'}; }
       else if (!isG && [s.today, addDays(s.today, -1)].indexOf(p.date) < 0) return {ok:false, error:'Só a gerência pode alterar dias anteriores a ontem.'};
       const lj = s.config.stores.find(x => x.id === p.store), vd = lj && lj.sellers.find(x => x.id === p.seller);
       if (!vd) return {ok:false, error:'Vendedor não encontrado nesta loja. Atualize o app.'};
@@ -648,9 +648,10 @@ function sellerName(sid, pid){ const s = store(sid); const p = s && s.sellers.fi
 function mcfg(mk, sid){ return CONFIG.months && CONFIG.months[mk] && CONFIG.months[mk].stores ? CONFIG.months[mk].stores[sid] || null : null; }
 function metasOf(sid){ const st = sid ? store(sid) : null; return Object.assign({}, CONFIG.metas, st && st.metas ? st.metas : {}); }
 /* lançamento retroativo pelos gerentes de loja: meses anteriores, dentro da janela liberada pela gerência */
-function retroCfg(){ const cur = mkOf(TODAY), r = CONFIG.retro || {}; return {on: r.on !== false, desde: r.desde || addMonths(cur, -12), ate: r.ate || addMonths(cur, -1)}; }
-function retroMonths(){ const r = retroCfg(), cur = mkOf(TODAY), out = []; if (!r.on) return out; let m = r.ate < cur ? r.ate : addMonths(cur, -1); while (m >= r.desde && out.length < 36){ out.push(m); m = addMonths(m, -1); } return out; }
-function retroOk(date){ const r = retroCfg(), mk = mkOf(date); return r.on && mk < mkOf(TODAY) && mk >= r.desde && mk <= r.ate; }
+/* padrão: de janeiro do ano atual até o mês atual (no mês atual, só até hoje) */
+function retroCfg(){ const cur = mkOf(TODAY), r = CONFIG.retro || {}; return {on: r.on !== false, desde: r.desde || cur.slice(0, 4) + '-01', ate: r.ate || cur}; }
+function retroMonths(){ const r = retroCfg(), cur = mkOf(TODAY), out = []; if (!r.on) return out; const fim = r.ate < cur ? r.ate : cur; let m = r.desde; while (m <= fim && out.length < 48){ out.push(m); m = addMonths(m, 1); } return out; }
+function retroOk(date){ const r = retroCfg(), mk = mkOf(date); return r.on && date <= TODAY && mk >= r.desde && mk <= r.ate; }
 function hasCota(mk, sid){ const mc = mcfg(mk, sid); return !!(mc && mc.cota > 0); }
 function products(all){ const out = []; CONFIG.categories.forEach(c => { if (c.archived && !all) return; c.products.forEach(p => { if (all || !p.archived) out.push(Object.assign({cat:c.id}, p)); }); }); return out; }
 function allFields(){ return FUNIL.concat(products(true).map(p => p.id)); }
@@ -1029,20 +1030,20 @@ function retroView(sid){
   const ms = retroMonths();
   if (!ms.length) return '<div class="info"><strong>Lançamento retroativo fechado</strong><span>A gerência geral não liberou meses anteriores para lançar. Se precisar, fale com a gerência.</span></div>';
   const ps = sellersOf(sid); if (!ps.length) return '<div class="alert">Esta loja ainda não tem vendedores cadastrados.</div>';
-  const R = ui.retro = Object.assign({mk:ms[0], pid:ps[0].id, date:null}, ui.retro || {});
-  if (ms.indexOf(R.mk) < 0) R.mk = ms[0]; if (!ps.some(p => p.id === R.pid)) R.pid = ps[0].id; if (R.date && (mkOf(R.date) !== R.mk || !retroOk(R.date))) R.date = null;
+  const R = ui.retro = Object.assign({mk:ms[ms.length - 1], pid:ps[0].id, date:null}, ui.retro || {});
+  if (ms.indexOf(R.mk) < 0) R.mk = ms[ms.length - 1]; if (!ps.some(p => p.id === R.pid)) R.pid = ps[0].id; if (R.date && (mkOf(R.date) !== R.mk || !retroOk(R.date))) R.date = null;
   if (!LOADED.has(R.mk)){ loadData([R.mk]).then(render).catch(() => toast('Sem conexão com a planilha.')); return '<div class="card"><span class="small">Carregando ' + mlabel(R.mk).toLowerCase() + '…</span></div>'; }
   if (R.date) return '<button class="btn small" data-act="retro-back" style="align-self:flex-start">' + icon('left', 16) + ' Voltar à lista de dias</button>' + editor(sid, R.pid, R.date, 'retro');
-  const D = daysIn(R.mk), dates = Array.from({length:D}, (_, i) => dateOf(R.mk, i + 1));
+  const D = daysIn(R.mk), dates = Array.from({length:D}, (_, i) => dateOf(R.mk, i + 1)).filter(dt => dt <= TODAY);
   const done = dates.filter(dt => ENTRIES[sid + '|' + R.pid + '|' + dt]).length, tot = dates.reduce((a, dt) => a + val(sid, R.pid, dt, 'venda'), 0);
   const sel = (id, lbl, opts, cur) => '<label class="field" for="' + id + '">' + lbl + '<span class="selwrap"><select id="' + id + '" data-change="' + id + '" style="padding-left:16px">' + opts.map(o => '<option value="' + o[0] + '"' + (o[0] === cur ? ' selected' : '') + '>' + o[1] + '</option>').join('') + '</select><span class="caret">' + icon('chev', 20) + '</span></span></label>';
-  return '<div class="note">' + icon('edit', 18) + '<span>Aqui você lança os dias de <strong>meses anteriores</strong> para os vendedores da loja, por exemplo o que estava na planilha antes do app. Cada dia salvo fica registrado no histórico com o seu nome.</span></div>' +
+  return '<div class="note">' + icon('edit', 18) + '<span>Aqui você lança os dias que ficaram para trás, por exemplo <strong>meses anteriores</strong> para os vendedores da loja, por exemplo o que estava na planilha antes do app. Cada dia salvo fica registrado no histórico com o seu nome.</span></div>' +
     '<section class="card storesel"><div class="grid2">' + sel('retro-mk', 'Mês', ms.map(m => [m, mlabel(m)]), R.mk) + sel('retro-pid', 'Vendedor', ps.map(p => [p.id, esc(p.name)]), R.pid) + '</div></section>' +
-    '<section class="card hero feature"><div class="row"><div class="stack"><span class="label">' + esc(sellerName(sid, R.pid)) + ' · ' + mlabel(R.mk).toLowerCase() + '</span><span class="big">' + brl(tot) + '</span></div><div class="stack" style="align-items:flex-end"><span class="label">Dias lançados</span><span class="mid">' + done + ' de ' + D + '</span></div></div>' + bar(done / D * 100, null) + '</section>' +
+    '<section class="card hero feature"><div class="row"><div class="stack"><span class="label">' + esc(sellerName(sid, R.pid)) + ' · ' + mlabel(R.mk).toLowerCase() + '</span><span class="big">' + brl(tot) + '</span></div><div class="stack" style="align-items:flex-end"><span class="label">Dias lançados</span><span class="mid">' + done + ' de ' + dates.length + '</span></div></div>' + bar(done / Math.max(1, dates.length) * 100, null) + '</section>' +
     '<section class="card flush"><div class="head row"><h2>Dias do mês</h2><span class="small">Toque para lançar</span></div>' + dates.map(dt => { const e = ENTRIES[sid + '|' + R.pid + '|' + dt];
       return '<button class="lrow" data-act="retro-day" data-date="' + dt + '"><span class="stack"><strong>' + dlabel(dt) + '</strong><span class="row start" style="gap:8px">' + (!e ? '<span class="chip mute">Não lançado</span>' : e.folga ? '<span class="chip mute">Folga</span>' : '<span class="chip ok">Lançado</span><span class="small">' + brl(e.v.venda) + '</span>') + '</span></span><span class="btn small">' + (e ? 'Corrigir' : 'Lançar') + '</span></button>'; }).join('') + '</section>';
 }
-function nextRetroDay(sid, pid, date){ const mk = mkOf(date), D = daysIn(mk); for (let d = P(date).d + 1; d <= D; d++){ const dt = dateOf(mk, d); if (!ENTRIES[sid + '|' + pid + '|' + dt]) return dt; } return null; }
+function nextRetroDay(sid, pid, date){ const mk = mkOf(date), D = daysIn(mk); for (let d = P(date).d + 1; d <= D; d++){ const dt = dateOf(mk, d); if (dt > TODAY) return null; if (!ENTRIES[sid + '|' + pid + '|' + dt]) return dt; } return null; }
 
 /* ---------- gerência geral ---------- */
 function viewGerencia(){
@@ -1141,9 +1142,9 @@ function sellersCard(sid, mk, mc){
     '<div style="padding:12px 16px">' + (!mc ? '' : !ss.length ? '<div class="alert"><strong>Loja sem vendedores.</strong><span>Adicione os vendedores para dividir a cota.</span></div>' : ok ? '<div class="note">' + icon('check', 18) + '<span>Soma das cotas = cota da loja (' + brl(mc.cota) + ').</span></div>' : '<div class="alert"><strong>A soma não fecha.</strong><span>Ninguém trabalha o mês inteiro, então sobram ' + brl((mc.cota || 0) - total) + ' sem dono. Ajuste os dias.</span></div>') + '</div></section>';
 }
 function retroCard(){
-  const r = retroCfg(), cur = mkOf(TODAY), opts = []; for (let m = addMonths(cur, -1), i = 0; i < 36; i++, m = addMonths(m, -1)) opts.push(m);
+  const r = retroCfg(), cur = mkOf(TODAY), opts = []; for (let m = (+cur.slice(0, 4) - 1) + '-01'; m <= cur.slice(0, 4) + '-12'; m = addMonths(m, 1)) opts.push(m);
   const sel = (k, v) => '<span class="selwrap"><select id="rt-' + k + '" data-k="rt' + k + '" style="padding-left:16px">' + opts.map(m => '<option value="' + m + '"' + (m === v ? ' selected' : '') + '>' + mlabel(m) + '</option>').join('') + '</select><span class="caret">' + icon('chev', 20) + '</span></span>';
-  return '<section class="card"><div class="row" style="flex-wrap:wrap"><div class="stack"><h2>Lançamento retroativo pelas lojas</h2><span class="small">O gerente de cada loja pode lançar dias de meses anteriores (aba “Retroativo”), por exemplo o que estava na planilha antes do app. O mês atual continua com a regra normal.</span></div>' +
+  return '<section class="card"><div class="row" style="flex-wrap:wrap"><div class="stack"><h2>Lançamento retroativo pelas lojas</h2><span class="small">O gerente de cada loja pode lançar dias de meses anteriores (aba “Retroativo”), por exemplo o que estava na planilha antes do app. Os vendedores continuam com a regra normal (só hoje e ontem).</span></div>' +
     '<span class="chip ' + (r.on ? 'ok' : 'mute') + '">' + (r.on ? 'Liberado' : 'Fechado') + '</span></div>' +
     '<div class="grid2"><label class="field" for="rt-desde">Liberado a partir de' + sel('desde', r.desde) + '</label><label class="field" for="rt-ate">Até' + sel('ate', r.ate) + '</label></div>' +
     '<div class="row start"><button class="btn small primary" data-act="retro-cfg" data-on="1">' + (r.on ? 'Salvar período' : 'Liberar') + '</button>' + (r.on ? '<button class="btn small" data-act="retro-cfg" data-on="0">Fechar retroativo</button>' : '') + '</div></section>';
