@@ -413,6 +413,26 @@ details.demo{box-shadow:none;background:transparent;border:1.5px dashed var(--li
 .checkrow{display:flex;align-items:center;gap:10px;font-weight:700;min-height:44px;cursor:pointer}
 .checkrow input{width:22px;height:22px;accent-color:var(--accent)}
 button.lrow>.btn{pointer-events:none}
+
+/* quadro vendedores clicável e detalhe do vendedor */
+.selrow{display:flex;flex-direction:column;align-items:stretch;gap:8px;width:100%;padding:12px 18px;border:0;border-top:1px solid var(--line);background:none;text-align:left;color:var(--ink);cursor:pointer;font:inherit;transition:background-color 160ms ease}
+.selrow .seemore{display:inline-flex;align-items:center;gap:2px;font-size:12px;font-weight:700;color:var(--accent-strong);flex:none}
+.selrow:active{background:var(--surface2)}
+@media (hover:hover) and (pointer:fine){.selrow:hover{background:var(--surface2)}}
+.avatar.sm{width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.16);color:#fff;font-size:20px;font-weight:800;display:flex;align-items:center;justify-content:center;flex:none}
+.dgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+.dgrid.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+.dstat,.dind{background:var(--surface2);border-radius:16px;padding:12px 14px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.dstat strong{font-size:22px;font-weight:800;letter-spacing:-.02em;overflow-wrap:anywhere}
+.dind strong{font-size:22px;font-weight:800;letter-spacing:-.02em}
+.dind{gap:6px}
+@media (max-width:520px){.dgrid.three{grid-template-columns:1fr}.dind{flex-direction:row;justify-content:space-between;align-items:center}.dind .dside{align-items:flex-end;text-align:right}}
+.pcats{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.pcat{display:flex;flex-direction:column;gap:2px;background:var(--surface2);border-radius:16px;padding:12px 14px}
+.pcat>.row{padding-bottom:6px;border-bottom:1px solid var(--line);margin-bottom:4px}
+.prow{display:flex;justify-content:space-between;gap:10px;font-size:14px;padding:4px 0}
+.prow.zero{color:var(--muted)} .prow.zero strong{font-weight:600}
+ul.obs{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:8px;font-size:14px;line-height:1.45}
 </style>
 </head>
 <body>
@@ -987,6 +1007,7 @@ async function askFix(sid, pid, date){
 
 /* ---------- loja (gerente e gerência) ---------- */
 function storeDash(sid, mk, who){
+  if (ui.sellerView && ui.sellerView.sid === sid && store(sid).sellers.some(p => p.id === ui.sellerView.pid)) return sellerDetail(sid, ui.sellerView.pid, mk, who);
   const c = ctx(mk), pids = sellersOf(sid).map(p => p.id), mc = mcfg(mk, sid), m = metrics(sid, pids, c), el = elapsed(sid, pids, c), pace = el / c.D * 100;
   const C = mc ? mc.cota || 0 : 0, mp = C ? m.venda / C * 100 : 0, proj = el ? m.venda / el * c.D : 0, ano = mc && mc.anoant ? mc.anoant * el / c.D : 0;
   let html = '<section class="card hero feature"><div class="row"><div class="stack"><span class="label">Vendido em ' + mlabel(mk).toLowerCase() + '</span><span class="big">' + brl(m.venda) + '</span></div>' + (C ? '<span class="mid ' + tone(mp, pace) + '">' + pct(mp) + '</span>' : '') + '</div>';
@@ -1000,10 +1021,64 @@ function storeDash(sid, mk, who){
   html += '</section>';
   const sp = mc ? split(C, mk, sid) : {};
   const ranked = sellersOf(sid).filter(p => daysOf(mk, sid, p.id) > 0).map(p => { const mm = metrics(sid, [p.id], c), q = sp[p.id] ? sp[p.id].v : 0; return {p:p, m:mm, q:q, pct: q ? mm.venda / q * 100 : 0}; }).sort((a, b) => b.pct - a.pct || b.m.venda - a.m.venda);
-  html += '<section class="card flush"><div class="head row"><h2>Vendedores</h2><span class="small">% da cota individual</span></div>' + (ranked.length ? ranked.map((r, i) =>
-    '<div class="stepline" style="flex-direction:column;align-items:stretch;gap:8px"><div class="row"><span class="row start" style="gap:10px;min-width:0"><span class="chip ok">' + (i + 1) + '</span><strong>' + esc(r.p.name) + '</strong></span><span><strong>' + brl(r.m.venda) + '</strong> <strong class="' + tone(r.pct, pace) + '">' + (r.q ? pct(r.pct) : '') + '</strong></span></div>' +
-    (r.q ? bar(r.pct, pace, true) : '') + '<span class="small">' + (r.q ? 'Cota ' + brl(r.q) + ' · ' : '') + 'P.A. ' + (r.m.pa == null ? '–' : dec1(r.m.pa)) + ' · Ticket ' + (r.m.tm == null ? '–' : brl(r.m.tm)) + ' · Conversão ' + pct(r.m.conv) + '</span></div>').join('') : '<div class="stepline small">Nenhum vendedor ativo.</div>') + '</section>';
+  html += '<section class="card flush"><div class="head row"><h2>Vendedores</h2><span class="small">Toque no nome para ver os detalhes</span></div>' + (ranked.length ? ranked.map((r, i) =>
+    '<button class="selrow" data-act="seller-detail" data-store="' + sid + '" data-pid="' + r.p.id + '"><div class="row"><span class="row start" style="gap:10px;min-width:0"><span class="chip ok">' + (i + 1) + '</span><strong>' + esc(r.p.name) + '</strong></span><span><strong>' + brl(r.m.venda) + '</strong> <strong class="' + tone(r.pct, pace) + '">' + (r.q ? pct(r.pct) : '') + '</strong></span></div>' +
+    (r.q ? bar(r.pct, pace, true) : '') + '<span class="row"><span class="small">' + (r.q ? 'Cota ' + brl(r.q) + ' · ' : '') + 'P.A. ' + (r.m.pa == null ? '–' : dec1(r.m.pa)) + ' · Ticket ' + (r.m.tm == null ? '–' : brl(r.m.tm)) + ' · Conversão ' + pct(r.m.conv) + '</span><span class="seemore">Ver detalhes' + icon('right', 16) + '</span></span></button>').join('') : '<div class="stepline small">Nenhum vendedor ativo.</div>') + '</section>';
   return html + kpiRow(m, sid) + prodCard(m, sid, null, mk, 'Cotas de produtos da loja') + chart(sid, pids, c);
+}
+/* ---------- detalhe de um vendedor (gerente e gerência) ---------- */
+function sellerDetail(sid, pid, mk, who){
+  const c = ctx(mk), st = store(sid), p = st.sellers.filter(x => x.id === pid)[0], allp = sellersOf(sid).map(x => x.id);
+  const m = metrics(sid, [pid], c), ml = metrics(sid, allp, c), M = metasOf(sid), mc = mcfg(mk, sid), C = mc ? mc.cota || 0 : 0;
+  const sp = mc ? split(C, mk, sid)[pid] : null, q = sp ? sp.v : 0, el = elapsed(sid, [pid], c), pace = c.D ? el / c.D * 100 : 0, mp = q ? m.venda / q * 100 : 0;
+  const nAtivos = Math.max(1, allp.filter(x => daysOf(mk, sid, x) > 0).length);
+  // dias: lançados, folgas, sem lançamento, com venda, maior dia
+  let lanc = 0, folgas = 0, falta = 0, comVenda = 0, maior = 0, maiorD = null;
+  for (let d = 1; d <= c.t; d++){ const dt = dateOf(mk, d), e = ENTRIES[sid + '|' + pid + '|' + dt];
+    if (!e){ if (dt < TODAY) falta++; continue; } if (e.folga){ folgas++; continue; } lanc++; const v = +e.v.venda || 0; if (v > 0) comVenda++; if (v > maior){ maior = v; maiorD = dt; } }
+  const rank = sellersOf(sid).filter(x => daysOf(mk, sid, x.id) > 0).map(x => ({id:x.id, v:metrics(sid, [x.id], c).venda})).sort((a, b) => b.v - a.v).findIndex(x => x.id === pid) + 1;
+  const part = ml.venda ? m.venda / ml.venda * 100 : 0, tv = m.tv || 0, media = lanc ? m.venda / lanc : 0, proj = el && q ? m.venda / el * c.D : 0;
+  const vs = (v, lj, fmt) => v == null || lj == null ? '' : '<span class="small">loja: ' + fmt(lj) + '</span>';
+  const stat = (lbl, v, sub) => '<div class="dstat"><span class="small">' + lbl + '</span><strong>' + v + '</strong>' + (sub || '') + '</div>';
+  const head = '<button class="btn small" data-act="seller-close" style="align-self:flex-start">' + icon('left', 16) + ' Voltar para a loja</button>';
+  // destaque
+  let html = head + '<section class="card hero feature"><div class="row"><div class="row start" style="gap:12px;min-width:0"><span class="avatar sm">' + esc(p.name).slice(0, 1).toUpperCase() + '</span><div class="stack"><span class="label">' + esc(st.name) + ' · ' + mlabel(mk).toLowerCase() + (c.t < c.D ? ' · até ' + dlabel(dateOf(mk, c.t)) : '') + '</span><strong style="font-size:22px;letter-spacing:-.02em">' + esc(p.name) + (p.archived ? ' (desativado)' : '') + '</strong></div></div>' + (rank ? '<span class="chip ok">' + rank + 'º da loja</span>' : '') + '</div>' +
+    '<div class="row"><div class="stack"><span class="label">Valor vendido</span><span class="big">' + brl(m.venda) + '</span></div>' + (q ? '<span class="mid ' + tone(mp, pace) + '">' + pct(mp) + '</span>' : '') + '</div>' +
+    (q ? bar(mp, pace) + '<span class="small">Cota individual ' + brl(q) + ' (' + howText(sp, C, c.D) + ') · ritmo esperado ' + pct(pace) + '</span>' : '<span class="small">Sem cota individual neste mês.</span>') +
+    '<div class="tiles"><div class="stack"><span class="small">Participação na loja</span><span class="mid">' + pct(part) + '</span><span class="small">média esperada ' + pct(100 / nAtivos) + '</span></div>' +
+    '<div class="stack"><span class="small">Projeção do mês</span><span class="mid">' + (proj ? short(proj) : '–') + '</span><span class="small ' + (proj ? tone(proj, q) : '') + '" style="font-weight:700">' + (proj ? pct(proj / q * 100) + ' da cota' : '') + '</span></div>' +
+    '<div class="stack"><span class="small">Média por dia</span><span class="mid">' + (media ? short(media) : '–') + '</span><span class="small">em ' + lanc + (lanc === 1 ? ' dia' : ' dias') + ' lançados</span></div></div></section>';
+  // funil
+  html += '<section class="card"><div class="stack"><h2>Funil de vendas</h2><span class="small">Total do mês até hoje · retorno conta como venda</span></div><div class="dgrid">' +
+    stat('Atendimentos', m.atend, '<span class="small">clientes novos</span>') + stat('Retornos', m.ret, '<span class="small">voltaram e compraram</span>') +
+    stat('Vendas', m.vendas, '<span class="small">pedidos de novos</span>') + stat('Total de vendas', tv, '<span class="small">vendas + retornos</span>') +
+    stat('Peças vendidas', m.pecas, '') + stat('Valor vendido', brl(m.venda), '') + '</div></section>';
+  // indicadores com meta e loja
+  const ind = (lbl, v, meta, lj, fmt) => '<div class="dind"><div class="stack"><span class="label">' + lbl + '</span><strong class="' + tone(v, meta) + '">' + (v == null ? '–' : fmt(v)) + '</strong></div><div class="stack dside"><span class="small">meta ' + fmt(meta) + '</span>' + vs(v, lj, fmt) + (v == null ? '<span class="small">sem vendas</span>' : v >= meta ? '<span class="tag-ok">● Na meta</span>' : '<span class="tag-bad">▲ Abaixo</span>') + '</div></div>';
+  html += '<section class="card"><div class="stack"><h2>Indicadores</h2><span class="small">Comparados com a meta e com a média da loja</span></div><div class="dgrid three">' +
+    ind('P.A.', m.pa, M.pa, ml.pa, dec1) + ind('Ticket médio', m.tm, M.tm, ml.tm, brl) + ind('Conversão', m.conv, M.conv, ml.conv, v => pct(v)) + '</div></section>';
+  // produtos vendidos
+  const cats = CONFIG.categories.filter(k => !k.archived).map(k => { const ps = k.products.filter(x => !x.archived); const tot = ps.reduce((a, x) => a + (m[x.id] || 0), 0);
+    return '<div class="pcat"><div class="row"><strong>' + esc(k.name) + '</strong><span class="small">' + tot + (tot === 1 ? ' item' : ' itens') + '</span></div>' +
+      ps.map(x => '<div class="prow' + ((m[x.id] || 0) ? '' : ' zero') + '"><span>' + esc(x.name) + '</span><strong>' + (m[x.id] || 0) + '</strong></div>').join('') + '</div>'; }).join('');
+  html += '<section class="card"><div class="stack"><h2>Produtos vendidos</h2><span class="small">Quantidade no mês até hoje</span></div><div class="pcats">' + cats + '</div></section>';
+  html += prodCard(m, sid, pid, mk, 'Cotas de produtos');
+  // dias
+  html += '<section class="card"><h2>Dias</h2><div class="dgrid">' + stat('Dias lançados', lanc, '<span class="small">de ' + c.t + ' até hoje</span>') + stat('Folgas', folgas, '') +
+    stat('Sem lançamento', falta, falta ? '<span class="small c-warn" style="font-weight:700">confira</span>' : '') + stat('Dias com venda', comVenda, '') +
+    stat('Maior dia', maior ? brl(maior) : '–', maiorD ? '<span class="small">' + dlabel(maiorD) + '</span>' : '') + stat('Trabalha no mês', daysOf(mk, sid, pid) + ' dias', '') + '</div></section>';
+  // análise automática
+  const obs = [];
+  if (q && proj) obs.push(proj >= q ? 'No ritmo atual, fecha o mês com ' + pct(proj / q * 100) + ' da cota.' : 'No ritmo atual, fecha o mês com ' + pct(proj / q * 100) + ' da cota. Faltam ' + brl(Math.max(0, q - m.venda)) + '.');
+  if (m.pa != null && m.pa < M.pa) obs.push('P.A. de ' + dec1(m.pa) + ' está abaixo da meta (' + dec1(M.pa) + '): vale reforçar a venda de itens adicionais (travesseiro, protetor, base).');
+  if (m.tm != null && m.tm < M.tm) obs.push('Ticket médio abaixo da meta: ' + brl(m.tm) + ' contra ' + brl(M.tm) + '.');
+  if (m.conv != null && m.conv < M.conv) obs.push('Conversão de ' + pct(m.conv) + ', abaixo da meta de ' + M.conv + '%.');
+  if (m.conv != null && ml.conv != null && m.conv > ml.conv + 5) obs.push('Converte melhor que a média da loja (' + pct(m.conv) + ' contra ' + pct(ml.conv) + ').');
+  if (m.atend + m.ret && ml.atend + ml.ret){ const share = (m.atend + m.ret) / (ml.atend + ml.ret) * 100; if (share < 100 / nAtivos * 0.7) obs.push('Atendeu ' + pct(share) + ' dos clientes da loja, menos que a média esperada (' + pct(100 / nAtivos) + ').'); }
+  if (falta) obs.push(falta + (falta === 1 ? ' dia sem lançamento' : ' dias sem lançamento') + ' no mês. Confira na aba de lançamentos.');
+  if (!obs.length) obs.push('Tudo dentro das metas até agora.');
+  html += '<section class="card"><h2>Análise</h2><ul class="obs">' + obs.map(o => '<li>' + o + '</li>').join('') + '</ul></section>';
+  return html + chart(sid, [pid], c);
 }
 function storeGrid(sid, mk){
   const c = ctx(mk), ps = sellersOf(sid); let rows = '';
@@ -1071,6 +1146,7 @@ function gerStore(sid, mk){
   else fix += '<div class="grid2"><label class="field" for="fx-p">Vendedor<select id="fx-p">' + ps.map(p => '<option value="' + p.id + '">' + esc(p.name) + '</option>').join('') + '</select></label><label class="field" for="fx-d">Dia<select id="fx-d">' +
     Array.from({length:c.t}, (_, i) => c.t - i).map(d => '<option value="' + dateOf(mk, d) + '">' + dlabel(dateOf(mk, d)) + '</option>').join('') + '</select></label></div><button class="btn" data-act="fix-pick" style="align-self:flex-start">Abrir lançamento</button>';
   fix += '</div></details>';
+  if (ui.sellerView && ui.sellerView.sid === sid) return storeDash(sid, mk, 'gerencia');
   return '<div class="split"><div class="main">' + storeDash(sid, mk, 'gerencia') + '</div><div class="side">' + storeConf(sid, mk, 'gerencia') + '</div></div>' + storeGrid(sid, mk) + fix;
 }
 function network(mk){
@@ -1378,7 +1454,7 @@ document.addEventListener('click', async ev => {
     case 'refresh': try { await refresh(); await flushOutbox(); render(); toast('Dados atualizados'); } catch (e) { render(); toast(e.message || 'Sem conexão com a planilha.'); } break;
     case 'flush': try { await refresh(); } catch (e) {} await flushOutbox(); render(); if (OFFLINE) toast('Ainda sem internet. Os lançamentos continuam guardados.'); break;
     case 'demo-net': DEMO_NET_DOWN = !DEMO_NET_DOWN; if (!DEMO_NET_DOWN){ OFFLINE = false; await flushOutbox(); } render(); toast(DEMO_NET_DOWN ? 'Internet desligada (simulação)' : 'Internet ligada de novo (simulação)'); break;
-    case 'tab': EDITOR = null; go({tab:d.tab, editDate:null, fix:null}); if (d.tab === 'config' && SESSION.role === 'gerencia' && !PINS){ await loadPins(); render(); } break;
+    case 'tab': EDITOR = null; go({tab:d.tab, editDate:null, fix:null, sellerView:null}); if (d.tab === 'config' && SESSION.role === 'gerencia' && !PINS){ await loadPins(); render(); } break;
     case 'inc': case 'dec': { const f = d.f; draft[f] = Math.max(0, (draft[f] || 0) + (a === 'inc' ? 1 : -1)); const i = document.querySelector('input.n[data-f="' + f + '"]'); if (i) i.value = draft[f]; keepDraft(); refreshLive(); break; }
     case 'save': saveDraft(false); break;
     case 'folga': saveDraft(true); break;
@@ -1386,7 +1462,9 @@ document.addEventListener('click', async ev => {
     case 'hist-back': EDITOR = null; go({editDate:null}); break;
     case 'ask-fix': askFix(SESSION.store, SESSION.seller, d.date); break;
     case 'month': { const nm = addMonths(ui.month, +d.d); if (nm > (ui.tab === 'config' ? addMonths(mkOf(TODAY), 1) : mkOf(TODAY))) return; ui.month = nm; if (!LOADED.has(nm)){ try { await loadData([nm]); } catch (e) { toast('Sem conexão com a planilha.'); } } render(); break; }
-    case 'open-store': go({tab:'lojas', store:d.store, fix:null}); break;
+    case 'open-store': go({tab:'lojas', store:d.store, fix:null, sellerView:null}); break;
+    case 'seller-detail': EDITOR = null; ui.sellerView = {sid:d.store, pid:d.pid}; render(); window.scrollTo(0, 0); break;
+    case 'seller-close': ui.sellerView = null; render(); window.scrollTo(0, 0); break;
     case 'pick-ger-store': EDITOR = null; go({store:d.store, fix:null}); break;
     case 'fix-pick': EDITOR = null; ui.fix = {sid:ui.store, pid:$('#fx-p').value, date:$('#fx-d').value}; render(); setTimeout(() => { const f = $('#fix-box'); if (f) f.scrollIntoView({behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'}); }, 50); break;
     case 'fix-open': {
@@ -1438,7 +1516,7 @@ document.addEventListener('change', ev => {
   const rs = ev.target.closest('select[data-change="retro-mk"], select[data-change="retro-pid"]');
   if (rs){ EDITOR = null; ui.retro = Object.assign({}, ui.retro, rs.id === 'retro-mk' ? {mk:rs.value, date:null} : {pid:rs.value, date:null}); render(); return; }
   const el = ev.target.closest('select[data-change="pick-ger-store"]'); if (!el) return;
-  EDITOR = null; go({store:el.value, fix:null});
+  EDITOR = null; go({store:el.value, fix:null, sellerView:null});
 });
 document.addEventListener('input', ev => {
   const el = ev.target; if (el.dataset.mask) applyMask(el);
