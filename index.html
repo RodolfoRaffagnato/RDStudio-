@@ -464,7 +464,7 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbxFWmJSaUHmr_zxxG3BK3yr
 /* ============================================================ */
 
 document.documentElement.lang = 'pt-BR';
-const APP_VER = '13';
+const APP_VER = '14';
 /* ajustes deste aparelho: tema, tamanho do texto, animações */
 let PREFS = (() => { try { return Object.assign({tema:'auto', texto:'normal', anim:'on'}, JSON.parse(localStorage.getItem('rd-prefs') || '{}')); } catch (e) { return {tema:'auto', texto:'normal', anim:'on'}; } })();
 function applyPrefs(){
@@ -491,6 +491,7 @@ const WD = ['dom','seg','ter','qua','qui','sex','sáb'];
 const WDL = ['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];
 const MESES = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
 const IC = {
+  menu:'<path d="M4 7h16M4 12h16M4 17h16"/>',
   edit:'<path d="M4 20h4L19 9l-4-4L4 16v4z"/>', chart:'<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
   list:'<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>', store:'<path d="M3 9l1-5h16l1 5M4 9v11h16V9M3 9h18M9 20v-6h6v6"/>',
   alert:'<path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/>',
@@ -837,7 +838,7 @@ function dezCard(C, sid, pids, c, anoant){
 function monthNav(){ const cur = mkOf(TODAY); return '<div class="mnav"><button class="linkbtn" data-act="month" data-d="-1" aria-label="Mês anterior">' + icon('left', 18) + '</button><strong>' + mlabel(ui.month) + '</strong><button class="linkbtn" data-act="month" data-d="1" aria-label="Próximo mês"' + (ui.month >= (ui.tab === 'config' ? addMonths(cur, 1) : cur) ? ' disabled' : '') + '>' + icon('right', 18) + '</button></div>'; }
 function band(o){
   return '<header class="band"><div class="band-in"><div class="row"><span class="brand"><img class="mark" src="' + MARK + '" alt="Studio do Sono">' + (o.title ? '<h1 class="inline">' + o.title + '</h1>' : '') + '</span>' +
-    (SESSION.role ? '<span class="row" style="gap:6px"><button class="linkbtn" data-act="refresh" aria-label="Atualizar dados">' + icon('refresh', 18) + '</button><button class="linkbtn" data-act="settings" aria-label="Ajustes">' + icon('gear', 18) + '</button><button class="linkbtn" data-act="logout">Sair</button></span>' : '') + '</div>' +
+    (SESSION.role ? '<span class="row" style="gap:6px"><button class="linkbtn" data-act="refresh" aria-label="Atualizar dados">' + icon('refresh', 18) + '</button><button class="linkbtn" data-act="settings" aria-label="Menu e ajustes">' + icon('menu', 20) + '</button><button class="linkbtn" data-act="logout">Sair</button></span>' : '') + '</div>' +
     '<span class="sub">' + [o.eyebrow, o.sub, SESSION.role && LAST_AT && !OFFLINE ? 'atualizado às ' + pad(LAST_AT.getHours()) + ':' + pad(LAST_AT.getMinutes()) : ''].filter(Boolean).join(' · ') + '</span>' + (o.nav ? o.nav : '') + (o.month ? monthNav() : '') + (o.chip ? '<span class="chip">' + o.chip + '</span>' : '') + '</div></header>';
 }
 function topTabs(list){ return '<nav class="toptabs" aria-label="Seções">' + list.map(t => '<button class="tt" data-act="tab" data-tab="' + t[0] + '"' + (ui.tab === t[0] ? ' aria-current="page"' : '') + '>' + icon(t[2], 18) + t[1] + '</button>').join('') + '</nav>'; }
@@ -891,7 +892,7 @@ function viewStart(){
   }
   if (!CONFIG && s !== 'home') ui.step = 'home';
   const tile = (role, ic, t, sub) => '<button class="role-tile" data-act="role" data-role="' + role + '"><span class="ico">' + icon(ic, 24) + '</span><span class="t">' + t + '</span><span class="small">' + sub + '</span></button>';
-  return page('<header class="band welcome home"><div class="band-in"><div class="row"><img class="logo-full" src="' + LOGO + '" alt="Studio do Sono"><span class="row" style="gap:6px"><button class="linkbtn" data-act="install-help">' + icon('phone', 18) + ' Instalar</button><button class="linkbtn" data-act="settings" aria-label="Ajustes">' + icon('gear', 18) + '</button></span></div>' +
+  return page('<header class="band welcome home"><div class="band-in"><div class="row"><img class="logo-full" src="' + LOGO + '" alt="Studio do Sono"><span class="row" style="gap:6px"><button class="linkbtn" data-act="install-help">' + icon('phone', 18) + ' Instalar</button><button class="linkbtn" data-act="settings" aria-label="Menu e ajustes">' + icon('menu', 20) + '</button></span></div>' +
       '<span class="hello">' + greet() + '</span><h1>Resumo de Desempenho</h1><span class="sub">' + (DEMO ? 'Demonstração com os dados de setembro/26' : 'Lançamento diário e cotas das lojas') + '</span></div></header>',
     (!CONFIG ? '<div class="alert"><strong>O app ainda não foi configurado.</strong><span>A gerência geral precisa entrar primeiro para cadastrar as lojas.</span></div>' : '') +
     '<h2 class="sect">Como você vai entrar?</h2>' +
