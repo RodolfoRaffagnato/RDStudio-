@@ -446,6 +446,25 @@ ul.obs{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:8px;fon
 :root.txt-g body{zoom:1.12}
 :root.no-anim *,:root.no-anim *::before,:root.no-anim *::after{animation:none!important;transition:none!important}
 :root.no-anim .btn:active,:root.no-anim .sq:active,:root.no-anim .pill:active,:root.no-anim .choice:active,:root.no-anim .tab:active{transform:none}
+
+/* dezenas por vendedor */
+details.dzsel>summary{gap:12px;align-items:center}
+details.dzsel.store{border:1.5px solid var(--accent-soft)}
+.avatar.xs{width:40px;height:40px;border-radius:50%;background:var(--accent-soft);color:var(--accent-strong);font-weight:800;font-size:16px;display:flex;align-items:center;justify-content:center;flex:none}
+.dzps{display:flex;gap:6px;flex-wrap:wrap}
+.dzp{display:inline-flex;align-items:baseline;gap:4px;font-size:12px;font-weight:700;color:var(--muted);background:var(--surface2);border-radius:999px;padding:3px 10px}
+.dzp b{font-size:13px;font-weight:800}
+.dzp.c-good{color:var(--good)} .dzp.c-mid{color:var(--mid)} .dzp.c-warn{color:var(--warn)} .dzp.off{opacity:.55}
+details.dzsel .inner{gap:10px}
+details.dz{background:var(--surface2);border-radius:16px;overflow:hidden}
+details.dz>summary{list-style:none;display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer;min-height:56px}
+details.dz>summary::-webkit-details-marker{display:none}
+details.dz>summary .chev{transition:transform .15s;color:var(--muted)}
+details.dz[open]>summary .chev{transform:rotate(180deg)}
+details.dz .dzin{padding:0 14px 14px}
+details.dz .dstat{background:var(--surface)}
+.dz.pre{background:var(--surface2);border-radius:16px;padding:12px 14px;display:flex;flex-direction:column;gap:2px;opacity:.75}
+.dlt{font-size:12px;font-weight:700;color:var(--muted)} .dlt.up{color:var(--good)} .dlt.down{color:var(--warn)}
 </style>
 </head>
 <body>
@@ -464,7 +483,7 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbxFWmJSaUHmr_zxxG3BK3yr
 /* ============================================================ */
 
 document.documentElement.lang = 'pt-BR';
-const APP_VER = '14';
+const APP_VER = '15';
 /* ajustes deste aparelho: tema, tamanho do texto, animações */
 let PREFS = (() => { try { return Object.assign({tema:'auto', texto:'normal', anim:'on'}, JSON.parse(localStorage.getItem('rd-prefs') || '{}')); } catch (e) { return {tema:'auto', texto:'normal', anim:'on'}; } })();
 function applyPrefs(){
@@ -731,6 +750,12 @@ function cotaDia(C, sid, pids, date){
   return {z:z, a:r[0], b:r[1], cotaDez:cd, before:before, falta:cd - before, dias:r[1] - day + 1, dia:(cd - before) / (r[1] - day + 1)};
 }
 function elapsed(sid, pids, c){ if (!c.t) return 0; if (c.mk !== mkOf(TODAY)) return c.t; return pids.some(pid => ENTRIES[sid + '|' + pid + '|' + dateOf(c.mk, c.t)]) ? c.t : c.t - 1; }
+function metricsRange(sid, pids, mk, a, b){
+  const m = {}; allFields().forEach(f => { m[f] = b >= a ? sum(sid, pids, f, mk, a, b) : 0; });
+  const den = m.atend + m.ret, tv = m.vendas + m.ret; m.tv = tv;
+  m.pa = tv ? m.pecas / tv : null; m.tm = tv ? m.venda / tv : null; m.conv = den ? tv / den * 100 : null;
+  return m;
+}
 function metrics(sid, pids, c){
   const m = {}; allFields().forEach(f => { m[f] = sum(sid, pids, f, c.mk, 1, c.t); });
   const den = m.atend + m.ret, tv = m.vendas + m.ret; m.tv = tv;
@@ -1052,6 +1077,46 @@ function storeDash(sid, mk, who){
     (r.q ? bar(r.pct, pace, true) : '') + '<span class="row"><span class="small">' + (r.q ? 'Cota ' + brl(r.q) + ' · ' : '') + 'P.A. ' + (r.m.pa == null ? '–' : dec1(r.m.pa)) + ' · Ticket ' + (r.m.tm == null ? '–' : brl(r.m.tm)) + ' · Conversão ' + pct(r.m.conv) + '</span><span class="seemore">Ver detalhes' + icon('right', 16) + '</span></span></button>').join('') : '<div class="stepline small">Nenhum vendedor ativo.</div>') + '</section>';
   return html + kpiRow(m, sid) + prodCard(m, sid, null, mk, 'Cotas de produtos da loja') + chart(sid, pids, c);
 }
+/* ---------- dezenas por vendedor (gerente e gerência) ---------- */
+let DZ_OPEN = new Set();
+function dezView(sid, mk){
+  const c = ctx(mk), mc = mcfg(mk, sid), C = mc ? mc.cota || 0 : 0, M = metasOf(sid), sp = mc ? split(C, mk, sid) : {};
+  if (!c.t) return '<div class="info"><strong>' + mlabel(mk) + ' ainda não começou.</strong></div>';
+  const ps = sellersOf(sid).filter(p => daysOf(mk, sid, p.id) > 0);
+  const delta = (v, prev, fmt, unit) => v == null || prev == null ? '' : (() => { const d = v - prev; if (Math.abs(d) < 0.05) return '<span class="dlt">= igual à anterior</span>'; return '<span class="dlt ' + (d > 0 ? 'up' : 'down') + '">' + (d > 0 ? '▲ +' : '▼ ') + fmt(d) + (unit || '') + ' vs anterior</span>'; })();
+  const stat = (lbl, v, sub, cls) => '<div class="dstat"><span class="small">' + lbl + '</span><strong class="' + (cls || '') + '">' + v + '</strong>' + (sub || '') + '</div>';
+  const dezBlocks = (key, pids, q) => {
+    let prev = null;
+    return [1, 2, 3].map(z => {
+      const r = dezRange(z, c.D), fim = Math.min(r[1], c.t), state = c.t > r[1] ? 'fechada' : c.t >= r[0] ? 'em andamento' : 'prévia';
+      const cd = q ? dezCota(q, sid, pids, mk, z) : 0;
+      if (state === 'prévia') return '<div class="dz pre"><span class="row"><strong>' + z + 'ª dezena</strong><span class="small">começa ' + dlabel(dateOf(mk, r[0])) + '</span></span>' + (q ? '<span class="small">Cota prevista hoje: ' + brl(cd) + '</span>' : '') + '</div>';
+      const m = metricsRange(sid, pids, mk, r[0], fim), p = cd > 0 ? m.venda / cd * 100 : null, id = key + '-' + z;
+      let lanc = 0, tot = 0; pids.forEach(pid => { for (let d = r[0]; d <= fim; d++){ tot++; if (ENTRIES[sid + '|' + pid + '|' + dateOf(mk, d)]) lanc++; } });
+      const html = '<details class="dz" data-dz="' + id + '"' + (DZ_OPEN.has(id) ? ' open' : '') + '><summary><span class="stack" style="flex:1;min-width:0;gap:6px"><span class="row"><span class="row start" style="gap:8px"><strong>' + z + 'ª dezena</strong><span class="chip ' + (state === 'fechada' ? 'mute' : 'ok') + '">' + state + '</span></span>' +
+          (p != null ? '<strong class="' + tone(p, 100) + '">' + pct(p) + '</strong>' : '') + '</span>' + (p != null ? bar(p, null, true) : '') +
+          '<span class="small">Dias ' + r[0] + ' a ' + r[1] + ' · ' + brl(m.venda) + (cd > 0 ? ' de ' + brl(cd) : '') + '</span></span><span class="chev">' + icon('chev', 18) + '</span></summary>' +
+        '<div class="dzin"><div class="dgrid">' +
+          stat('Valor vendido', brl(m.venda), cd > 0 ? '<span class="small">cota ' + brl(cd) + '</span>' : '') +
+          stat('Atendimentos', m.atend, '<span class="small">clientes novos</span>') + stat('Retornos', m.ret, '<span class="small">voltaram e compraram</span>') +
+          stat('Vendas', m.vendas, '<span class="small">pedidos de novos</span>') + stat('Total de vendas', m.tv, '<span class="small">vendas + retornos</span>') + stat('Peças', m.pecas, '') +
+          stat('P.A.', m.pa == null ? '–' : dec1(m.pa), '<span class="small">meta ' + dec1(M.pa) + '</span>' + (prev ? delta(m.pa, prev.pa, v => dec1(Math.abs(v))) : ''), tone(m.pa, M.pa)) +
+          stat('Ticket médio', m.tm == null ? '–' : brl(m.tm), '<span class="small">meta ' + brl(M.tm) + '</span>' + (prev ? delta(m.tm, prev.tm, v => brl(Math.abs(v))) : ''), tone(m.tm, M.tm)) +
+          stat('Conversão', m.conv == null ? '–' : pct(m.conv), '<span class="small">meta ' + M.conv + '%</span>' + (prev ? delta(m.conv, prev.conv, v => Math.abs(v).toFixed(0).replace('.', ','), ' pts') : ''), tone(m.conv, M.conv)) +
+          stat('Dias lançados', lanc + ' de ' + tot, lanc < tot && state === 'fechada' ? '<span class="small c-warn" style="font-weight:700">faltam lançamentos</span>' : '') +
+        '</div></div></details>';
+      prev = m; return html;
+    }).join('');
+  };
+  const pill = (z, pids, q) => { const r = dezRange(z, c.D); if (c.t < r[0]) return '<span class="dzp off">' + z + 'ª</span>'; const cd = q ? dezCota(q, sid, pids, mk, z) : 0, v = sum(sid, pids, 'venda', mk, r[0], Math.min(r[1], c.t)), p = cd > 0 ? v / cd * 100 : null; return '<span class="dzp ' + (p == null ? '' : tone(p, 100)) + '">' + z + 'ª <b>' + (p == null ? '–' : pct(p)) + '</b></span>'; };
+  const block = (key, name, sub, pids, q, isStore) => '<details class="grp dzsel' + (isStore ? ' store' : '') + '" data-dz="' + key + '"' + (DZ_OPEN.has(key) ? ' open' : '') + '><summary><span class="avatar xs">' + (isStore ? icon('store', 18) : esc(name).slice(0, 1).toUpperCase()) + '</span><span class="stack" style="flex:1;min-width:0;gap:6px"><span class="row"><strong>' + esc(name) + '</strong><span class="small">' + sub + '</span></span><span class="dzps">' + pill(1, pids, q) + pill(2, pids, q) + pill(3, pids, q) + '</span></span><span class="chev">' + icon('chev', 20) + '</span></summary>' +
+    '<div class="inner">' + dezBlocks(key, pids, q) + '</div></details>';
+  const allp = ps.map(p => p.id);
+  return '<section class="card"><div class="stack"><h2>Dezenas por vendedor</h2><span class="small">' + mlabel(mk) + (c.t < c.D ? ' · até ' + dlabel(dateOf(mk, c.t)) : '') + '. Toque no vendedor para abrir as dezenas e na dezena para ver os números. O % é sobre a cota de cada dezena.</span></div></section>' +
+    block('loja', 'Loja inteira', brl(sum(sid, allp, 'venda', mk, 1, c.t)), allp, C, true) +
+    ps.map(p => block(p.id, p.name, brl(sum(sid, [p.id], 'venda', mk, 1, c.t)), [p.id], sp[p.id] ? sp[p.id].v : 0, false)).join('') +
+    (ps.length ? '' : '<div class="info">Nenhum vendedor ativo neste mês.</div>');
+}
 /* ---------- detalhe de um vendedor (gerente e gerência) ---------- */
 function sellerDetail(sid, pid, mk, who){
   const c = ctx(mk), st = store(sid), p = st.sellers.filter(x => x.id === pid)[0], allp = sellersOf(sid).map(x => x.id);
@@ -1126,9 +1191,9 @@ function viewGerente(){
   const sid = SESSION.store, st = store(sid); if (!st){ SESSION = {}; saveSession(); return viewStart(); }
   if (!ui.month || ui.month > mkOf(TODAY)) ui.month = mkOf(TODAY);
   const tab = ui.tab || 'loja', mk = ui.month, n = storeAlerts(sid, mkOf(TODAY)).length;
-  const body = tab === 'loja' ? storeDash(sid, mk, 'gerente') : tab === 'grid' ? storeGrid(sid, mk) : tab === 'retro' ? retroView(sid) : storeConf(sid, mkOf(TODAY), 'gerente');
-  const tl = [['loja', 'Loja', 'store'], ['grid', 'Lançamentos', 'list'], ['retro', 'Retroativo', 'edit'], ['conf', 'Conferência' + (n ? ' (' + n + ')' : ''), 'alert']];
-  return page(band({eyebrow:'Gerente da loja', title:esc(st.name), sub:dlong(TODAY) + ' · ' + sellersOf(sid).length + ' vendedores', month: tab === 'loja' || tab === 'grid'}), body, tabs(tl));
+  const body = tab === 'loja' ? storeDash(sid, mk, 'gerente') : tab === 'grid' ? storeGrid(sid, mk) : tab === 'dez' ? dezView(sid, mk) : tab === 'retro' ? retroView(sid) : storeConf(sid, mkOf(TODAY), 'gerente');
+  const tl = [['loja', 'Loja', 'store'], ['dez', 'Dezenas', 'chart'], ['grid', 'Dias', 'list'], ['retro', 'Retroativo', 'edit'], ['conf', 'Conferência' + (n ? ' (' + n + ')' : ''), 'alert']];
+  return page(band({eyebrow:'Gerente da loja', title:esc(st.name), sub:dlong(TODAY) + ' · ' + sellersOf(sid).length + ' vendedores', month: tab === 'loja' || tab === 'grid' || tab === 'dez'}), body, tabs(tl));
 }
 function retroView(sid){
   const ms = retroMonths();
@@ -1173,7 +1238,7 @@ function gerStore(sid, mk){
     Array.from({length:c.t}, (_, i) => c.t - i).map(d => '<option value="' + dateOf(mk, d) + '">' + dlabel(dateOf(mk, d)) + '</option>').join('') + '</select></label></div><button class="btn" data-act="fix-pick" style="align-self:flex-start">Abrir lançamento</button>';
   fix += '</div></details>';
   if (ui.sellerView && ui.sellerView.sid === sid) return storeDash(sid, mk, 'gerencia');
-  return '<div class="split"><div class="main">' + storeDash(sid, mk, 'gerencia') + '</div><div class="side">' + storeConf(sid, mk, 'gerencia') + '</div></div>' + storeGrid(sid, mk) + fix;
+  return '<div class="split"><div class="main">' + storeDash(sid, mk, 'gerencia') + '</div><div class="side">' + storeConf(sid, mk, 'gerencia') + '</div></div>' + dezView(sid, mk) + storeGrid(sid, mk) + fix;
 }
 function network(mk){
   const tot = {v:0, c:0, p:0}; let pace = 0;
@@ -1565,6 +1630,7 @@ document.addEventListener('beforeinput', ev => {
   else return;
   el.value = d; applyMask(el); el.dispatchEvent(new Event('input', {bubbles:true}));
 });
+document.addEventListener('toggle', ev => { const el = ev.target; if (!el || !el.matches || !el.matches('details[data-dz]')) return; const k = el.dataset.dz; if (el.open) DZ_OPEN.add(k); else DZ_OPEN.delete(k); }, true);
 document.addEventListener('change', ev => {
   if (ev.target.id === 'm-padrao'){ const o = $('#m-own'); if (o) o.classList.toggle('dim', ev.target.checked); return; }
   const rs = ev.target.closest('select[data-change="retro-mk"], select[data-change="retro-pid"]');
